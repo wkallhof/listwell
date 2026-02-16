@@ -59,6 +59,8 @@ export function ListingCard({
               <img
                 src={primaryImageUrl}
                 alt={title ?? "Listing image"}
+                loading="lazy"
+                decoding="async"
                 className="h-full w-full object-cover"
               />
             ) : (

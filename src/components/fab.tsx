@@ -13,7 +13,7 @@ export function FAB({ href = "/new" }: FABProps) {
 
   return (
     <Button
-      className="fixed bottom-6 right-5 z-50 h-14 w-14 rounded-full shadow-md"
+      className="fixed bottom-6 right-5 z-50 h-14 w-14 rounded-full shadow-md duration-100 ease-in-out active:scale-95"
       size="icon"
       onClick={() => router.push(href)}
       aria-label="Create new listing"

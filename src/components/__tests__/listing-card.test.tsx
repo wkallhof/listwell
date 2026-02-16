@@ -66,4 +66,12 @@ describe("ListingCard", () => {
 
     expect(screen.getByText("Untitled")).toBeInTheDocument();
   });
+
+  it("lazy loads the thumbnail image", () => {
+    render(<ListingCard {...defaultProps} />);
+
+    const img = screen.getByAltText("Vintage Camera");
+    expect(img).toHaveAttribute("loading", "lazy");
+    expect(img).toHaveAttribute("decoding", "async");
+  });
 });

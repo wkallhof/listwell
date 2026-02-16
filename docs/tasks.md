@@ -43,7 +43,7 @@
 - Phase 1: [x] Complete
 - Phase 2: [ ] Not Started
 - Phase 3: [ ] Not Started
-- Phase 4: [ ] Not Started
+- Phase 4: [x] Complete
 - Phase 5: [ ] Not Started
 - **MVP Status:** Not Started
 
@@ -542,9 +542,9 @@
 - [x] 4.3.3: Add loading and skeleton states across all screens
   - Screens: `docs/design-system.md` § Motion & Transitions
   - Test: Skeleton loading appears while data loads
-- [ ] 4.3.4: Optimize image loading (lazy loading, proper sizing, blur placeholders)
+- [x] 4.3.4: Optimize image loading (lazy loading, proper sizing, blur placeholders)
   - Test: Images load progressively, LCP improved
-- [ ] 4.3.5: Add mobile UX polish — FAB press scale, sheet transitions, smooth scrolling
+- [x] 4.3.5: Add mobile UX polish — FAB press scale, sheet transitions, smooth scrolling
   - Screens: `docs/design-system.md` § Motion & Transitions
   - Test: Animations match design system spec
 
@@ -723,8 +723,8 @@
 | 4.3.1 | 2026-02-15 | (batch) | Title-$Price inline + condition/brand/model |
 | 4.3.2 | 2026-02-15 | (batch) | Toasts aligned to spec table |
 | 4.3.3 | 2026-02-15 | (batch) | Feed + detail loading.tsx skeletons |
-| 4.3.4 |           |        |       |
-| 4.3.5 |           |        |       |
+| 4.3.4 | 2026-02-15 |        |       |
+| 4.3.5 | 2026-02-15 |        |       |
 | 5.1.1 |           |        |       |
 | 5.1.2 |           |        |       |
 | 5.1.3 |           |        |       |
