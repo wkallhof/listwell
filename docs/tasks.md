@@ -40,7 +40,7 @@
 ## Progress Summary
 
 - Phase 0: [x] Complete
-- Phase 1: [ ] Not Started
+- Phase 1: [x] Complete
 - Phase 2: [ ] Not Started
 - Phase 3: [ ] Not Started
 - Phase 4: [ ] Not Started
@@ -154,175 +154,175 @@
 
 ### 1.1 Authentication
 
-- [ ] 1.1.1: Install and configure BetterAuth with Drizzle adapter (PostgreSQL provider)
+- [x] 1.1.1: Install and configure BetterAuth with Drizzle adapter (PostgreSQL provider)
   - Files: src/lib/auth.ts, src/lib/auth-client.ts, package.json
   - Test: Auth instance created without errors
-- [ ] 1.1.2: Create BetterAuth API route handler
+- [x] 1.1.2: Create BetterAuth API route handler
   - Files: src/app/api/auth/[...all]/route.ts
   - Test: GET /api/auth/ok returns 200
-- [ ] 1.1.3: Generate and run BetterAuth database tables migration
+- [x] 1.1.3: Generate and run BetterAuth database tables migration
   - Files: src/db/schema.ts (add auth tables if needed), migrations/
   - Test: Auth tables exist in database
-- [ ] 1.1.4: Create auth middleware for protecting routes
+- [x] 1.1.4: Create auth middleware for protecting routes
   - Files: src/lib/auth-middleware.ts, src/middleware.ts
   - Test: Unauthenticated requests redirect to /login
-- [ ] 1.1.5: Build Login/Register screen with Tabs component
+- [x] 1.1.5: Build Login/Register screen with Tabs component
   - Files: src/app/login/page.tsx
   - Screens: `docs/screens.md` § Screen 1: Login/Register — `docs/design-system.md`
   - Test: Login and register forms render, tab switching works
-- [ ] 1.1.6: Implement login form submission with BetterAuth client
+- [x] 1.1.6: Implement login form submission with BetterAuth client
   - Files: src/app/login/page.tsx
   - Test: Successful login redirects to /, error shows inline message
-- [ ] 1.1.7: Implement register form submission with BetterAuth client
+- [x] 1.1.7: Implement register form submission with BetterAuth client
   - Files: src/app/login/page.tsx
   - Test: Successful registration redirects to /, error shows inline message
-- [ ] 1.1.8: Write tests for auth flow (login, register, protected routes)
+- [x] 1.1.8: Write tests for auth flow (login, register, protected routes)
   - Files: src/app/login/__tests__/page.test.tsx, src/lib/__tests__/auth.test.ts
   - Test: Tests pass with ≥80% coverage
 
 ### 1.2 Listings API
 
-- [ ] 1.2.1: Create listings API route — GET /api/listings (list all user listings)
+- [x] 1.2.1: Create listings API route — GET /api/listings (list all user listings)
   - Files: src/app/api/listings/route.ts
   - Test: Returns array of listings filtered by authenticated user, sorted by createdAt desc
-- [ ] 1.2.2: Create listings API route — POST /api/listings (create listing + upload images)
+- [x] 1.2.2: Create listings API route — POST /api/listings (create listing + upload images)
   - Files: src/app/api/listings/route.ts
   - Test: Creates listing record, uploads images to Vercel Blob, returns listing
-- [ ] 1.2.3: Create listing detail API route — GET /api/listings/[id]
+- [x] 1.2.3: Create listing detail API route — GET /api/listings/[id]
   - Files: src/app/api/listings/[id]/route.ts
   - Test: Returns full listing with images, only if owned by authenticated user
-- [ ] 1.2.4: Create listing update API route — PATCH /api/listings/[id]
+- [x] 1.2.4: Create listing update API route — PATCH /api/listings/[id]
   - Files: src/app/api/listings/[id]/route.ts
   - Test: Updates listing fields (status, manual edits), validates ownership
-- [ ] 1.2.5: Create listing delete API route — DELETE /api/listings/[id]
+- [x] 1.2.5: Create listing delete API route — DELETE /api/listings/[id]
   - Files: src/app/api/listings/[id]/route.ts
   - Test: Deletes listing and associated images from DB and Vercel Blob
-- [ ] 1.2.6: Create image delete API route — DELETE /api/listings/[id]/images
+- [x] 1.2.6: Create image delete API route — DELETE /api/listings/[id]/images
   - Files: src/app/api/listings/[id]/images/route.ts
   - Test: Deletes specific enhanced image variant, validates ownership
-- [ ] 1.2.7: Implement Vercel Blob upload helper for listing images
+- [x] 1.2.7: Implement Vercel Blob upload helper for listing images
   - Files: src/lib/blob.ts
   - Test: Upload function stores image and returns URL + key
-- [ ] 1.2.8: Write tests for all listings API routes
+- [x] 1.2.8: Write tests for all listings API routes
   - Files: src/app/api/listings/__tests__/route.test.ts, src/app/api/listings/[id]/__tests__/route.test.ts
   - Test: Tests pass with ≥80% coverage
 
 ### 1.3 Shared Components
 
-- [ ] 1.3.1: Create ListingStatusBadge component with status color mapping
+- [x] 1.3.1: Create ListingStatusBadge component with status color mapping
   - Files: src/components/listing-status-badge.tsx
   - Screens: `docs/screens.md` § Shared Components — `docs/design-system.md` § Status Colors
   - Test: Renders correct colors/icons for each status (DRAFT, PROCESSING, READY, LISTED, SOLD, ARCHIVED, ERROR)
-- [ ] 1.3.2: Create CopyButton component with clipboard + toast feedback
+- [x] 1.3.2: Create CopyButton component with clipboard + toast feedback
   - Files: src/components/copy-button.tsx
   - Screens: `docs/screens.md` § CopyButton — `docs/design-system.md`
   - Test: Copies text, shows Check icon for 2s, triggers Sonner toast
-- [ ] 1.3.3: Create BottomBar component (fixed bottom action container)
+- [x] 1.3.3: Create BottomBar component (fixed bottom action container)
   - Files: src/components/bottom-bar.tsx
   - Screens: `docs/screens.md` § BottomBar — `docs/design-system.md` § Bottom Action Bar
   - Test: Renders fixed at bottom with blur backdrop
-- [ ] 1.3.4: Create EmptyState component
+- [x] 1.3.4: Create EmptyState component
   - Files: src/components/empty-state.tsx
   - Screens: `docs/screens.md` § EmptyState — `docs/design-system.md`
   - Test: Renders icon, title, and description centered
-- [ ] 1.3.5: Create FAB (Floating Action Button) component
+- [x] 1.3.5: Create FAB (Floating Action Button) component
   - Files: src/components/fab.tsx
   - Screens: `docs/screens.md` § FAB — `docs/design-system.md` § Floating Action Button
   - Test: Renders fixed bottom-right with Plus icon
-- [ ] 1.3.6: Write tests for all shared components
+- [x] 1.3.6: Write tests for all shared components
   - Files: src/components/__tests__/*.test.tsx
   - Test: Tests pass with ≥80% coverage
 
 ### 1.4 Listings Feed Screen
 
-- [ ] 1.4.1: Create ListingCard component for feed display
+- [x] 1.4.1: Create ListingCard component for feed display
   - Files: src/components/listing-card.tsx
   - Screens: `docs/screens.md` § ListingCard Component — `docs/design-system.md`
   - Test: Renders thumbnail, title, price, status badge, pipeline progress, timeAgo
-- [ ] 1.4.2: Build Listings Feed page (home screen) with header, filter row, and cards
+- [x] 1.4.2: Build Listings Feed page (home screen) with header, filter row, and cards
   - Files: src/app/(authenticated)/page.tsx
   - Screens: `docs/screens.md` § Screen 2: Listings Feed — `docs/design-system.md`
   - Test: Fetches and displays listings, shows empty state when no listings
-- [ ] 1.4.3: Add overflow menu with logout action
+- [x] 1.4.3: Add overflow menu with logout action
   - Files: src/app/(authenticated)/page.tsx
   - Test: Dropdown shows, logout works
-- [ ] 1.4.4: Write tests for listings feed
+- [x] 1.4.4: Write tests for listings feed
   - Files: src/app/(authenticated)/__tests__/page.test.tsx, src/components/__tests__/listing-card.test.tsx
   - Test: Tests pass with ≥80% coverage
 
 ### 1.5 New Listing Flow
 
-- [ ] 1.5.1: Build New Listing — Capture screen with photo grid and camera/gallery buttons
+- [x] 1.5.1: Build New Listing — Capture screen with photo grid and camera/gallery buttons
   - Files: src/app/(authenticated)/new/page.tsx, src/components/image-grid.tsx
   - Screens: `docs/screens.md` § Screen 3: New Listing — Capture — `docs/design-system.md`
   - Test: Can add/remove photos (1-5), Take Photo triggers camera input, Choose from Library triggers gallery
-- [ ] 1.5.2: Build New Listing — Describe screen with text area and thumbnail strip
+- [x] 1.5.2: Build New Listing — Describe screen with text area and thumbnail strip
   - Files: src/app/(authenticated)/new/describe/page.tsx
   - Screens: `docs/screens.md` § Screen 4: New Listing — Describe — `docs/design-system.md`
   - Test: Text area works, thumbnail strip shows captured photos, Skip and Generate buttons work
-- [ ] 1.5.3: Implement listing submission flow (upload images to Blob, create listing via API)
+- [x] 1.5.3: Implement listing submission flow (upload images to Blob, create listing via API)
   - Files: src/app/(authenticated)/new/describe/page.tsx, src/lib/listing-actions.ts
   - Test: Photos uploaded to Vercel Blob, listing created in DB with status DRAFT
-- [ ] 1.5.4: Build New Listing — Submitted confirmation screen
+- [x] 1.5.4: Build New Listing — Submitted confirmation screen
   - Files: src/app/(authenticated)/new/submitted/page.tsx
   - Screens: `docs/screens.md` § Screen 5: New Listing — Submitted — `docs/design-system.md`
   - Test: Shows confirmation message, "Back to Listings" navigates to feed
-- [ ] 1.5.5: Create state management for multi-step new listing flow (photos + description across screens)
+- [x] 1.5.5: Create state management for multi-step new listing flow (photos + description across screens)
   - Files: src/lib/new-listing-context.tsx
   - Test: State persists across capture → describe → submit
-- [ ] 1.5.6: Write tests for new listing flow
+- [x] 1.5.6: Write tests for new listing flow
   - Files: src/app/(authenticated)/new/__tests__/*.test.tsx
   - Test: Tests pass with ≥80% coverage
 
 ### 1.6 Listing Detail Screen
 
-- [ ] 1.6.1: Build image carousel component with scroll-snap and dot indicators
+- [x] 1.6.1: Build image carousel component with scroll-snap and dot indicators
   - Files: src/components/image-carousel.tsx
   - Screens: `docs/screens.md` § Image Carousel — `docs/design-system.md` § Image Display Conventions
   - Test: Swipe between images, dots indicate current image
-- [ ] 1.6.2: Build Listing Detail — Ready page with all sections
+- [x] 1.6.2: Build Listing Detail — Ready page with all sections
   - Sections: status badge, title + copy, price card, description + copy, product details grid, comparables list, market notes
   - Files: src/app/(authenticated)/listings/[id]/page.tsx
   - Screens: `docs/screens.md` § Screen 7: Listing Detail — Ready — `docs/design-system.md`
   - Test: All sections render with listing data
-- [ ] 1.6.3: Implement "Copy Full Listing" bottom bar action
+- [x] 1.6.3: Implement "Copy Full Listing" bottom bar action
   - Files: src/app/(authenticated)/listings/[id]/page.tsx
   - Test: Copies formatted title + price + description to clipboard, shows toast
-- [ ] 1.6.4: Implement dropdown menu actions (Mark as Listed, Mark as Sold, Archive, Delete)
+- [x] 1.6.4: Implement dropdown menu actions (Mark as Listed, Mark as Sold, Archive, Delete)
   - Files: src/app/(authenticated)/listings/[id]/page.tsx
   - Test: Status updates via PATCH, delete shows confirmation dialog then deletes
-- [ ] 1.6.5: Build delete listing confirmation dialog
+- [x] 1.6.5: Build delete listing confirmation dialog
   - Files: src/app/(authenticated)/listings/[id]/page.tsx
   - Screens: `docs/screens.md` § Confirmation Dialogs — Delete Listing
   - Test: Dialog shows, cancel dismisses, confirm deletes and navigates to feed
-- [ ] 1.6.6: Write tests for listing detail screen
+- [x] 1.6.6: Write tests for listing detail screen
   - Files: src/app/(authenticated)/listings/[id]/__tests__/page.test.tsx
   - Test: Tests pass with ≥80% coverage
 
 ### 1.7 PWA Configuration
 
-- [ ] 1.7.1: Create web app manifest with Listwell branding and design system colors
+- [x] 1.7.1: Create web app manifest with Listwell branding and design system colors
   - Files: src/app/manifest.ts
   - Screens: `docs/design-system.md` § Color Tokens
   - Test: Manifest accessible at /manifest.webmanifest
-- [ ] 1.7.2: Create service worker shell for basic asset caching
+- [x] 1.7.2: Create service worker shell for basic asset caching
   - Files: public/sw.js
   - Test: Service worker registers on page load
-- [ ] 1.7.3: Add viewport meta tags for edge-to-edge display on notched phones
+- [x] 1.7.3: Add viewport meta tags for edge-to-edge display on notched phones
   - Files: src/app/layout.tsx
   - Test: viewport-fit=cover applied, safe area insets respected
 
 **Phase 1 Checkpoint:**
 
-- [ ] User can register and log in with email/password
-- [ ] Listings feed displays all user listings with status badges
-- [ ] User can capture photos, describe item, and submit a new listing
-- [ ] Listing detail shows all generated content with copy functionality
-- [ ] PWA manifest and service worker are functional
-- [ ] App is responsive and follows design system
-- [ ] All tests pass with ≥80% code coverage on Phase 1 code
-- [ ] No TypeScript errors
-- [ ] Commit: "feat: complete auth and core CRUD (Phase 1)"
+- [x] User can register and log in with email/password
+- [x] Listings feed displays all user listings with status badges
+- [x] User can capture photos, describe item, and submit a new listing
+- [x] Listing detail shows all generated content with copy functionality
+- [x] PWA manifest and service worker are functional
+- [x] App is responsive and follows design system
+- [x] All tests pass with ≥80% code coverage on Phase 1 code
+- [x] No TypeScript errors
+- [x] Commit: "feat: complete auth and core CRUD (Phase 1)"
 
 ---
 
@@ -634,47 +634,47 @@
 | 0.5.1 | 2026-02-15 | (phase commit) | All 10 env vars documented |
 | 0.5.2 | 2026-02-15 | (phase commit) | Local dev values |
 | 0.5.3 | 2026-02-15 | (phase commit) | Next.js + env + coverage ignores |
-| 1.1.1 |           |        |       |
-| 1.1.2 |           |        |       |
-| 1.1.3 |           |        |       |
-| 1.1.4 |           |        |       |
-| 1.1.5 |           |        |       |
-| 1.1.6 |           |        |       |
-| 1.1.7 |           |        |       |
-| 1.1.8 |           |        |       |
-| 1.2.1 |           |        |       |
-| 1.2.2 |           |        |       |
-| 1.2.3 |           |        |       |
-| 1.2.4 |           |        |       |
-| 1.2.5 |           |        |       |
-| 1.2.6 |           |        |       |
-| 1.2.7 |           |        |       |
-| 1.2.8 |           |        |       |
-| 1.3.1 |           |        |       |
-| 1.3.2 |           |        |       |
-| 1.3.3 |           |        |       |
-| 1.3.4 |           |        |       |
-| 1.3.5 |           |        |       |
-| 1.3.6 |           |        |       |
-| 1.4.1 |           |        |       |
-| 1.4.2 |           |        |       |
-| 1.4.3 |           |        |       |
-| 1.4.4 |           |        |       |
-| 1.5.1 |           |        |       |
-| 1.5.2 |           |        |       |
-| 1.5.3 |           |        |       |
-| 1.5.4 |           |        |       |
-| 1.5.5 |           |        |       |
-| 1.5.6 |           |        |       |
-| 1.6.1 |           |        |       |
-| 1.6.2 |           |        |       |
-| 1.6.3 |           |        |       |
-| 1.6.4 |           |        |       |
-| 1.6.5 |           |        |       |
-| 1.6.6 |           |        |       |
-| 1.7.1 |           |        |       |
-| 1.7.2 |           |        |       |
-| 1.7.3 |           |        |       |
+| 1.1.1 | 2026-02-15 | (batch) | BetterAuth + Drizzle adapter |
+| 1.1.2 | 2026-02-15 | (batch) | Auth catch-all route handler |
+| 1.1.3 | 2026-02-15 | (batch) | Auth tables in schema.ts + push |
+| 1.1.4 | 2026-02-15 | (batch) | Middleware + route protection |
+| 1.1.5 | 2026-02-15 | (batch) | Login/Register page w/ Tabs |
+| 1.1.6 | 2026-02-15 | (batch) | Login form + BetterAuth client |
+| 1.1.7 | 2026-02-15 | (batch) | Register form + validation |
+| 1.1.8 | 2026-02-15 | (batch) | 46 tests passing |
+| 1.2.1 | 2026-02-15 | (batch) | GET /api/listings |
+| 1.2.2 | 2026-02-15 | (batch) | POST /api/listings + Blob upload |
+| 1.2.3 | 2026-02-15 | (batch) | GET /api/listings/[id] |
+| 1.2.4 | 2026-02-15 | (batch) | PATCH /api/listings/[id] |
+| 1.2.5 | 2026-02-15 | (batch) | DELETE /api/listings/[id] + Blob cleanup |
+| 1.2.6 | 2026-02-15 | (batch) | DELETE /api/listings/[id]/images |
+| 1.2.7 | 2026-02-15 | (batch) | Blob upload/delete helpers |
+| 1.2.8 | 2026-02-15 | (batch) | 20 API + blob tests |
+| 1.3.1 | 2026-02-15 | (batch) | ListingStatusBadge w/ 7 statuses |
+| 1.3.2 | 2026-02-15 | (batch) | CopyButton w/ clipboard + toast |
+| 1.3.3 | 2026-02-15 | (batch) | BottomBar fixed container |
+| 1.3.4 | 2026-02-15 | (batch) | EmptyState centered placeholder |
+| 1.3.5 | 2026-02-15 | (batch) | FAB floating action button |
+| 1.3.6 | 2026-02-15 | (batch) | 23 component tests |
+| 1.4.1 | 2026-02-15 | (batch) | ListingCard component |
+| 1.4.2 | 2026-02-15 | (batch) | Feed page w/ server fetch |
+| 1.4.3 | 2026-02-15 | (batch) | Overflow menu + logout |
+| 1.4.4 | 2026-02-15 | (batch) | 9 feed + card tests |
+| 1.5.1 | 2026-02-15 | (batch) | Capture page + ImageGrid |
+| 1.5.2 | 2026-02-15 | (batch) | Describe page w/ textarea + thumbnails |
+| 1.5.3 | 2026-02-15 | (batch) | createListing server action |
+| 1.5.4 | 2026-02-15 | (batch) | Submitted confirmation page |
+| 1.5.5 | 2026-02-15 | (batch) | NewListingProvider context |
+| 1.5.6 | 2026-02-15 | (batch) | 32 new listing flow tests |
+| 1.6.1 | 2026-02-15 | (batch) | ImageCarousel w/ scroll-snap + dots |
+| 1.6.2 | 2026-02-15 | (batch) | Full detail page w/ all sections |
+| 1.6.3 | 2026-02-15 | (batch) | Copy Full Listing + formatter |
+| 1.6.4 | 2026-02-15 | (batch) | Dropdown menu status actions |
+| 1.6.5 | 2026-02-15 | (batch) | AlertDialog delete confirmation |
+| 1.6.6 | 2026-02-15 | (batch) | 17 detail + carousel + formatter tests |
+| 1.7.1 | 2026-02-15 | (batch) | PWA manifest w/ branding |
+| 1.7.2 | 2026-02-15 | (batch) | Service worker asset caching |
+| 1.7.3 | 2026-02-15 | (batch) | Viewport meta + SW registration |
 | 2.1.1 |           |        |       |
 | 2.1.2 |           |        |       |
 | 2.1.3 |           |        |       |
