@@ -44,7 +44,7 @@
 - Phase 2: [x] Complete
 - Phase 3: [ ] Not Started
 - Phase 4: [x] Complete
-- Phase 5: [ ] Not Started
+- Phase 5: [x] Complete
 - **MVP Status:** Not Started
 
 ---
@@ -591,17 +591,17 @@
   - Files: src/lib/ai/enhancement-prompt.ts
   - Ref: `docs/selling-strategy.md` § Image Enhancement Guidance, § Category-Specific Notes
   - Test: Enhancement prompts include category-specific instructions
-- [ ] 5.2.2: Add listing quality score / checklist on detail screen
+- [x] 5.2.2: Add listing quality score / checklist on detail screen
   - Files: src/components/listing-quality.tsx, src/app/(authenticated)/listings/[id]/page.tsx
   - Test: Quality score reflects completeness of listing (photos, description length, price research)
 
 **Phase 5 Checkpoint:**
 
-- [ ] Generated listings follow full selling strategy guide
-- [ ] Market notes include pricing tactics and platform-specific advice
-- [ ] Image enhancement uses category-aware prompts
-- [ ] All tests pass with ≥80% code coverage
-- [ ] Commit: "feat: complete listing intelligence (Phase 5)"
+- [x] Generated listings follow full selling strategy guide
+- [x] Market notes include pricing tactics and platform-specific advice
+- [x] Image enhancement uses category-aware prompts
+- [x] All tests pass with ≥80% code coverage
+- [x] Commit: "feat: complete listing intelligence (Phase 5)"
 
 ---
 
@@ -730,4 +730,4 @@
 | 5.1.3 | 2026-02-16 | (batch) | FB/eBay/CL platform tips in prompt |
 | 5.1.4 | 2026-02-16 | (batch) | Relisting reminder with ALWAYS instruction |
 | 5.2.1 | 2026-02-16 | (batch) | Category-aware Gemini enhancement prompts |
-| 5.2.2 |           |        |       |
+| 5.2.2 | 2026-02-16 | (batch) | ListingQuality component + detail page integration |
