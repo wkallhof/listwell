@@ -182,28 +182,28 @@
 
 ### 1.2 Listings API
 
-- [ ] 1.2.1: Create listings API route — GET /api/listings (list all user listings)
+- [x] 1.2.1: Create listings API route — GET /api/listings (list all user listings)
   - Files: src/app/api/listings/route.ts
   - Test: Returns array of listings filtered by authenticated user, sorted by createdAt desc
-- [ ] 1.2.2: Create listings API route — POST /api/listings (create listing + upload images)
+- [x] 1.2.2: Create listings API route — POST /api/listings (create listing + upload images)
   - Files: src/app/api/listings/route.ts
   - Test: Creates listing record, uploads images to Vercel Blob, returns listing
-- [ ] 1.2.3: Create listing detail API route — GET /api/listings/[id]
+- [x] 1.2.3: Create listing detail API route — GET /api/listings/[id]
   - Files: src/app/api/listings/[id]/route.ts
   - Test: Returns full listing with images, only if owned by authenticated user
-- [ ] 1.2.4: Create listing update API route — PATCH /api/listings/[id]
+- [x] 1.2.4: Create listing update API route — PATCH /api/listings/[id]
   - Files: src/app/api/listings/[id]/route.ts
   - Test: Updates listing fields (status, manual edits), validates ownership
-- [ ] 1.2.5: Create listing delete API route — DELETE /api/listings/[id]
+- [x] 1.2.5: Create listing delete API route — DELETE /api/listings/[id]
   - Files: src/app/api/listings/[id]/route.ts
   - Test: Deletes listing and associated images from DB and Vercel Blob
-- [ ] 1.2.6: Create image delete API route — DELETE /api/listings/[id]/images
+- [x] 1.2.6: Create image delete API route — DELETE /api/listings/[id]/images
   - Files: src/app/api/listings/[id]/images/route.ts
   - Test: Deletes specific enhanced image variant, validates ownership
-- [ ] 1.2.7: Implement Vercel Blob upload helper for listing images
+- [x] 1.2.7: Implement Vercel Blob upload helper for listing images
   - Files: src/lib/blob.ts
   - Test: Upload function stores image and returns URL + key
-- [ ] 1.2.8: Write tests for all listings API routes
+- [x] 1.2.8: Write tests for all listings API routes
   - Files: src/app/api/listings/__tests__/route.test.ts, src/app/api/listings/[id]/__tests__/route.test.ts
   - Test: Tests pass with ≥80% coverage
 
@@ -642,14 +642,14 @@
 | 1.1.6 | 2026-02-15 | (batch) | Login form + BetterAuth client |
 | 1.1.7 | 2026-02-15 | (batch) | Register form + validation |
 | 1.1.8 | 2026-02-15 | (batch) | 46 tests passing |
-| 1.2.1 |           |        |       |
-| 1.2.2 |           |        |       |
-| 1.2.3 |           |        |       |
-| 1.2.4 |           |        |       |
-| 1.2.5 |           |        |       |
-| 1.2.6 |           |        |       |
-| 1.2.7 |           |        |       |
-| 1.2.8 |           |        |       |
+| 1.2.1 | 2026-02-15 | (batch) | GET /api/listings |
+| 1.2.2 | 2026-02-15 | (batch) | POST /api/listings + Blob upload |
+| 1.2.3 | 2026-02-15 | (batch) | GET /api/listings/[id] |
+| 1.2.4 | 2026-02-15 | (batch) | PATCH /api/listings/[id] |
+| 1.2.5 | 2026-02-15 | (batch) | DELETE /api/listings/[id] + Blob cleanup |
+| 1.2.6 | 2026-02-15 | (batch) | DELETE /api/listings/[id]/images |
+| 1.2.7 | 2026-02-15 | (batch) | Blob upload/delete helpers |
+| 1.2.8 | 2026-02-15 | (batch) | 20 API + blob tests |
 | 1.3.1 |           |        |       |
 | 1.3.2 |           |        |       |
 | 1.3.3 |           |        |       |
