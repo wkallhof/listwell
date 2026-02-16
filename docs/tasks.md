@@ -44,7 +44,7 @@
 - Phase 2: [x] Complete
 - Phase 3: [x] Complete
 - Phase 4: [x] Complete
-- Phase 5: [ ] Not Started
+- Phase 5: [x] Complete
 - **MVP Status:** Not Started
 
 ---
@@ -569,39 +569,39 @@
 
 ### 5.1 Enhanced Prompts
 
-- [ ] 5.1.1: Refine consolidated agent system prompt with advanced selling strategy rules (the base selling strategy is integrated in Phase 2; this adds deeper category-specific tactics, seasonal timing, and cross-posting guidance)
+- [x] 5.1.1: Refine consolidated agent system prompt with advanced selling strategy rules (the base selling strategy is integrated in Phase 2; this adds deeper category-specific tactics, seasonal timing, and cross-posting guidance)
   - Files: src/lib/ai/prompts/listing-agent-prompt.ts
   - Ref: `docs/selling-strategy.md` — all sections
   - Test: Generated listings show improved category-specific tactics and market awareness
-- [ ] 5.1.2: Add pricing strategy suggestions in market notes (OBO, firm, bundle discount recommendations)
-  - Files: src/inngest/functions/generate-listing.ts
+- [x] 5.1.2: Add pricing strategy suggestions in market notes (OBO, firm, bundle discount recommendations)
+  - Files: src/lib/ai/prompts/listing-agent-prompt.ts
   - Ref: `docs/selling-strategy.md` § Pricing Strategy, § Market Notes Template
   - Test: Market notes include pricing tactic advice
-- [ ] 5.1.3: Add platform-specific optimization notes (Facebook Marketplace, eBay, Craigslist tips)
-  - Files: src/inngest/functions/generate-listing.ts
+- [x] 5.1.3: Add platform-specific optimization notes (Facebook Marketplace, eBay, Craigslist tips)
+  - Files: src/lib/ai/prompts/listing-agent-prompt.ts
   - Ref: `docs/selling-strategy.md` § Platform-Specific Optimization
   - Test: Market notes include platform-specific advice
-- [ ] 5.1.4: Add relisting reminder to market notes
+- [x] 5.1.4: Add relisting reminder to market notes
   - Ref: `docs/selling-strategy.md` § The Relisting Reminder
   - Test: Every market notes section includes relisting advice
 
 ### 5.2 Quality & Refinement
 
-- [ ] 5.2.1: Refine Gemini enhancement prompts based on category-specific guidance
+- [x] 5.2.1: Refine Gemini enhancement prompts based on category-specific guidance
   - Files: src/lib/ai/enhancement-prompt.ts
   - Ref: `docs/selling-strategy.md` § Image Enhancement Guidance, § Category-Specific Notes
   - Test: Enhancement prompts include category-specific instructions
-- [ ] 5.2.2: Add listing quality score / checklist on detail screen
+- [x] 5.2.2: Add listing quality score / checklist on detail screen
   - Files: src/components/listing-quality.tsx, src/app/(authenticated)/listings/[id]/page.tsx
   - Test: Quality score reflects completeness of listing (photos, description length, price research)
 
 **Phase 5 Checkpoint:**
 
-- [ ] Generated listings follow full selling strategy guide
-- [ ] Market notes include pricing tactics and platform-specific advice
-- [ ] Image enhancement uses category-aware prompts
-- [ ] All tests pass with ≥80% code coverage
-- [ ] Commit: "feat: complete listing intelligence (Phase 5)"
+- [x] Generated listings follow full selling strategy guide
+- [x] Market notes include pricing tactics and platform-specific advice
+- [x] Image enhancement uses category-aware prompts
+- [x] All tests pass with ≥80% code coverage
+- [x] Commit: "feat: complete listing intelligence (Phase 5)"
 
 ---
 
@@ -725,9 +725,9 @@
 | 4.3.3 | 2026-02-15 | (batch) | Feed + detail loading.tsx skeletons |
 | 4.3.4 | 2026-02-15 |        |       |
 | 4.3.5 | 2026-02-15 |        |       |
-| 5.1.1 |           |        |       |
-| 5.1.2 |           |        |       |
-| 5.1.3 |           |        |       |
-| 5.1.4 |           |        |       |
-| 5.2.1 |           |        |       |
-| 5.2.2 |           |        |       |
+| 5.1.1 | 2026-02-16 | (batch) | Category tactics, seasonal timing, cross-posting |
+| 5.1.2 | 2026-02-16 | (batch) | OBO/Firm/bundle pricing tactics in prompt |
+| 5.1.3 | 2026-02-16 | (batch) | FB/eBay/CL platform tips in prompt |
+| 5.1.4 | 2026-02-16 | (batch) | Relisting reminder with ALWAYS instruction |
+| 5.2.1 | 2026-02-16 | (batch) | Category-aware Gemini enhancement prompts |
+| 5.2.2 | 2026-02-16 | (batch) | ListingQuality component + detail page integration |

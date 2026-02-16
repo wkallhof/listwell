@@ -41,6 +41,7 @@ import { ListingStatusBadge } from "@/components/listing-status-badge";
 import { CopyButton } from "@/components/copy-button";
 import { BottomBar } from "@/components/bottom-bar";
 import { PipelineSteps } from "@/components/pipeline-steps";
+import { ListingQuality } from "@/components/listing-quality";
 import { formatListingForClipboard } from "@/lib/listing-formatter";
 
 interface Comparable {
@@ -697,6 +698,17 @@ export default function ListingDetailPage() {
             </p>
           </div>
         )}
+
+        {/* Listing Quality Checklist */}
+        <ListingQuality
+          photoCount={listing.images.filter((img) => img.type === "ORIGINAL").length}
+          description={listing.description}
+          suggestedPrice={listing.suggestedPrice}
+          comparablesCount={listing.comparables?.length ?? 0}
+          brand={listing.brand}
+          condition={listing.condition}
+          researchNotes={listing.researchNotes}
+        />
       </div>
 
       {/* Bottom Action Bar */}

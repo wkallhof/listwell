@@ -4,50 +4,52 @@ interface EnhancementPromptInput {
   title?: string | null;
 }
 
-export function buildEnhancementPrompt(input?: EnhancementPromptInput): string {
-  const parts: string[] = [
-    `Edit this product photo for a peer-to-peer marketplace listing. The goal is "authentic but improved" — it should look like a good phone photo taken in decent light, not a studio product shot.`,
-    "",
-    "Enhancement rules:",
-    "- Improve lighting: brighten underexposed areas, simulate warm natural window light, remove harsh shadows and color casts from artificial lighting",
-    "- Reduce background clutter: de-emphasize (don't remove) distracting background elements so the item stands out",
-    "- Preserve the item's true color — color accuracy matters",
-    "- Do NOT remove or hide any defects, scratches, dents, or wear on the item itself",
-    "- Do NOT add props, staging, watermarks, borders, text, or logos",
-    "- Do NOT apply heavy filters, HDR halos, or artificial bokeh",
-    "- The result must look like a real phone photo, not a magazine ad or stock photo",
-  ];
+const CATEGORY_INSTRUCTIONS: Record<string, string> = {
+  furniture:
+    "Preserve objects near the furniture that provide scale reference — a person sitting, a lamp on a table, a book on a shelf. Buyers need to judge size. Do not crop out context that shows how large the piece is.",
+  electronics:
+    "If a screen is visible and was on in the original photo, keep the screen content readable. Do not wash out or blur screen displays. Ensure ports, buttons, and labels remain sharp and legible.",
+  tools:
+    "Keep the functional surfaces sharp and clear — blades, drill bits, chuck jaws, cutting edges. Buyers want to assess wear on the parts that do the work. Do not smooth or soften metal textures.",
+  clothing:
+    "Preserve the natural texture of the fabric. Wrinkles are expected and authentic — do not smooth fabric to the point it looks digitally altered. Maintain accurate color representation of the material.",
+  "kids & baby items":
+    "Keep the item looking clean and safe. Preserve any safety labels, brand markings, or weight limit indicators that are visible. Buyers of children's items are especially attentive to condition and cleanliness.",
+};
 
-  const categoryNotes = getCategoryNotes(input?.category);
-  if (categoryNotes) {
-    parts.push("", `Category-specific guidance (${input!.category}):`, categoryNotes);
+function getCategoryInstruction(category: string | null | undefined): string {
+  if (!category) return "";
+
+  const key = category.toLowerCase();
+  for (const [cat, instruction] of Object.entries(CATEGORY_INSTRUCTIONS)) {
+    if (key.includes(cat) || cat.includes(key)) {
+      return `\n\nCategory-specific guidance (${category}): ${instruction}`;
+    }
   }
-
-  parts.push("", "Return only the enhanced image. Do not include any text in your response.");
-
-  return parts.join("\n");
+  return "";
 }
 
-function getCategoryNotes(category?: string | null): string | null {
-  if (!category) return null;
+export function buildEnhancementPrompt(input: EnhancementPromptInput): string {
+  const categoryNote = getCategoryInstruction(input.category);
+  const itemContext = input.title
+    ? `The item is: ${input.title}.`
+    : "The item category is unknown.";
+  const conditionNote = input.condition
+    ? ` The seller describes its condition as "${input.condition}".`
+    : "";
 
-  const lower = category.toLowerCase();
+  return `Enhance this product photo for a peer-to-peer marketplace listing. ${itemContext}${conditionNote}
 
-  if (lower.includes("furniture")) {
-    return "- Preserve context objects that show scale (a dresser next to nothing looks ambiguous in size)\n- Keep the room context visible but de-emphasized";
-  }
+Goals:
+- Improve lighting: brighten underexposed areas, simulate warm natural window light, remove harsh shadows and color casts from artificial lighting
+- Reduce background clutter: de-emphasize (do not remove) distracting background elements so the item stands out
+- Maintain authenticity: the result should look like a good phone photo taken by someone who found a clean spot with decent light — not a magazine ad or stock photo
+- Preserve the item's true color: color accuracy matters, buyers who show up expecting navy blue and see black will walk away
 
-  if (lower.includes("electronic") || lower.includes("computer") || lower.includes("phone") || lower.includes("tv") || lower.includes("audio")) {
-    return "- If screens were on in the original, keep them visible and readable\n- Don't wash out screen content or LED indicators";
-  }
-
-  if (lower.includes("clothing") || lower.includes("apparel") || lower.includes("shoe") || lower.includes("fashion")) {
-    return "- Wrinkles are expected — don't over-smooth fabric\n- Preserve texture and material appearance";
-  }
-
-  if (lower.includes("tool") || lower.includes("hardware")) {
-    return "- Keep functional surfaces (blades, bits, drill chucks) clearly visible\n- Buyers assess wear on functional parts, so preserve detail there";
-  }
-
-  return null;
+Rules you must follow:
+- NEVER remove or hide defects on the item (scratches, dents, stains, wear marks must remain visible)
+- NEVER change the item's color
+- NEVER add props, staging, text overlays, watermarks, borders, or logos
+- NEVER apply heavy filters, HDR halos, or artificial bokeh
+- NEVER make the image look like a stock photo or studio product shot${categoryNote}`;
 }
