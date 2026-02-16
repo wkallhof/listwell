@@ -229,7 +229,7 @@ describe("ListingDetailPage", () => {
     await user.click(screen.getByRole("button", { name: "Delete" }));
 
     await waitFor(() => {
-      expect(toast.info).toHaveBeenCalledWith("Listing deleted");
+      expect(toast.success).toHaveBeenCalledWith("Listing deleted");
       expect(mockPush).toHaveBeenCalledWith("/");
     });
   });

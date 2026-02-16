@@ -16,7 +16,9 @@ export function CopyButton({ text, label }: CopyButtonProps) {
   async function handleCopy() {
     await navigator.clipboard.writeText(text);
     setCopied(true);
-    toast.success(label ? `${label} copied` : "Copied!");
+    toast.success(
+      label ? `${label.charAt(0).toUpperCase() + label.slice(1)} copied` : "Copied!",
+    );
     setTimeout(() => setCopied(false), 2000);
   }
 

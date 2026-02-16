@@ -187,7 +187,7 @@ export default function ListingDetailPage() {
     });
 
     if (response.ok) {
-      toast.info(`Listing marked as ${newStatus.toLowerCase()}`);
+      toast.success(`Marked as ${newStatus.toLowerCase()}`);
       refreshListing();
     } else {
       toast.error("Failed to update listing");
@@ -201,7 +201,7 @@ export default function ListingDetailPage() {
     });
 
     if (response.ok) {
-      toast.info("Listing deleted");
+      toast.success("Listing deleted");
       router.push("/");
     } else {
       toast.error("Failed to delete listing");

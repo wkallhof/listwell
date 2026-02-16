@@ -535,7 +535,7 @@
 - [x] 4.3.1: Refine "Copy Full Listing" formatting for marketplace paste (title + price + description)
   - Files: src/lib/listing-formatter.ts
   - Test: Formatted output matches expected marketplace-friendly format
-- [ ] 4.3.2: Add toast messages for all actions per screens.md toast table
+- [x] 4.3.2: Add toast messages for all actions per screens.md toast table
   - Files: src/app/layout.tsx, relevant pages
   - Screens: `docs/screens.md` § Toast Messages
   - Test: Each action triggers correct toast type and message
@@ -721,7 +721,7 @@
 | 4.2.1 | 2026-02-15 | (batch) | Inline title + description editing |
 | 4.2.2 | 2026-02-15 | (batch) | Inline price editing |
 | 4.3.1 | 2026-02-15 | (batch) | Title-$Price inline + condition/brand/model |
-| 4.3.2 |           |        |       |
+| 4.3.2 | 2026-02-15 | (batch) | Toasts aligned to spec table |
 | 4.3.3 |           |        |       |
 | 4.3.4 |           |        |       |
 | 4.3.5 |           |        |       |
