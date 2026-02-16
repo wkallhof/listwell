@@ -363,22 +363,22 @@
 
 ### 2.3 Listing Generate Inngest Function
 
-- [ ] 2.3.1: Implement `run-agent` Inngest step — spins up Vercel Sandbox with AgentSDK, passes image URLs + user description, agent performs full pipeline (analyze → research → write) in one session
+- [x] 2.3.1: Implement `run-agent` Inngest step — spins up Vercel Sandbox with AgentSDK, passes image URLs + user description, agent performs full pipeline (analyze → research → write) in one session
   - Files: src/inngest/functions/generate-listing.ts
   - Test: Agent returns structured result with all listing fields populated
-- [ ] 2.3.2: Add pipelineStep progress updates within agent execution — agent updates DB directly as it transitions between analyzing, researching, and generating phases
+- [x] 2.3.2: Add pipelineStep progress updates within agent execution — agent updates DB directly as it transitions between analyzing, researching, and generating phases
   - Files: src/inngest/functions/generate-listing.ts, src/lib/ai/agent.ts
   - Test: pipelineStep updates to ANALYZING → RESEARCHING → GENERATING during agent run
-- [ ] 2.3.3: Implement `complete` Inngest step (separate from agent) — save structured results to DB, mark status READY
+- [x] 2.3.3: Implement `complete` Inngest step (separate from agent) — save structured results to DB, mark status READY
   - Files: src/inngest/functions/generate-listing.ts
   - Test: Listing record updated with all generated fields, status = READY, pipelineStep = COMPLETE
-- [ ] 2.3.4: Wire up full `listing.generate` function with both Inngest steps
+- [x] 2.3.4: Wire up full `listing.generate` function with both Inngest steps
   - Files: src/inngest/functions/generate-listing.ts
   - Test: End-to-end: run-agent returns results → complete saves to DB
-- [ ] 2.3.5: Register generate-listing function in Inngest serve route
+- [x] 2.3.5: Register generate-listing function in Inngest serve route
   - Files: src/app/api/inngest/route.ts
   - Test: Function appears in Inngest dev dashboard
-- [ ] 2.3.6: Write tests for generate-listing Inngest function
+- [x] 2.3.6: Write tests for generate-listing Inngest function
   - Files: src/inngest/functions/__tests__/generate-listing.test.ts
   - Test: Tests pass with ≥80% coverage
 
@@ -683,12 +683,12 @@
 | 2.2.3 | 2026-02-15 | (batch) | Full selling strategy prompt |
 | 2.2.4 | 2026-02-15 | (batch) | Zod schema for structured agent output |
 | 2.2.5 | 2026-02-15 | (batch) | 18 agent + schema + prompt tests |
-| 2.3.1 |           |        |       |
-| 2.3.2 |           |        |       |
-| 2.3.3 |           |        |       |
-| 2.3.4 |           |        |       |
-| 2.3.5 |           |        |       |
-| 2.3.6 |           |        |       |
+| 2.3.1 | 2026-02-15 | (batch) | run-agent step w/ Agent SDK |
+| 2.3.2 | 2026-02-15 | (batch) | Pipeline hooks for step transitions |
+| 2.3.3 | 2026-02-15 | (batch) | complete step: DB save + notification |
+| 2.3.4 | 2026-02-15 | (batch) | Full listing.generate wired up |
+| 2.3.5 | 2026-02-15 | (batch) | Registered in Inngest serve route |
+| 2.3.6 | 2026-02-15 | (batch) | 7 generate-listing tests |
 | 2.4.1 |           |        |       |
 | 2.4.2 |           |        |       |
 | 2.4.3 |           |        |       |
