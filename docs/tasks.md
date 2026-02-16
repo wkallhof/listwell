@@ -40,7 +40,7 @@
 ## Progress Summary
 
 - Phase 0: [x] Complete
-- Phase 1: [ ] Not Started
+- Phase 1: [x] Complete
 - Phase 2: [ ] Not Started
 - Phase 3: [ ] Not Started
 - Phase 4: [ ] Not Started
@@ -301,28 +301,28 @@
 
 ### 1.7 PWA Configuration
 
-- [ ] 1.7.1: Create web app manifest with Listwell branding and design system colors
+- [x] 1.7.1: Create web app manifest with Listwell branding and design system colors
   - Files: src/app/manifest.ts
   - Screens: `docs/design-system.md` § Color Tokens
   - Test: Manifest accessible at /manifest.webmanifest
-- [ ] 1.7.2: Create service worker shell for basic asset caching
+- [x] 1.7.2: Create service worker shell for basic asset caching
   - Files: public/sw.js
   - Test: Service worker registers on page load
-- [ ] 1.7.3: Add viewport meta tags for edge-to-edge display on notched phones
+- [x] 1.7.3: Add viewport meta tags for edge-to-edge display on notched phones
   - Files: src/app/layout.tsx
   - Test: viewport-fit=cover applied, safe area insets respected
 
 **Phase 1 Checkpoint:**
 
-- [ ] User can register and log in with email/password
-- [ ] Listings feed displays all user listings with status badges
-- [ ] User can capture photos, describe item, and submit a new listing
-- [ ] Listing detail shows all generated content with copy functionality
-- [ ] PWA manifest and service worker are functional
-- [ ] App is responsive and follows design system
-- [ ] All tests pass with ≥80% code coverage on Phase 1 code
-- [ ] No TypeScript errors
-- [ ] Commit: "feat: complete auth and core CRUD (Phase 1)"
+- [x] User can register and log in with email/password
+- [x] Listings feed displays all user listings with status badges
+- [x] User can capture photos, describe item, and submit a new listing
+- [x] Listing detail shows all generated content with copy functionality
+- [x] PWA manifest and service worker are functional
+- [x] App is responsive and follows design system
+- [x] All tests pass with ≥80% code coverage on Phase 1 code
+- [x] No TypeScript errors
+- [x] Commit: "feat: complete auth and core CRUD (Phase 1)"
 
 ---
 
@@ -672,9 +672,9 @@
 | 1.6.4 | 2026-02-15 | (batch) | Dropdown menu status actions |
 | 1.6.5 | 2026-02-15 | (batch) | AlertDialog delete confirmation |
 | 1.6.6 | 2026-02-15 | (batch) | 17 detail + carousel + formatter tests |
-| 1.7.1 |           |        |       |
-| 1.7.2 |           |        |       |
-| 1.7.3 |           |        |       |
+| 1.7.1 | 2026-02-15 | (batch) | PWA manifest w/ branding |
+| 1.7.2 | 2026-02-15 | (batch) | Service worker asset caching |
+| 1.7.3 | 2026-02-15 | (batch) | Viewport meta + SW registration |
 | 2.1.1 |           |        |       |
 | 2.1.2 |           |        |       |
 | 2.1.3 |           |        |       |
