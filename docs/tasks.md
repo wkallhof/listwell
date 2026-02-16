@@ -523,10 +523,10 @@
 
 ### 4.2 Listing Editing
 
-- [ ] 4.2.1: Add inline editing capability for title and description on the listing detail screen
+- [x] 4.2.1: Add inline editing capability for title and description on the listing detail screen
   - Files: src/app/(authenticated)/listings/[id]/page.tsx
   - Test: Tap to edit title/description, save persists via PATCH API
-- [ ] 4.2.2: Add price editing on listing detail screen
+- [x] 4.2.2: Add price editing on listing detail screen
   - Files: src/app/(authenticated)/listings/[id]/page.tsx
   - Test: Tap suggested price to edit, save persists
 
@@ -718,8 +718,8 @@
 | 4.1.3 | 2026-02-15 | (batch) | VoiceInput w/ mic, recording, transcribing states |
 | 4.1.4 | 2026-02-15 | (batch) | Mic button in describe textarea + transcript append |
 | 4.1.5 | 2026-02-15 | (batch) | 19 tests (13 component + 6 API) |
-| 4.2.1 |           |        |       |
-| 4.2.2 |           |        |       |
+| 4.2.1 | 2026-02-15 | (batch) | Inline title + description editing |
+| 4.2.2 | 2026-02-15 | (batch) | Inline price editing |
 | 4.3.1 |           |        |       |
 | 4.3.2 |           |        |       |
 | 4.3.3 |           |        |       |

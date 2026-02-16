@@ -296,4 +296,193 @@ describe("ListingDetailPage", () => {
       expect(screen.getByText("Mark as Sold")).toBeInTheDocument();
     });
   });
+
+  it("enables inline editing of title", async () => {
+    const user = userEvent.setup();
+    (global.fetch as ReturnType<typeof vi.fn>).mockImplementation(
+      (_url: string, options?: RequestInit) => {
+        if (options?.method === "PATCH") {
+          return Promise.resolve(new Response(JSON.stringify({}), { status: 200 }));
+        }
+        return Promise.resolve(
+          new Response(JSON.stringify(mockListing), { status: 200 }),
+        );
+      },
+    );
+
+    render(<ListingDetailPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Vintage Camera")).toBeInTheDocument();
+    });
+
+    // Click title to edit
+    await user.click(screen.getByText("Vintage Camera"));
+
+    // Input should appear with current title value
+    const titleInput = screen.getByDisplayValue("Vintage Camera");
+    expect(titleInput).toBeInTheDocument();
+
+    // Clear and type new title
+    await user.clear(titleInput);
+    await user.type(titleInput, "Updated Camera");
+
+    // Click save
+    await user.click(screen.getByRole("button", { name: "Save" }));
+
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledWith(
+        "/api/listings/listing-1",
+        expect.objectContaining({
+          method: "PATCH",
+          body: JSON.stringify({ title: "Updated Camera" }),
+        }),
+      );
+    });
+
+    expect(toast.success).toHaveBeenCalledWith("Changes saved");
+  });
+
+  it("enables inline editing of description", async () => {
+    const user = userEvent.setup();
+    (global.fetch as ReturnType<typeof vi.fn>).mockImplementation(
+      (_url: string, options?: RequestInit) => {
+        if (options?.method === "PATCH") {
+          return Promise.resolve(new Response(JSON.stringify({}), { status: 200 }));
+        }
+        return Promise.resolve(
+          new Response(JSON.stringify(mockListing), { status: 200 }),
+        );
+      },
+    );
+
+    render(<ListingDetailPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText("A great camera from the 1980s.")).toBeInTheDocument();
+    });
+
+    // Click description to edit
+    await user.click(screen.getByText("A great camera from the 1980s."));
+
+    // Textarea should appear
+    const textarea = screen.getByDisplayValue("A great camera from the 1980s.");
+    expect(textarea).toBeInTheDocument();
+
+    // Click save
+    await user.click(screen.getByRole("button", { name: "Save description" }));
+
+    await waitFor(() => {
+      expect(toast.success).toHaveBeenCalledWith("Changes saved");
+    });
+  });
+
+  it("enables inline editing of price", async () => {
+    const user = userEvent.setup();
+    (global.fetch as ReturnType<typeof vi.fn>).mockImplementation(
+      (_url: string, options?: RequestInit) => {
+        if (options?.method === "PATCH") {
+          return Promise.resolve(new Response(JSON.stringify({}), { status: 200 }));
+        }
+        return Promise.resolve(
+          new Response(JSON.stringify(mockListing), { status: 200 }),
+        );
+      },
+    );
+
+    render(<ListingDetailPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText("$150")).toBeInTheDocument();
+    });
+
+    // Click price to edit
+    await user.click(screen.getByText("$150"));
+
+    // Number input should appear with current price
+    const priceInput = screen.getByDisplayValue("150");
+    expect(priceInput).toBeInTheDocument();
+
+    // Clear and type new price
+    await user.clear(priceInput);
+    await user.type(priceInput, "175");
+
+    // Click save
+    await user.click(screen.getByRole("button", { name: "Save price" }));
+
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledWith(
+        "/api/listings/listing-1",
+        expect.objectContaining({
+          method: "PATCH",
+          body: JSON.stringify({ suggestedPrice: 175 }),
+        }),
+      );
+    });
+  });
+
+  it("cancels editing on Escape key", async () => {
+    const user = userEvent.setup();
+    mockFetchWith(mockListing);
+    render(<ListingDetailPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Vintage Camera")).toBeInTheDocument();
+    });
+
+    // Click title to edit
+    await user.click(screen.getByText("Vintage Camera"));
+
+    const titleInput = screen.getByDisplayValue("Vintage Camera");
+    await user.type(titleInput, " modified");
+
+    // Press Escape
+    await user.keyboard("{Escape}");
+
+    // Should revert to display mode
+    expect(screen.getByText("Vintage Camera")).toBeInTheDocument();
+    expect(screen.queryByDisplayValue("Vintage Camera modified")).not.toBeInTheDocument();
+  });
+
+  it("cancels editing on cancel button click", async () => {
+    const user = userEvent.setup();
+    mockFetchWith(mockListing);
+    render(<ListingDetailPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Vintage Camera")).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByText("Vintage Camera"));
+    await user.click(screen.getByRole("button", { name: "Cancel" }));
+
+    expect(screen.getByText("Vintage Camera")).toBeInTheDocument();
+  });
+
+  it("shows error toast when save fails", async () => {
+    const user = userEvent.setup();
+    (global.fetch as ReturnType<typeof vi.fn>).mockImplementation(
+      (_url: string, options?: RequestInit) => {
+        if (options?.method === "PATCH") {
+          return Promise.resolve(new Response(null, { status: 500 }));
+        }
+        return Promise.resolve(
+          new Response(JSON.stringify(mockListing), { status: 200 }),
+        );
+      },
+    );
+
+    render(<ListingDetailPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Vintage Camera")).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByText("Vintage Camera"));
+    await user.click(screen.getByRole("button", { name: "Save" }));
+
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith("Failed to save changes");
+    });
+  });
 });

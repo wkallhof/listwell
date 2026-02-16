@@ -1,16 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
   ArrowLeft,
+  Check,
   Copy,
   ExternalLink,
   Loader2,
   MoreVertical,
+  Pencil,
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   DropdownMenu,
@@ -94,6 +99,55 @@ export default function ListingDetailPage() {
   const [loading, setLoading] = useState(true);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [editingField, setEditingField] = useState<"title" | "description" | "price" | null>(null);
+  const [editValue, setEditValue] = useState("");
+  const [saving, setSaving] = useState(false);
+  const editInputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
+
+  function startEditing(field: "title" | "description" | "price") {
+    if (!listing) return;
+    if (field === "title") setEditValue(listing.title ?? "");
+    else if (field === "description") setEditValue(listing.description ?? "");
+    else if (field === "price") setEditValue(String(listing.suggestedPrice ?? ""));
+    setEditingField(field);
+    setTimeout(() => editInputRef.current?.focus(), 0);
+  }
+
+  function cancelEditing() {
+    setEditingField(null);
+    setEditValue("");
+  }
+
+  async function saveEdit() {
+    if (!listing || !editingField) return;
+
+    const payload: Record<string, unknown> = {};
+    if (editingField === "title") payload.title = editValue.trim();
+    else if (editingField === "description") payload.description = editValue.trim();
+    else if (editingField === "price") payload.suggestedPrice = Number(editValue) || null;
+
+    setSaving(true);
+    const response = await fetch(`/api/listings/${params.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (response.ok) {
+      setListing({ ...listing, ...payload } as ListingDetail);
+      toast.success("Changes saved");
+    } else {
+      toast.error("Failed to save changes");
+    }
+    setSaving(false);
+    setEditingField(null);
+    setEditValue("");
+  }
+
+  function handleEditKeyDown(e: React.KeyboardEvent) {
+    if (e.key === "Escape") cancelEditing();
+    if (e.key === "Enter" && editingField !== "description") saveEdit();
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -239,27 +293,78 @@ export default function ListingDetailPage() {
         </div>
 
         {/* Title Section */}
-        {listing.title && (
-          <div className="flex items-start justify-between gap-2">
-            <h2 className="text-xl font-bold leading-tight">
-              {listing.title}
-            </h2>
-            <CopyButton text={listing.title} label="title" />
+        {(listing.title || editingField === "title") && (
+          <div>
+            {editingField === "title" ? (
+              <div className="flex items-center gap-2">
+                <Input
+                  ref={editInputRef as React.RefObject<HTMLInputElement>}
+                  value={editValue}
+                  onChange={(e) => setEditValue(e.target.value)}
+                  onKeyDown={handleEditKeyDown}
+                  className="text-xl font-bold"
+                  disabled={saving}
+                />
+                <Button variant="ghost" size="icon" onClick={saveEdit} disabled={saving} aria-label="Save">
+                  <Check size={16} />
+                </Button>
+                <Button variant="ghost" size="icon" onClick={cancelEditing} aria-label="Cancel">
+                  <X size={16} />
+                </Button>
+              </div>
+            ) : (
+              <div className="group flex items-start justify-between gap-2">
+                <h2
+                  className="cursor-pointer text-xl font-bold leading-tight"
+                  onClick={() => startEditing("title")}
+                >
+                  {listing.title}
+                  <Pencil size={14} className="ml-2 inline opacity-0 group-hover:opacity-50" />
+                </h2>
+                <CopyButton text={listing.title!} label="title" />
+              </div>
+            )}
           </div>
         )}
 
         {/* Price Card */}
-        {listing.suggestedPrice != null && (
+        {(listing.suggestedPrice != null || editingField === "price") && (
           <Card>
             <CardContent className="py-4">
-              <div className="flex items-baseline justify-between">
-                <span className="text-3xl font-bold">
-                  ${listing.suggestedPrice}
-                </span>
-                <span className="text-xs text-muted-foreground">
-                  suggested price
-                </span>
-              </div>
+              {editingField === "price" ? (
+                <div className="flex items-center gap-2">
+                  <span className="text-3xl font-bold">$</span>
+                  <Input
+                    ref={editInputRef as React.RefObject<HTMLInputElement>}
+                    type="number"
+                    value={editValue}
+                    onChange={(e) => setEditValue(e.target.value)}
+                    onKeyDown={handleEditKeyDown}
+                    className="text-3xl font-bold"
+                    disabled={saving}
+                    min={0}
+                  />
+                  <Button variant="ghost" size="icon" onClick={saveEdit} disabled={saving} aria-label="Save price">
+                    <Check size={16} />
+                  </Button>
+                  <Button variant="ghost" size="icon" onClick={cancelEditing} aria-label="Cancel price">
+                    <X size={16} />
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-baseline justify-between">
+                  <span
+                    className="group cursor-pointer text-3xl font-bold"
+                    onClick={() => startEditing("price")}
+                  >
+                    ${listing.suggestedPrice}
+                    <Pencil size={14} className="ml-2 inline opacity-0 group-hover:opacity-50" />
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    suggested price
+                  </span>
+                </div>
+              )}
               {listing.priceRangeLow != null &&
                 listing.priceRangeHigh != null && (
                   <div className="mt-1 flex items-center gap-1">
@@ -274,15 +379,41 @@ export default function ListingDetailPage() {
         )}
 
         {/* Description Section */}
-        {listing.description && (
+        {(listing.description || editingField === "description") && (
           <div>
             <div className="mb-2 flex items-center justify-between">
               <h3 className="text-lg font-semibold">Description</h3>
-              <CopyButton text={listing.description} label="description" />
+              {editingField === "description" ? (
+                <div className="flex gap-1">
+                  <Button variant="ghost" size="icon" onClick={saveEdit} disabled={saving} aria-label="Save description">
+                    <Check size={16} />
+                  </Button>
+                  <Button variant="ghost" size="icon" onClick={cancelEditing} aria-label="Cancel description">
+                    <X size={16} />
+                  </Button>
+                </div>
+              ) : (
+                <CopyButton text={listing.description!} label="description" />
+              )}
             </div>
-            <div className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
-              {listing.description}
-            </div>
+            {editingField === "description" ? (
+              <Textarea
+                ref={editInputRef as React.RefObject<HTMLTextAreaElement>}
+                value={editValue}
+                onChange={(e) => setEditValue(e.target.value)}
+                onKeyDown={handleEditKeyDown}
+                className="min-h-[120px] resize-none text-sm"
+                disabled={saving}
+              />
+            ) : (
+              <div
+                className="group cursor-pointer whitespace-pre-wrap text-sm leading-relaxed text-foreground"
+                onClick={() => startEditing("description")}
+              >
+                {listing.description}
+                <Pencil size={14} className="ml-2 inline opacity-0 group-hover:opacity-50" />
+              </div>
+            )}
           </div>
         )}
 
