@@ -252,25 +252,25 @@
 
 ### 1.5 New Listing Flow
 
-- [ ] 1.5.1: Build New Listing — Capture screen with photo grid and camera/gallery buttons
+- [x] 1.5.1: Build New Listing — Capture screen with photo grid and camera/gallery buttons
   - Files: src/app/(authenticated)/new/page.tsx, src/components/image-grid.tsx
   - Screens: `docs/screens.md` § Screen 3: New Listing — Capture — `docs/design-system.md`
   - Test: Can add/remove photos (1-5), Take Photo triggers camera input, Choose from Library triggers gallery
-- [ ] 1.5.2: Build New Listing — Describe screen with text area and thumbnail strip
+- [x] 1.5.2: Build New Listing — Describe screen with text area and thumbnail strip
   - Files: src/app/(authenticated)/new/describe/page.tsx
   - Screens: `docs/screens.md` § Screen 4: New Listing — Describe — `docs/design-system.md`
   - Test: Text area works, thumbnail strip shows captured photos, Skip and Generate buttons work
-- [ ] 1.5.3: Implement listing submission flow (upload images to Blob, create listing via API)
+- [x] 1.5.3: Implement listing submission flow (upload images to Blob, create listing via API)
   - Files: src/app/(authenticated)/new/describe/page.tsx, src/lib/listing-actions.ts
   - Test: Photos uploaded to Vercel Blob, listing created in DB with status DRAFT
-- [ ] 1.5.4: Build New Listing — Submitted confirmation screen
+- [x] 1.5.4: Build New Listing — Submitted confirmation screen
   - Files: src/app/(authenticated)/new/submitted/page.tsx
   - Screens: `docs/screens.md` § Screen 5: New Listing — Submitted — `docs/design-system.md`
   - Test: Shows confirmation message, "Back to Listings" navigates to feed
-- [ ] 1.5.5: Create state management for multi-step new listing flow (photos + description across screens)
+- [x] 1.5.5: Create state management for multi-step new listing flow (photos + description across screens)
   - Files: src/lib/new-listing-context.tsx
   - Test: State persists across capture → describe → submit
-- [ ] 1.5.6: Write tests for new listing flow
+- [x] 1.5.6: Write tests for new listing flow
   - Files: src/app/(authenticated)/new/__tests__/*.test.tsx
   - Test: Tests pass with ≥80% coverage
 
@@ -660,12 +660,12 @@
 | 1.4.2 | 2026-02-15 | (batch) | Feed page w/ server fetch |
 | 1.4.3 | 2026-02-15 | (batch) | Overflow menu + logout |
 | 1.4.4 | 2026-02-15 | (batch) | 9 feed + card tests |
-| 1.5.1 |           |        |       |
-| 1.5.2 |           |        |       |
-| 1.5.3 |           |        |       |
-| 1.5.4 |           |        |       |
-| 1.5.5 |           |        |       |
-| 1.5.6 |           |        |       |
+| 1.5.1 | 2026-02-15 | (batch) | Capture page + ImageGrid |
+| 1.5.2 | 2026-02-15 | (batch) | Describe page w/ textarea + thumbnails |
+| 1.5.3 | 2026-02-15 | (batch) | createListing server action |
+| 1.5.4 | 2026-02-15 | (batch) | Submitted confirmation page |
+| 1.5.5 | 2026-02-15 | (batch) | NewListingProvider context |
+| 1.5.6 | 2026-02-15 | (batch) | 32 new listing flow tests |
 | 1.6.1 |           |        |       |
 | 1.6.2 |           |        |       |
 | 1.6.3 |           |        |       |
