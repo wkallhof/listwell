@@ -154,29 +154,29 @@
 
 ### 1.1 Authentication
 
-- [ ] 1.1.1: Install and configure BetterAuth with Drizzle adapter (PostgreSQL provider)
+- [x] 1.1.1: Install and configure BetterAuth with Drizzle adapter (PostgreSQL provider)
   - Files: src/lib/auth.ts, src/lib/auth-client.ts, package.json
   - Test: Auth instance created without errors
-- [ ] 1.1.2: Create BetterAuth API route handler
+- [x] 1.1.2: Create BetterAuth API route handler
   - Files: src/app/api/auth/[...all]/route.ts
   - Test: GET /api/auth/ok returns 200
-- [ ] 1.1.3: Generate and run BetterAuth database tables migration
+- [x] 1.1.3: Generate and run BetterAuth database tables migration
   - Files: src/db/schema.ts (add auth tables if needed), migrations/
   - Test: Auth tables exist in database
-- [ ] 1.1.4: Create auth middleware for protecting routes
+- [x] 1.1.4: Create auth middleware for protecting routes
   - Files: src/lib/auth-middleware.ts, src/middleware.ts
   - Test: Unauthenticated requests redirect to /login
-- [ ] 1.1.5: Build Login/Register screen with Tabs component
+- [x] 1.1.5: Build Login/Register screen with Tabs component
   - Files: src/app/login/page.tsx
   - Screens: `docs/screens.md` § Screen 1: Login/Register — `docs/design-system.md`
   - Test: Login and register forms render, tab switching works
-- [ ] 1.1.6: Implement login form submission with BetterAuth client
+- [x] 1.1.6: Implement login form submission with BetterAuth client
   - Files: src/app/login/page.tsx
   - Test: Successful login redirects to /, error shows inline message
-- [ ] 1.1.7: Implement register form submission with BetterAuth client
+- [x] 1.1.7: Implement register form submission with BetterAuth client
   - Files: src/app/login/page.tsx
   - Test: Successful registration redirects to /, error shows inline message
-- [ ] 1.1.8: Write tests for auth flow (login, register, protected routes)
+- [x] 1.1.8: Write tests for auth flow (login, register, protected routes)
   - Files: src/app/login/__tests__/page.test.tsx, src/lib/__tests__/auth.test.ts
   - Test: Tests pass with ≥80% coverage
 
@@ -634,14 +634,14 @@
 | 0.5.1 | 2026-02-15 | (phase commit) | All 10 env vars documented |
 | 0.5.2 | 2026-02-15 | (phase commit) | Local dev values |
 | 0.5.3 | 2026-02-15 | (phase commit) | Next.js + env + coverage ignores |
-| 1.1.1 |           |        |       |
-| 1.1.2 |           |        |       |
-| 1.1.3 |           |        |       |
-| 1.1.4 |           |        |       |
-| 1.1.5 |           |        |       |
-| 1.1.6 |           |        |       |
-| 1.1.7 |           |        |       |
-| 1.1.8 |           |        |       |
+| 1.1.1 | 2026-02-15 | (batch) | BetterAuth + Drizzle adapter |
+| 1.1.2 | 2026-02-15 | (batch) | Auth catch-all route handler |
+| 1.1.3 | 2026-02-15 | (batch) | Auth tables in schema.ts + push |
+| 1.1.4 | 2026-02-15 | (batch) | Middleware + route protection |
+| 1.1.5 | 2026-02-15 | (batch) | Login/Register page w/ Tabs |
+| 1.1.6 | 2026-02-15 | (batch) | Login form + BetterAuth client |
+| 1.1.7 | 2026-02-15 | (batch) | Register form + validation |
+| 1.1.8 | 2026-02-15 | (batch) | 46 tests passing |
 | 1.2.1 |           |        |       |
 | 1.2.2 |           |        |       |
 | 1.2.3 |           |        |       |
