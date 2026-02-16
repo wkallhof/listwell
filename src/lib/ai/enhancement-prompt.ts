@@ -11,8 +11,6 @@ const CATEGORY_INSTRUCTIONS: Record<string, string> = {
     "If a screen is visible and was on in the original photo, keep the screen content readable. Do not wash out or blur screen displays. Ensure ports, buttons, and labels remain sharp and legible.",
   tools:
     "Keep the functional surfaces sharp and clear — blades, drill bits, chuck jaws, cutting edges. Buyers want to assess wear on the parts that do the work. Do not smooth or soften metal textures.",
-  "clothing & accessories":
-    "Preserve the natural texture of the fabric. Wrinkles are expected and authentic — do not smooth fabric to the point it looks digitally altered. Maintain accurate color representation of the material.",
   clothing:
     "Preserve the natural texture of the fabric. Wrinkles are expected and authentic — do not smooth fabric to the point it looks digitally altered. Maintain accurate color representation of the material.",
   "kids & baby items":
@@ -33,12 +31,12 @@ function getCategoryInstruction(category: string | null | undefined): string {
 
 export function buildEnhancementPrompt(input: EnhancementPromptInput): string {
   const categoryNote = getCategoryInstruction(input.category);
-  const itemContext =
-    input.title ? `The item is: ${input.title}.` : "The item category is unknown.";
-  const conditionNote =
-    input.condition
-      ? ` The seller describes its condition as "${input.condition}".`
-      : "";
+  const itemContext = input.title
+    ? `The item is: ${input.title}.`
+    : "The item category is unknown.";
+  const conditionNote = input.condition
+    ? ` The seller describes its condition as "${input.condition}".`
+    : "";
 
   return `Enhance this product photo for a peer-to-peer marketplace listing. ${itemContext}${conditionNote}
 
