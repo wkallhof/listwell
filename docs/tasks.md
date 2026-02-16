@@ -330,34 +330,34 @@
 
 ### 2.1 Inngest Setup
 
-- [ ] 2.1.1: Install Inngest SDK and configure client
+- [x] 2.1.1: Install Inngest SDK and configure client
   - Files: src/inngest/client.ts, package.json
   - Test: Inngest client initializes without errors
-- [ ] 2.1.2: Create Inngest serve route handler
+- [x] 2.1.2: Create Inngest serve route handler
   - Files: src/app/api/inngest/route.ts
   - Test: GET /api/inngest returns Inngest dashboard info
-- [ ] 2.1.3: Write tests for Inngest setup
+- [x] 2.1.3: Write tests for Inngest setup
   - Files: src/inngest/__tests__/client.test.ts
   - Test: Tests pass
 
 ### 2.2 Consolidated Agent Setup
 
-- [ ] 2.2.1: Install Anthropic SDK and AgentSDK packages
+- [x] 2.2.1: Install Anthropic SDK and AgentSDK packages
   - Files: package.json
   - Test: Packages installed, imports resolve
-- [ ] 2.2.2: Set up Vercel Sandbox + AgentSDK integration
+- [x] 2.2.2: Set up Vercel Sandbox + AgentSDK integration
   - Files: src/lib/ai/agent.ts
   - Test: Sandbox environment can be created, agent session starts
-- [ ] 2.2.3: Build agent system prompt that covers the full listing generation pipeline
+- [x] 2.2.3: Build agent system prompt that covers the full listing generation pipeline
   - Responsibilities: image analysis (product identification, brand, model, condition), web research (eBay sold listings, FB Marketplace, Amazon comps), and listing writing (title, description, price, market notes)
   - Files: src/lib/ai/prompts/listing-agent-prompt.ts
   - Ref: `docs/selling-strategy.md` — all sections (title construction, description voice/tone, pricing strategy, condition assessment, category tactics, market notes template)
   - Test: Prompt includes all selling strategy rules, structured output format is defined
-- [ ] 2.2.4: Define structured output schema for agent results
+- [x] 2.2.4: Define structured output schema for agent results
   - Fields: title, description, suggestedPrice, priceRangeLow, priceRangeHigh, category, condition, brand, model, researchNotes, comparables[], pipelineStep progress callbacks
   - Files: src/lib/ai/agent-output-schema.ts
   - Test: Schema validates expected agent output structure
-- [ ] 2.2.5: Write tests for agent setup and prompt
+- [x] 2.2.5: Write tests for agent setup and prompt
   - Files: src/lib/ai/__tests__/agent.test.ts
   - Test: Tests pass with ≥80% coverage
 
@@ -675,14 +675,14 @@
 | 1.7.1 | 2026-02-15 | (batch) | PWA manifest w/ branding |
 | 1.7.2 | 2026-02-15 | (batch) | Service worker asset caching |
 | 1.7.3 | 2026-02-15 | (batch) | Viewport meta + SW registration |
-| 2.1.1 |           |        |       |
-| 2.1.2 |           |        |       |
-| 2.1.3 |           |        |       |
-| 2.2.1 |           |        |       |
-| 2.2.2 |           |        |       |
-| 2.2.3 |           |        |       |
-| 2.2.4 |           |        |       |
-| 2.2.5 |           |        |       |
+| 2.1.1 | 2026-02-15 | (batch) | Inngest SDK + client |
+| 2.1.2 | 2026-02-15 | (batch) | Inngest serve route handler |
+| 2.1.3 | 2026-02-15 | (batch) | 3 Inngest client tests |
+| 2.2.1 | 2026-02-15 | (batch) | @anthropic-ai/claude-agent-sdk + @anthropic-ai/sdk |
+| 2.2.2 | 2026-02-15 | (batch) | Agent SDK query + sandbox + pipeline hooks |
+| 2.2.3 | 2026-02-15 | (batch) | Full selling strategy prompt |
+| 2.2.4 | 2026-02-15 | (batch) | Zod schema for structured agent output |
+| 2.2.5 | 2026-02-15 | (batch) | 18 agent + schema + prompt tests |
 | 2.3.1 |           |        |       |
 | 2.3.2 |           |        |       |
 | 2.3.3 |           |        |       |
