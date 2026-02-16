@@ -235,18 +235,18 @@
 
 ### 1.4 Listings Feed Screen
 
-- [ ] 1.4.1: Create ListingCard component for feed display
+- [x] 1.4.1: Create ListingCard component for feed display
   - Files: src/components/listing-card.tsx
   - Screens: `docs/screens.md` § ListingCard Component — `docs/design-system.md`
   - Test: Renders thumbnail, title, price, status badge, pipeline progress, timeAgo
-- [ ] 1.4.2: Build Listings Feed page (home screen) with header, filter row, and cards
+- [x] 1.4.2: Build Listings Feed page (home screen) with header, filter row, and cards
   - Files: src/app/(authenticated)/page.tsx
   - Screens: `docs/screens.md` § Screen 2: Listings Feed — `docs/design-system.md`
   - Test: Fetches and displays listings, shows empty state when no listings
-- [ ] 1.4.3: Add overflow menu with logout action
+- [x] 1.4.3: Add overflow menu with logout action
   - Files: src/app/(authenticated)/page.tsx
   - Test: Dropdown shows, logout works
-- [ ] 1.4.4: Write tests for listings feed
+- [x] 1.4.4: Write tests for listings feed
   - Files: src/app/(authenticated)/__tests__/page.test.tsx, src/components/__tests__/listing-card.test.tsx
   - Test: Tests pass with ≥80% coverage
 
@@ -656,10 +656,10 @@
 | 1.3.4 | 2026-02-15 | (batch) | EmptyState centered placeholder |
 | 1.3.5 | 2026-02-15 | (batch) | FAB floating action button |
 | 1.3.6 | 2026-02-15 | (batch) | 23 component tests |
-| 1.4.1 |           |        |       |
-| 1.4.2 |           |        |       |
-| 1.4.3 |           |        |       |
-| 1.4.4 |           |        |       |
+| 1.4.1 | 2026-02-15 | (batch) | ListingCard component |
+| 1.4.2 | 2026-02-15 | (batch) | Feed page w/ server fetch |
+| 1.4.3 | 2026-02-15 | (batch) | Overflow menu + logout |
+| 1.4.4 | 2026-02-15 | (batch) | 9 feed + card tests |
 | 1.5.1 |           |        |       |
 | 1.5.2 |           |        |       |
 | 1.5.3 |           |        |       |
