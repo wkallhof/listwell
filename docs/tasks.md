@@ -276,26 +276,26 @@
 
 ### 1.6 Listing Detail Screen
 
-- [ ] 1.6.1: Build image carousel component with scroll-snap and dot indicators
+- [x] 1.6.1: Build image carousel component with scroll-snap and dot indicators
   - Files: src/components/image-carousel.tsx
   - Screens: `docs/screens.md` § Image Carousel — `docs/design-system.md` § Image Display Conventions
   - Test: Swipe between images, dots indicate current image
-- [ ] 1.6.2: Build Listing Detail — Ready page with all sections
+- [x] 1.6.2: Build Listing Detail — Ready page with all sections
   - Sections: status badge, title + copy, price card, description + copy, product details grid, comparables list, market notes
   - Files: src/app/(authenticated)/listings/[id]/page.tsx
   - Screens: `docs/screens.md` § Screen 7: Listing Detail — Ready — `docs/design-system.md`
   - Test: All sections render with listing data
-- [ ] 1.6.3: Implement "Copy Full Listing" bottom bar action
+- [x] 1.6.3: Implement "Copy Full Listing" bottom bar action
   - Files: src/app/(authenticated)/listings/[id]/page.tsx
   - Test: Copies formatted title + price + description to clipboard, shows toast
-- [ ] 1.6.4: Implement dropdown menu actions (Mark as Listed, Mark as Sold, Archive, Delete)
+- [x] 1.6.4: Implement dropdown menu actions (Mark as Listed, Mark as Sold, Archive, Delete)
   - Files: src/app/(authenticated)/listings/[id]/page.tsx
   - Test: Status updates via PATCH, delete shows confirmation dialog then deletes
-- [ ] 1.6.5: Build delete listing confirmation dialog
+- [x] 1.6.5: Build delete listing confirmation dialog
   - Files: src/app/(authenticated)/listings/[id]/page.tsx
   - Screens: `docs/screens.md` § Confirmation Dialogs — Delete Listing
   - Test: Dialog shows, cancel dismisses, confirm deletes and navigates to feed
-- [ ] 1.6.6: Write tests for listing detail screen
+- [x] 1.6.6: Write tests for listing detail screen
   - Files: src/app/(authenticated)/listings/[id]/__tests__/page.test.tsx
   - Test: Tests pass with ≥80% coverage
 
@@ -666,12 +666,12 @@
 | 1.5.4 | 2026-02-15 | (batch) | Submitted confirmation page |
 | 1.5.5 | 2026-02-15 | (batch) | NewListingProvider context |
 | 1.5.6 | 2026-02-15 | (batch) | 32 new listing flow tests |
-| 1.6.1 |           |        |       |
-| 1.6.2 |           |        |       |
-| 1.6.3 |           |        |       |
-| 1.6.4 |           |        |       |
-| 1.6.5 |           |        |       |
-| 1.6.6 |           |        |       |
+| 1.6.1 | 2026-02-15 | (batch) | ImageCarousel w/ scroll-snap + dots |
+| 1.6.2 | 2026-02-15 | (batch) | Full detail page w/ all sections |
+| 1.6.3 | 2026-02-15 | (batch) | Copy Full Listing + formatter |
+| 1.6.4 | 2026-02-15 | (batch) | Dropdown menu status actions |
+| 1.6.5 | 2026-02-15 | (batch) | AlertDialog delete confirmation |
+| 1.6.6 | 2026-02-15 | (batch) | 17 detail + carousel + formatter tests |
 | 1.7.1 |           |        |       |
 | 1.7.2 |           |        |       |
 | 1.7.3 |           |        |       |
