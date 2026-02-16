@@ -3,8 +3,10 @@ import { describe, expect, it } from "vitest";
 import {
   listings,
   listingImages,
+  pushSubscriptions,
   listingsRelations,
   listingImagesRelations,
+  pushSubscriptionRelations,
   listingStatusEnum,
   pipelineStepEnum,
   imageTypeEnum,
@@ -127,6 +129,35 @@ describe("listingImages schema", () => {
 
   it("should define listingImages relations", () => {
     expect(listingImagesRelations).toBeDefined();
+  });
+});
+
+describe("pushSubscriptions schema", () => {
+  it("should have all required columns", () => {
+    const columns = getTableColumns(pushSubscriptions);
+
+    expect(columns.id).toBeDefined();
+    expect(columns.userId).toBeDefined();
+    expect(columns.endpoint).toBeDefined();
+    expect(columns.p256dh).toBeDefined();
+    expect(columns.auth).toBeDefined();
+    expect(columns.createdAt).toBeDefined();
+  });
+
+  it("should have userId, endpoint, p256dh, auth as non-nullable", () => {
+    const columns = getTableColumns(pushSubscriptions);
+    expect(columns.userId.notNull).toBe(true);
+    expect(columns.endpoint.notNull).toBe(true);
+    expect(columns.p256dh.notNull).toBe(true);
+    expect(columns.auth.notNull).toBe(true);
+  });
+
+  it("should use the 'push_subscriptions' table name", () => {
+    expect(getTableName(pushSubscriptions)).toBe("push_subscriptions");
+  });
+
+  it("should define pushSubscription relations", () => {
+    expect(pushSubscriptionRelations).toBeDefined();
   });
 });
 

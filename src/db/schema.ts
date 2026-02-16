@@ -91,6 +91,7 @@ export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
   accounts: many(account),
   listings: many(listings),
+  pushSubscriptions: many(pushSubscriptions),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({
@@ -106,6 +107,40 @@ export const accountRelations = relations(account, ({ one }) => ({
     references: [user.id],
   }),
 }));
+
+// ─── Push Subscriptions Table ────────────────────────────────────────────────
+
+export const pushSubscriptions = pgTable(
+  "push_subscriptions",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    endpoint: text("endpoint").notNull(),
+    p256dh: text("p256dh").notNull(),
+    auth: text("auth").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("push_sub_userId_idx").on(table.userId),
+    index("push_sub_endpoint_idx").on(table.endpoint),
+  ],
+);
+
+export const pushSubscriptionRelations = relations(
+  pushSubscriptions,
+  ({ one }) => ({
+    user: one(user, {
+      fields: [pushSubscriptions.userId],
+      references: [user.id],
+    }),
+  }),
+);
 
 // ─── Enums ───────────────────────────────────────────────────────────────────
 

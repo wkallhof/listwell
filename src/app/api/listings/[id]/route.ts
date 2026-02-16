@@ -4,6 +4,7 @@ import { eq, and } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { listings } from "@/db/schema";
+import { inngest } from "@/inngest/client";
 import { deleteImages } from "@/lib/blob";
 
 interface RouteParams {
@@ -66,6 +67,8 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     "rawDescription",
     "category",
     "condition",
+    "pipelineStep",
+    "pipelineError",
   ] as const;
 
   const updates: Record<string, unknown> = {};
@@ -87,6 +90,27 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     .set(updates)
     .where(eq(listings.id, id))
     .returning();
+
+  // If retry flag is set, re-trigger the pipeline
+  if (body.retry) {
+    const listingWithImages = await db.query.listings.findFirst({
+      where: eq(listings.id, id),
+      with: { images: true },
+    });
+
+    if (listingWithImages) {
+      await inngest.send({
+        name: "listing.submitted",
+        data: {
+          listingId: id,
+          imageUrls: listingWithImages.images
+            .filter((img) => img.type === "ORIGINAL")
+            .map((img) => img.blobUrl),
+          userDescription: listingWithImages.rawDescription,
+        },
+      });
+    }
+  }
 
   return NextResponse.json(updated);
 }

@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
+  AlertCircle,
   ArrowLeft,
   Copy,
   ExternalLink,
@@ -33,6 +34,7 @@ import { ImageCarousel } from "@/components/image-carousel";
 import { ListingStatusBadge } from "@/components/listing-status-badge";
 import { CopyButton } from "@/components/copy-button";
 import { BottomBar } from "@/components/bottom-bar";
+import { PipelineSteps } from "@/components/pipeline-steps";
 import { formatListingForClipboard } from "@/lib/listing-formatter";
 
 interface Comparable {
@@ -63,7 +65,7 @@ interface ListingDetail {
   model: string | null;
   researchNotes: string | null;
   comparables: Comparable[] | null;
-  status: "DRAFT" | "PROCESSING" | "READY" | "LISTED" | "SOLD" | "ARCHIVED" | "ERROR";
+  status: "DRAFT" | "PROCESSING" | "READY" | "LISTED" | "SOLD" | "ARCHIVED";
   pipelineStep: string | null;
   pipelineError: string | null;
   createdAt: string;
@@ -87,6 +89,8 @@ function DetailRow({ label, value }: DetailRowProps) {
   );
 }
 
+const POLL_INTERVAL_MS = 4000;
+
 export default function ListingDetailPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
@@ -94,35 +98,66 @@ export default function ListingDetailPage() {
   const [loading, setLoading] = useState(true);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [retrying, setRetrying] = useState(false);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  const fetchListing = useCallback(async () => {
+    const response = await fetch(`/api/listings/${params.id}`);
+    if (!response.ok) return null;
+    return response.json();
+  }, [params.id]);
+
+  // Initial load
   useEffect(() => {
     let cancelled = false;
 
-    fetch(`/api/listings/${params.id}`)
-      .then(async (response) => {
-        if (cancelled) return;
-        if (!response.ok) {
-          toast.error("Failed to load listing");
-          router.push("/");
-          return;
-        }
-        const data = await response.json();
-        if (!cancelled) {
-          setListing(data);
-          setLoading(false);
-        }
-      });
+    fetchListing().then((data) => {
+      if (cancelled) return;
+      if (!data) {
+        toast.error("Failed to load listing");
+        router.push("/");
+        return;
+      }
+      setListing(data);
+      setLoading(false);
+    });
 
-    return () => { cancelled = true; };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params.id]);
+    return () => {
+      cancelled = true;
+    };
+  }, [fetchListing, router]);
+
+  // Poll when processing
+  useEffect(() => {
+    const isProcessing =
+      listing?.status === "PROCESSING" || listing?.status === "DRAFT";
+    const isNotErrorOrComplete =
+      listing?.pipelineStep !== "ERROR" && listing?.pipelineStep !== "COMPLETE";
+
+    if (!isProcessing || !isNotErrorOrComplete) {
+      if (pollRef.current) {
+        clearInterval(pollRef.current);
+        pollRef.current = null;
+      }
+      return;
+    }
+
+    pollRef.current = setInterval(async () => {
+      const data = await fetchListing();
+      if (data) setListing(data);
+    }, POLL_INTERVAL_MS);
+
+    return () => {
+      if (pollRef.current) {
+        clearInterval(pollRef.current);
+        pollRef.current = null;
+      }
+    };
+  }, [listing?.status, listing?.pipelineStep, fetchListing]);
 
   async function refreshListing() {
-    const response = await fetch(`/api/listings/${params.id}`);
-    if (response.ok) {
-      const data = await response.json();
-      setListing(data);
-    }
+    const data = await fetchListing();
+    if (data) setListing(data);
   }
 
   async function handleStatusUpdate(newStatus: string) {
@@ -138,6 +173,28 @@ export default function ListingDetailPage() {
     } else {
       toast.error("Failed to update listing");
     }
+  }
+
+  async function handleRetry() {
+    setRetrying(true);
+    const response = await fetch(`/api/listings/${params.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        status: "PROCESSING",
+        pipelineStep: "PENDING",
+        pipelineError: null,
+        retry: true,
+      }),
+    });
+
+    if (response.ok) {
+      toast.info("Retrying listing generation...");
+      await refreshListing();
+    } else {
+      toast.error("Failed to retry");
+    }
+    setRetrying(false);
   }
 
   async function handleDelete() {
@@ -183,8 +240,135 @@ export default function ListingDetailPage() {
 
   if (!listing) return null;
 
+  const isProcessing =
+    listing.status === "PROCESSING" ||
+    (listing.status === "DRAFT" &&
+      listing.pipelineStep !== "PENDING" &&
+      listing.pipelineStep !== "ERROR");
+  const isError = listing.pipelineStep === "ERROR";
   const images = [...listing.images].sort((a, b) => a.sortOrder - b.sortOrder);
-  const hasDetails = listing.brand || listing.model || listing.condition || listing.category;
+  const primaryImage = images[0];
+
+  // Processing / Error view
+  if (isProcessing || isError) {
+    return (
+      <div className="min-h-svh px-5 pb-8 pt-4">
+        <header className="flex items-center pb-4">
+          <Button variant="ghost" size="icon" onClick={() => router.push("/")}>
+            <ArrowLeft size={20} />
+          </Button>
+          <h1 className="ml-2 text-lg font-semibold">
+            {isError ? "Generation Failed" : "Generating..."}
+          </h1>
+        </header>
+
+        {/* Photo Preview */}
+        {primaryImage && (
+          <div className="mb-6 aspect-[4/3] overflow-hidden rounded-lg bg-muted">
+            <img
+              src={primaryImage.blobUrl}
+              alt="Item photo"
+              className="h-full w-full object-cover"
+            />
+          </div>
+        )}
+
+        {/* Pipeline Steps */}
+        {!isError && (
+          <Card>
+            <CardContent className="py-4">
+              <PipelineSteps currentStep={listing.pipelineStep ?? "PENDING"} />
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Error State */}
+        {isError && (
+          <Card className="border-destructive/50">
+            <CardContent className="py-4">
+              <div className="flex items-start gap-3">
+                <AlertCircle
+                  size={20}
+                  className="mt-0.5 shrink-0 text-destructive"
+                />
+                <div>
+                  <p className="text-sm font-medium">Generation failed</p>
+                  {listing.pipelineError && (
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {listing.pipelineError}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <div className="mt-4 flex gap-2">
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={handleRetry}
+                  disabled={retrying}
+                >
+                  {retrying ? (
+                    <>
+                      <Loader2 className="animate-spin" size={16} />
+                      Retrying...
+                    </>
+                  ) : (
+                    "Retry"
+                  )}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setDeleteOpen(true)}
+                >
+                  Delete
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {!isError && (
+          <p className="mt-6 text-center text-xs text-muted-foreground">
+            This usually takes 30–90 seconds
+          </p>
+        )}
+
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete this listing?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will permanently delete the listing and all its images.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                onClick={handleDelete}
+                disabled={deleting}
+              >
+                {deleting ? (
+                  <>
+                    <Loader2 className="animate-spin" size={16} />
+                    Deleting...
+                  </>
+                ) : (
+                  "Delete"
+                )}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
+    );
+  }
+
+  // Ready / Listed / Sold / Archived view
+  const hasDetails =
+    listing.brand || listing.model || listing.condition || listing.category;
 
   return (
     <div className="pb-28">

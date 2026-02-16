@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { PushPrompt } from "@/components/push-prompt";
 
 export default function SubmittedPage() {
   const router = useRouter();
@@ -21,6 +22,10 @@ export default function SubmittedPage() {
       <p className="mt-1 text-sm text-muted-foreground">
         You&apos;ll get a notification when it&apos;s ready.
       </p>
+
+      <div className="mt-6 w-full max-w-xs">
+        <PushPrompt />
+      </div>
 
       <Button
         className="mt-8 h-11 px-8"

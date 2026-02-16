@@ -4,6 +4,7 @@ import { eq, desc } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { listings, listingImages } from "@/db/schema";
+import { inngest } from "@/inngest/client";
 import { uploadImage } from "@/lib/blob";
 
 export async function GET() {
@@ -84,6 +85,16 @@ export async function POST(request: NextRequest) {
       return imageRecord;
     }),
   );
+
+  // Trigger AI pipeline
+  await inngest.send({
+    name: "listing.submitted",
+    data: {
+      listingId: listing.id,
+      imageUrls: imageRecords.map((img) => img.blobUrl),
+      userDescription: description,
+    },
+  });
 
   const result = { ...listing, images: imageRecords };
   return NextResponse.json(result, { status: 201 });

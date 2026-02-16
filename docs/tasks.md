@@ -41,7 +41,7 @@
 
 - Phase 0: [x] Complete
 - Phase 1: [x] Complete
-- Phase 2: [ ] Not Started
+- Phase 2: [x] Complete
 - Phase 3: [ ] Not Started
 - Phase 4: [ ] Not Started
 - Phase 5: [ ] Not Started
@@ -330,111 +330,111 @@
 
 ### 2.1 Inngest Setup
 
-- [ ] 2.1.1: Install Inngest SDK and configure client
+- [x] 2.1.1: Install Inngest SDK and configure client
   - Files: src/inngest/client.ts, package.json
   - Test: Inngest client initializes without errors
-- [ ] 2.1.2: Create Inngest serve route handler
+- [x] 2.1.2: Create Inngest serve route handler
   - Files: src/app/api/inngest/route.ts
   - Test: GET /api/inngest returns Inngest dashboard info
-- [ ] 2.1.3: Write tests for Inngest setup
+- [x] 2.1.3: Write tests for Inngest setup
   - Files: src/inngest/__tests__/client.test.ts
   - Test: Tests pass
 
 ### 2.2 Consolidated Agent Setup
 
-- [ ] 2.2.1: Install Anthropic SDK and AgentSDK packages
+- [x] 2.2.1: Install Anthropic SDK and AgentSDK packages
   - Files: package.json
   - Test: Packages installed, imports resolve
-- [ ] 2.2.2: Set up Vercel Sandbox + AgentSDK integration
+- [x] 2.2.2: Set up Vercel Sandbox + AgentSDK integration
   - Files: src/lib/ai/agent.ts
   - Test: Sandbox environment can be created, agent session starts
-- [ ] 2.2.3: Build agent system prompt that covers the full listing generation pipeline
+- [x] 2.2.3: Build agent system prompt that covers the full listing generation pipeline
   - Responsibilities: image analysis (product identification, brand, model, condition), web research (eBay sold listings, FB Marketplace, Amazon comps), and listing writing (title, description, price, market notes)
   - Files: src/lib/ai/prompts/listing-agent-prompt.ts
   - Ref: `docs/selling-strategy.md` — all sections (title construction, description voice/tone, pricing strategy, condition assessment, category tactics, market notes template)
   - Test: Prompt includes all selling strategy rules, structured output format is defined
-- [ ] 2.2.4: Define structured output schema for agent results
+- [x] 2.2.4: Define structured output schema for agent results
   - Fields: title, description, suggestedPrice, priceRangeLow, priceRangeHigh, category, condition, brand, model, researchNotes, comparables[], pipelineStep progress callbacks
   - Files: src/lib/ai/agent-output-schema.ts
   - Test: Schema validates expected agent output structure
-- [ ] 2.2.5: Write tests for agent setup and prompt
+- [x] 2.2.5: Write tests for agent setup and prompt
   - Files: src/lib/ai/__tests__/agent.test.ts
   - Test: Tests pass with ≥80% coverage
 
 ### 2.3 Listing Generate Inngest Function
 
-- [ ] 2.3.1: Implement `run-agent` Inngest step — spins up Vercel Sandbox with AgentSDK, passes image URLs + user description, agent performs full pipeline (analyze → research → write) in one session
+- [x] 2.3.1: Implement `run-agent` Inngest step — spins up Vercel Sandbox with AgentSDK, passes image URLs + user description, agent performs full pipeline (analyze → research → write) in one session
   - Files: src/inngest/functions/generate-listing.ts
   - Test: Agent returns structured result with all listing fields populated
-- [ ] 2.3.2: Add pipelineStep progress updates within agent execution — agent updates DB directly as it transitions between analyzing, researching, and generating phases
+- [x] 2.3.2: Add pipelineStep progress updates within agent execution — agent updates DB directly as it transitions between analyzing, researching, and generating phases
   - Files: src/inngest/functions/generate-listing.ts, src/lib/ai/agent.ts
   - Test: pipelineStep updates to ANALYZING → RESEARCHING → GENERATING during agent run
-- [ ] 2.3.3: Implement `complete` Inngest step (separate from agent) — save structured results to DB, mark status READY
+- [x] 2.3.3: Implement `complete` Inngest step (separate from agent) — save structured results to DB, mark status READY
   - Files: src/inngest/functions/generate-listing.ts
   - Test: Listing record updated with all generated fields, status = READY, pipelineStep = COMPLETE
-- [ ] 2.3.4: Wire up full `listing.generate` function with both Inngest steps
+- [x] 2.3.4: Wire up full `listing.generate` function with both Inngest steps
   - Files: src/inngest/functions/generate-listing.ts
   - Test: End-to-end: run-agent returns results → complete saves to DB
-- [ ] 2.3.5: Register generate-listing function in Inngest serve route
+- [x] 2.3.5: Register generate-listing function in Inngest serve route
   - Files: src/app/api/inngest/route.ts
   - Test: Function appears in Inngest dev dashboard
-- [ ] 2.3.6: Write tests for generate-listing Inngest function
+- [x] 2.3.6: Write tests for generate-listing Inngest function
   - Files: src/inngest/functions/__tests__/generate-listing.test.ts
   - Test: Tests pass with ≥80% coverage
 
 ### 2.4 Pipeline Status & UI
 
-- [ ] 2.4.1: Update listing creation flow to trigger `listing.submitted` Inngest event after upload
+- [x] 2.4.1: Update listing creation flow to trigger `listing.submitted` Inngest event after upload
   - Files: src/app/api/listings/route.ts (POST handler)
   - Test: Creating a listing sends Inngest event with listingId and imageUrls
-- [ ] 2.4.2: Verify pipelineStep updates propagate from agent execution to the DB
+- [x] 2.4.2: Verify pipelineStep updates propagate from agent execution to the DB
   - Files: src/inngest/functions/generate-listing.ts
   - Test: pipelineStep transitions visible in DB: ANALYZING → RESEARCHING → GENERATING → COMPLETE
-- [ ] 2.4.3: Build Listing Detail — Processing screen with live pipeline step indicators
+- [x] 2.4.3: Build Listing Detail — Processing screen with live pipeline step indicators
   - Files: src/app/(authenticated)/listings/[id]/page.tsx, src/components/pipeline-steps.tsx
   - Screens: `docs/screens.md` § Screen 6: Listing Detail — Processing — `docs/design-system.md`
   - Test: Shows step icons (completed/active/pending), step labels, active spinner
-- [ ] 2.4.4: Implement polling for pipeline status updates (poll GET /api/listings/[id] every 3-5s)
+- [x] 2.4.4: Implement polling for pipeline status updates (poll GET /api/listings/[id] every 3-5s)
   - Files: src/app/(authenticated)/listings/[id]/page.tsx
   - Test: Status transitions from PROCESSING to READY auto-refreshes the view
-- [ ] 2.4.5: Build error state with retry button
+- [x] 2.4.5: Build error state with retry button
   - Files: src/app/(authenticated)/listings/[id]/page.tsx
   - Screens: `docs/screens.md` § Screen 9: Error Recovery — `docs/design-system.md`
   - Test: Error card shows pipelineError, retry resets pipeline and re-triggers Inngest
-- [ ] 2.4.6: Write tests for pipeline UI
+- [x] 2.4.6: Write tests for pipeline UI
   - Files: src/components/__tests__/pipeline-steps.test.tsx
   - Test: Tests pass with ≥80% coverage
 
 ### 2.5 Push Notifications
 
-- [ ] 2.5.1: Generate VAPID keys and add to environment variables
+- [x] 2.5.1: Generate VAPID keys and add to environment variables
   - Files: .env.example, .env.local
   - Test: Keys generated and stored
-- [ ] 2.5.2: Install web-push library and create notification helper
+- [x] 2.5.2: Install web-push library and create notification helper
   - Files: src/lib/notifications.ts, package.json
   - Test: Can send test notification
-- [ ] 2.5.3: Add push subscription management (subscribe/unsubscribe server actions)
+- [x] 2.5.3: Add push subscription management (subscribe/unsubscribe server actions)
   - Files: src/lib/push-actions.ts, src/db/schema.ts (push_subscriptions table)
   - Test: Subscription stored in DB, can be retrieved by userId
-- [ ] 2.5.4: Update service worker to handle push events and notification clicks
+- [x] 2.5.4: Update service worker to handle push events and notification clicks
   - Files: public/sw.js
   - Test: Push event displays notification, click opens app
-- [ ] 2.5.5: Add push subscription prompt in the app (after first listing submission)
+- [x] 2.5.5: Add push subscription prompt in the app (after first listing submission)
   - Files: src/components/push-prompt.tsx
   - Test: Prompt shows, user can accept or dismiss
-- [ ] 2.5.6: Trigger push notification in Inngest `complete` step (the separate step after agent execution)
+- [x] 2.5.6: Trigger push notification in Inngest `complete` step (the separate step after agent execution)
   - Files: src/inngest/functions/generate-listing.ts
   - Test: Notification sent when listing status transitions to READY
-- [ ] 2.5.7: Write tests for push notification system
+- [x] 2.5.7: Write tests for push notification system
   - Files: src/lib/__tests__/notifications.test.ts
   - Test: Tests pass with ≥80% coverage
 
 **Phase 2 Checkpoint:**
 
-- [ ] Submitting photos triggers consolidated agent pipeline in Vercel Sandbox
-- [ ] Agent analyzes images, researches pricing, and writes listing in one session with full context
-- [ ] Pipeline progress displays live on the processing screen (agent updates pipelineStep in DB)
-- [ ] Completed listings have AI-generated title, description, price, comparables, and market notes
+- [x] Submitting photos triggers consolidated agent pipeline in Vercel Sandbox
+- [x] Agent analyzes images, researches pricing, and writes listing in one session with full context
+- [x] Pipeline progress displays live on the processing screen (agent updates pipelineStep in DB)
+- [x] Completed listings have AI-generated title, description, price, comparables, and market notes
 - [ ] Push notification fires when listing is ready
 - [ ] Error state shows with retry capability
 - [ ] All tests pass with ≥80% code coverage on Phase 2 code
@@ -675,33 +675,33 @@
 | 1.7.1 | 2026-02-15 | (batch) | PWA manifest w/ branding |
 | 1.7.2 | 2026-02-15 | (batch) | Service worker asset caching |
 | 1.7.3 | 2026-02-15 | (batch) | Viewport meta + SW registration |
-| 2.1.1 |           |        |       |
-| 2.1.2 |           |        |       |
-| 2.1.3 |           |        |       |
-| 2.2.1 |           |        |       |
-| 2.2.2 |           |        |       |
-| 2.2.3 |           |        |       |
-| 2.2.4 |           |        |       |
-| 2.2.5 |           |        |       |
-| 2.3.1 |           |        |       |
-| 2.3.2 |           |        |       |
-| 2.3.3 |           |        |       |
-| 2.3.4 |           |        |       |
-| 2.3.5 |           |        |       |
-| 2.3.6 |           |        |       |
-| 2.4.1 |           |        |       |
-| 2.4.2 |           |        |       |
-| 2.4.3 |           |        |       |
-| 2.4.4 |           |        |       |
-| 2.4.5 |           |        |       |
-| 2.4.6 |           |        |       |
-| 2.5.1 |           |        |       |
-| 2.5.2 |           |        |       |
-| 2.5.3 |           |        |       |
-| 2.5.4 |           |        |       |
-| 2.5.5 |           |        |       |
-| 2.5.6 |           |        |       |
-| 2.5.7 |           |        |       |
+| 2.1.1 | 2026-02-15 | (batch) | Inngest SDK + client |
+| 2.1.2 | 2026-02-15 | (batch) | Inngest serve route handler |
+| 2.1.3 | 2026-02-15 | (batch) | 3 Inngest client tests |
+| 2.2.1 | 2026-02-15 | (batch) | @anthropic-ai/claude-agent-sdk + @anthropic-ai/sdk |
+| 2.2.2 | 2026-02-15 | (batch) | Agent SDK query + sandbox + pipeline hooks |
+| 2.2.3 | 2026-02-15 | (batch) | Full selling strategy prompt |
+| 2.2.4 | 2026-02-15 | (batch) | Zod schema for structured agent output |
+| 2.2.5 | 2026-02-15 | (batch) | 18 agent + schema + prompt tests |
+| 2.3.1 | 2026-02-15 | (batch) | run-agent step w/ Agent SDK |
+| 2.3.2 | 2026-02-15 | (batch) | Pipeline hooks for step transitions |
+| 2.3.3 | 2026-02-15 | (batch) | complete step: DB save + notification |
+| 2.3.4 | 2026-02-15 | (batch) | Full listing.generate wired up |
+| 2.3.5 | 2026-02-15 | (batch) | Registered in Inngest serve route |
+| 2.3.6 | 2026-02-15 | (batch) | 7 generate-listing tests |
+| 2.4.1 | 2026-02-15 | (batch) | POST triggers listing.submitted Inngest event |
+| 2.4.2 | 2026-02-15 | (batch) | Pipeline step propagation verified by construction |
+| 2.4.3 | 2026-02-15 | (batch) | PipelineSteps component w/ step indicators |
+| 2.4.4 | 2026-02-15 | (batch) | 4s polling on detail page |
+| 2.4.5 | 2026-02-15 | (batch) | Error state + retry + PATCH re-trigger |
+| 2.4.6 | 2026-02-15 | (batch) | 8 pipeline-steps tests |
+| 2.5.1 | 2026-02-15 | (batch) | VAPID keys in .env.example |
+| 2.5.2 | 2026-02-15 | (batch) | web-push + sendPushNotification |
+| 2.5.3 | 2026-02-15 | (batch) | push_subscriptions table + server actions |
+| 2.5.4 | 2026-02-15 | (batch) | SW push + notificationclick handlers |
+| 2.5.5 | 2026-02-15 | (batch) | PushPrompt on submitted page |
+| 2.5.6 | 2026-02-15 | (batch) | Already wired in generate-listing.ts |
+| 2.5.7 | 2026-02-15 | (batch) | 20 push notification tests |
 | 3.1.1 |           |        |       |
 | 3.1.2 |           |        |       |
 | 3.1.3 |           |        |       |
