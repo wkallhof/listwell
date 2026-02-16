@@ -41,8 +41,10 @@ import { ListingStatusBadge } from "@/components/listing-status-badge";
 import { CopyButton } from "@/components/copy-button";
 import { BottomBar } from "@/components/bottom-bar";
 import { PipelineSteps } from "@/components/pipeline-steps";
+import { AgentActivityLog } from "@/components/agent-activity-log";
 import { ListingQuality } from "@/components/listing-quality";
 import { formatListingForClipboard } from "@/lib/listing-formatter";
+import type { AgentLogEntry } from "@/types";
 
 interface Comparable {
   title: string;
@@ -76,6 +78,7 @@ interface ListingDetail {
   status: "DRAFT" | "PROCESSING" | "READY" | "LISTED" | "SOLD" | "ARCHIVED";
   pipelineStep: string | null;
   pipelineError: string | null;
+  agentLog: AgentLogEntry[] | null;
   createdAt: string;
   images: ListingImage[];
 }
@@ -97,7 +100,7 @@ function DetailRow({ label, value }: DetailRowProps) {
   );
 }
 
-const POLL_INTERVAL_MS = 4000;
+const POLL_INTERVAL_MS = 3000;
 
 export default function ListingDetailPage() {
   const params = useParams<{ id: string }>();
@@ -363,11 +366,17 @@ export default function ListingDetailPage() {
 
         {/* Pipeline Steps */}
         {!isError && (
-          <Card>
-            <CardContent className="py-4">
-              <PipelineSteps currentStep={listing.pipelineStep ?? "PENDING"} />
-            </CardContent>
-          </Card>
+          <>
+            <Card>
+              <CardContent className="py-4">
+                <PipelineSteps currentStep={listing.pipelineStep ?? "PENDING"} />
+              </CardContent>
+            </Card>
+
+            {listing.agentLog && listing.agentLog.length > 0 && (
+              <AgentActivityLog entries={listing.agentLog} />
+            )}
+          </>
         )}
 
         {/* Error State */}

@@ -44,7 +44,7 @@ export default function DescribePage() {
 
       toast.info("Generating your listing...");
       reset();
-      router.push("/new/submitted");
+      router.push(`/listings/${result.listingId}`);
     } catch {
       toast.error("An unexpected error occurred");
     } finally {

@@ -21,8 +21,19 @@ vi.mock("@/db/schema", () => ({
   listings: { id: "id" },
 }));
 
+// Mock fs/promises
+const mockMkdtemp = vi.fn();
+const mockReadFile = vi.fn();
+const mockRm = vi.fn();
+vi.mock("node:fs/promises", () => ({
+  mkdtemp: (...args: unknown[]) => mockMkdtemp(...args),
+  readFile: (...args: unknown[]) => mockReadFile(...args),
+  rm: (...args: unknown[]) => mockRm(...args),
+}));
+
 import { buildListingAgentPrompt } from "../prompts/listing-agent-prompt";
 import { listingAgentOutputSchema } from "../agent-output-schema";
+import { extractLogEntries } from "../agent";
 import type { RunAgentInput } from "../agent";
 
 describe("listing agent prompt", () => {
@@ -126,6 +137,14 @@ describe("listing agent prompt", () => {
     expect(prompt).toContain("delete the listing and repost");
     expect(prompt).toContain("swap the lead photo");
   });
+
+  it("includes output format instructions for file-based output", () => {
+    const prompt = buildListingAgentPrompt();
+    expect(prompt).toContain("Output Format");
+    expect(prompt).toContain("listing-output.json");
+    expect(prompt).toContain("Write tool");
+    expect(prompt).toContain("CRITICAL");
+  });
 });
 
 describe("listing agent output schema", () => {
@@ -210,27 +229,199 @@ describe("listing agent output schema", () => {
   });
 });
 
+describe("extractLogEntries", () => {
+  it("extracts text entries from assistant messages", () => {
+    const message = {
+      type: "assistant" as const,
+      message: {
+        content: [
+          { type: "text", text: "Analyzing the item photos..." },
+        ],
+      },
+    };
+
+    const entries = extractLogEntries(message);
+
+    expect(entries).toHaveLength(1);
+    expect(entries[0].type).toBe("text");
+    expect(entries[0].content).toBe("Analyzing the item photos...");
+  });
+
+  it("truncates text entries to 200 chars", () => {
+    const longText = "A".repeat(300);
+    const message = {
+      type: "assistant" as const,
+      message: {
+        content: [{ type: "text", text: longText }],
+      },
+    };
+
+    const entries = extractLogEntries(message);
+
+    expect(entries[0].content).toHaveLength(200);
+  });
+
+  it("extracts WebSearch tool_use entries", () => {
+    const message = {
+      type: "assistant" as const,
+      message: {
+        content: [
+          {
+            type: "tool_use",
+            name: "WebSearch",
+            input: { query: "DeWalt drill price eBay" },
+          },
+        ],
+      },
+    };
+
+    const entries = extractLogEntries(message);
+
+    expect(entries).toHaveLength(1);
+    expect(entries[0].type).toBe("search");
+    expect(entries[0].content).toBe("Searching: DeWalt drill price eBay");
+  });
+
+  it("extracts WebFetch tool_use entries", () => {
+    const message = {
+      type: "assistant" as const,
+      message: {
+        content: [
+          {
+            type: "tool_use",
+            name: "WebFetch",
+            input: { url: "https://ebay.com/listing/123" },
+          },
+        ],
+      },
+    };
+
+    const entries = extractLogEntries(message);
+
+    expect(entries).toHaveLength(1);
+    expect(entries[0].type).toBe("fetch");
+    expect(entries[0].content).toBe("Fetching: https://ebay.com/listing/123");
+  });
+
+  it("extracts Write tool_use entries", () => {
+    const message = {
+      type: "assistant" as const,
+      message: {
+        content: [
+          {
+            type: "tool_use",
+            name: "Write",
+            input: { file_path: "listing-output.json" },
+          },
+        ],
+      },
+    };
+
+    const entries = extractLogEntries(message);
+
+    expect(entries).toHaveLength(1);
+    expect(entries[0].type).toBe("write");
+    expect(entries[0].content).toBe("Writing listing output");
+  });
+
+  it("handles multiple content blocks in one message", () => {
+    const message = {
+      type: "assistant" as const,
+      message: {
+        content: [
+          { type: "text", text: "Let me search for prices" },
+          {
+            type: "tool_use",
+            name: "WebSearch",
+            input: { query: "drill prices" },
+          },
+        ],
+      },
+    };
+
+    const entries = extractLogEntries(message);
+
+    expect(entries).toHaveLength(2);
+    expect(entries[0].type).toBe("text");
+    expect(entries[1].type).toBe("search");
+  });
+
+  it("ignores unknown tool types", () => {
+    const message = {
+      type: "assistant" as const,
+      message: {
+        content: [
+          {
+            type: "tool_use",
+            name: "UnknownTool",
+            input: {},
+          },
+        ],
+      },
+    };
+
+    const entries = extractLogEntries(message);
+
+    expect(entries).toHaveLength(0);
+  });
+
+  it("handles empty content array", () => {
+    const message = {
+      type: "assistant" as const,
+      message: {
+        content: [],
+      },
+    };
+
+    const entries = extractLogEntries(message);
+
+    expect(entries).toHaveLength(0);
+  });
+
+  it("uses fallback for missing query in WebSearch", () => {
+    const message = {
+      type: "assistant" as const,
+      message: {
+        content: [
+          {
+            type: "tool_use",
+            name: "WebSearch",
+            input: {},
+          },
+        ],
+      },
+    };
+
+    const entries = extractLogEntries(message);
+
+    expect(entries[0].content).toBe("Searching: ...");
+  });
+});
+
 describe("runListingAgent", () => {
+  const validOutput = {
+    title: "Test Item",
+    description: "A test description for the item.",
+    suggestedPrice: 50,
+    priceRangeLow: 40,
+    priceRangeHigh: 60,
+    category: "Electronics",
+    condition: "Good",
+    brand: "TestBrand",
+    researchNotes: "Test notes.",
+    comparables: [],
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
     mockSet.mockReturnValue({ where: vi.fn() });
+    mockMkdtemp.mockResolvedValue("/tmp/listwell-agent-abc123");
+    mockRm.mockResolvedValue(undefined);
   });
 
-  it("constructs correct prompt with image URLs and description", async () => {
-    const validOutput = {
-      title: "Test Item",
-      description: "A test description for the item.",
-      suggestedPrice: 50,
-      priceRangeLow: 40,
-      priceRangeHigh: 60,
-      category: "Electronics",
-      condition: "Good",
-      brand: "TestBrand",
-      researchNotes: "Test notes.",
-      comparables: [],
-    };
+  it("reads output from file after agent completes", async () => {
+    mockReadFile.mockResolvedValue(JSON.stringify(validOutput));
 
-    // Make mockQuery return an async iterable
     mockQuery.mockReturnValue({
       [Symbol.asyncIterator]: async function* () {
         yield {
@@ -238,7 +429,6 @@ describe("runListingAgent", () => {
           subtype: "success",
           total_cost_usd: 0.05,
           is_error: false,
-          structured_output: validOutput,
         };
       },
     });
@@ -262,24 +452,16 @@ describe("runListingAgent", () => {
     expect(callArgs.prompt).toContain("img2.jpg");
     expect(callArgs.prompt).toContain("My old drill, works great");
     expect(callArgs.options.model).toBe("claude-sonnet-4-5-20250929");
-    expect(callArgs.options.outputFormat).toBeDefined();
+    expect(callArgs.options.cwd).toBe("/tmp/listwell-agent-abc123");
+    expect(callArgs.options.tools).toContain("Write");
     expect(result.output.title).toBe("Test Item");
     expect(result.costUsd).toBe(0.05);
   });
 
   it("handles missing user description", async () => {
-    const validOutput = {
-      title: "Unknown Item",
-      description: "A found item.",
-      suggestedPrice: 30,
-      priceRangeLow: 20,
-      priceRangeHigh: 40,
-      category: "Other",
-      condition: "Good",
-      brand: "Unknown",
-      researchNotes: "Limited data.",
-      comparables: [],
-    };
+    mockReadFile.mockResolvedValue(
+      JSON.stringify({ ...validOutput, title: "Unknown Item" }),
+    );
 
     mockQuery.mockReturnValue({
       [Symbol.asyncIterator]: async function* () {
@@ -288,7 +470,6 @@ describe("runListingAgent", () => {
           subtype: "success",
           total_cost_usd: 0.03,
           is_error: false,
-          structured_output: validOutput,
         };
       },
     });
@@ -336,7 +517,9 @@ describe("runListingAgent", () => {
     );
   });
 
-  it("throws when no structured output is produced", async () => {
+  it("throws when output file is missing", async () => {
+    mockReadFile.mockRejectedValue(new Error("ENOENT: no such file"));
+
     mockQuery.mockReturnValue({
       [Symbol.asyncIterator]: async function* () {
         yield {
@@ -344,7 +527,6 @@ describe("runListingAgent", () => {
           subtype: "success",
           total_cost_usd: 0.02,
           is_error: false,
-          structured_output: null,
         };
       },
     });
@@ -357,8 +539,110 @@ describe("runListingAgent", () => {
       userDescription: null,
     };
 
-    await expect(runListingAgent(input)).rejects.toThrow(
-      "Agent completed without producing structured output",
+    await expect(runListingAgent(input)).rejects.toThrow("ENOENT");
+  });
+
+  it("cleans up temp directory in finally block", async () => {
+    mockReadFile.mockResolvedValue(JSON.stringify(validOutput));
+
+    mockQuery.mockReturnValue({
+      [Symbol.asyncIterator]: async function* () {
+        yield {
+          type: "result",
+          subtype: "success",
+          total_cost_usd: 0.01,
+          is_error: false,
+        };
+      },
+    });
+
+    const { runListingAgent } = await import("../agent");
+
+    await runListingAgent({
+      listingId: "test-cleanup",
+      imageUrls: ["https://blob.example.com/img.jpg"],
+      userDescription: null,
+    });
+
+    expect(mockRm).toHaveBeenCalledWith(
+      "/tmp/listwell-agent-abc123",
+      { recursive: true, force: true },
     );
+  });
+
+  it("cleans up temp directory even on error", async () => {
+    mockQuery.mockReturnValue({
+      [Symbol.asyncIterator]: async function* () {
+        yield {
+          type: "result",
+          subtype: "error_during_execution",
+          total_cost_usd: 0.01,
+          is_error: true,
+          errors: ["Some error"],
+        };
+      },
+    });
+
+    const { runListingAgent } = await import("../agent");
+
+    await expect(
+      runListingAgent({
+        listingId: "test-cleanup-error",
+        imageUrls: ["https://blob.example.com/img.jpg"],
+        userDescription: null,
+      }),
+    ).rejects.toThrow();
+
+    expect(mockRm).toHaveBeenCalledWith(
+      "/tmp/listwell-agent-abc123",
+      { recursive: true, force: true },
+    );
+  });
+
+  it("accumulates log entries from assistant messages", async () => {
+    mockReadFile.mockResolvedValue(JSON.stringify(validOutput));
+
+    mockQuery.mockReturnValue({
+      [Symbol.asyncIterator]: async function* () {
+        yield {
+          type: "assistant",
+          message: {
+            content: [
+              { type: "text", text: "Analyzing the photos..." },
+            ],
+          },
+        };
+        yield {
+          type: "assistant",
+          message: {
+            content: [
+              {
+                type: "tool_use",
+                name: "WebSearch",
+                input: { query: "drill prices" },
+              },
+            ],
+          },
+        };
+        yield {
+          type: "result",
+          subtype: "success",
+          total_cost_usd: 0.05,
+          is_error: false,
+        };
+      },
+    });
+
+    const { runListingAgent } = await import("../agent");
+
+    await runListingAgent({
+      listingId: "test-log",
+      imageUrls: ["https://blob.example.com/img.jpg"],
+      userDescription: null,
+    });
+
+    // DB update should have been called multiple times for log flushes
+    // Initial "Starting analysis..." + 2 assistant messages + final "Listing generated"
+    expect(mockUpdate).toHaveBeenCalled();
   });
 });

@@ -74,7 +74,7 @@ describe("DescribePage", () => {
 
     expect(mockCreateListing).toHaveBeenCalledWith(expect.any(FormData));
     expect(mockReset).toHaveBeenCalled();
-    expect(mockPush).toHaveBeenCalledWith("/new/submitted");
+    expect(mockPush).toHaveBeenCalledWith("/listings/123");
   });
 
   it("calls createListing without description on Skip click", async () => {
@@ -86,7 +86,7 @@ describe("DescribePage", () => {
     await user.click(screen.getByText("Skip"));
 
     expect(mockCreateListing).toHaveBeenCalledWith(expect.any(FormData));
-    expect(mockPush).toHaveBeenCalledWith("/new/submitted");
+    expect(mockPush).toHaveBeenCalledWith("/listings/123");
   });
 
   it("shows error toast on failure", async () => {

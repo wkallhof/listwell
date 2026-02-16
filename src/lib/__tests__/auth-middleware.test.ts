@@ -54,6 +54,13 @@ describe("authMiddleware", () => {
     expect(result).toBeUndefined();
   });
 
+  it("allows unauthenticated access to /api/inngest", () => {
+    mockedGetSessionCookie.mockReturnValue(null);
+
+    const result = authMiddleware(createRequest("/api/inngest"));
+    expect(result).toBeUndefined();
+  });
+
   it("redirects unauthenticated users from nested protected routes", () => {
     mockedGetSessionCookie.mockReturnValue(null);
 

@@ -1,9 +1,12 @@
 import { query } from "@anthropic-ai/claude-agent-sdk";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { eq } from "drizzle-orm";
-import { z } from "zod";
 
 import { db } from "@/db";
 import { listings } from "@/db/schema";
+import type { AgentLogEntry } from "@/types";
 
 import {
   listingAgentOutputSchema,
@@ -59,9 +62,9 @@ function buildUserPrompt(
 }
 
 function parseAgentOutput(
-  structuredOutput: unknown,
+  raw: unknown,
 ): ListingAgentOutput {
-  const parsed = listingAgentOutputSchema.safeParse(structuredOutput);
+  const parsed = listingAgentOutputSchema.safeParse(raw);
 
   if (!parsed.success) {
     throw new Error(
@@ -72,6 +75,71 @@ function parseAgentOutput(
   return parsed.data;
 }
 
+interface ContentBlock {
+  type: string;
+  text?: string;
+  name?: string;
+  input?: Record<string, unknown>;
+}
+
+interface SDKAssistantMessageLike {
+  type: "assistant";
+  message: {
+    content: ContentBlock[];
+  };
+}
+
+export function extractLogEntries(
+  message: SDKAssistantMessageLike,
+): AgentLogEntry[] {
+  const entries: AgentLogEntry[] = [];
+  const now = Date.now();
+
+  for (const block of message.message.content) {
+    if (block.type === "text" && block.text) {
+      entries.push({
+        ts: now,
+        type: "text",
+        content: block.text.slice(0, 200),
+      });
+    } else if (block.type === "tool_use" && block.name === "WebSearch") {
+      const queryText =
+        typeof block.input?.query === "string" ? block.input.query : "...";
+      entries.push({
+        ts: now,
+        type: "search",
+        content: `Searching: ${queryText}`,
+      });
+    } else if (block.type === "tool_use" && block.name === "WebFetch") {
+      const url =
+        typeof block.input?.url === "string" ? block.input.url : "...";
+      entries.push({
+        ts: now,
+        type: "fetch",
+        content: `Fetching: ${url}`,
+      });
+    } else if (block.type === "tool_use" && block.name === "Write") {
+      entries.push({
+        ts: now,
+        type: "write",
+        content: "Writing listing output",
+      });
+    }
+  }
+
+  return entries;
+}
+
+async function flushAgentLog(
+  listingId: string,
+  log: AgentLogEntry[],
+): Promise<void> {
+  await db
+    .update(listings)
+    .set({ agentLog: log, updatedAt: new Date() })
+    .where(eq(listings.id, listingId));
+}
+
 export async function runListingAgent(
   input: RunAgentInput,
 ): Promise<RunAgentResult> {
@@ -79,62 +147,89 @@ export async function runListingAgent(
 
   await updatePipelineStep(listingId, "ANALYZING");
 
-  const outputSchema = z.toJSONSchema(listingAgentOutputSchema);
+  const workDir = await mkdtemp(join(tmpdir(), "listwell-agent-"));
+  const agentLog: AgentLogEntry[] = [
+    { ts: Date.now(), type: "status", content: "Starting analysis..." },
+  ];
+  await flushAgentLog(listingId, agentLog);
 
-  let result: ListingAgentOutput | null = null;
   let totalCost = 0;
 
-  for await (const message of query({
-    prompt: buildUserPrompt(imageUrls, userDescription),
-    options: {
-      systemPrompt: buildListingAgentPrompt(),
-      model: "claude-sonnet-4-5-20250929",
-      permissionMode: "bypassPermissions",
-      allowDangerouslySkipPermissions: true,
-      allowedTools: ["WebSearch", "WebFetch"],
-      maxTurns: 15,
-      outputFormat: {
-        type: "json_schema",
-        schema: outputSchema,
+  try {
+    for await (const message of query({
+      prompt: buildUserPrompt(imageUrls, userDescription),
+      options: {
+        systemPrompt: buildListingAgentPrompt(),
+        model: "claude-sonnet-4-5-20250929",
+        permissionMode: "bypassPermissions",
+        allowDangerouslySkipPermissions: true,
+        allowedTools: ["WebSearch", "WebFetch", "Write"],
+        tools: ["WebSearch", "WebFetch", "Write"],
+        cwd: workDir,
+        maxTurns: 15,
+        hooks: {
+          PostToolUse: [
+            {
+              matcher: "WebSearch",
+              hooks: [
+                async () => {
+                  await updatePipelineStep(listingId, "RESEARCHING");
+                  return {};
+                },
+              ],
+            },
+          ],
+        },
       },
-      hooks: {
-        PostToolUse: [
-          {
-            matcher: "WebSearch",
-            hooks: [
-              async () => {
-                await updatePipelineStep(listingId, "RESEARCHING");
-                return {};
-              },
-            ],
-          },
-        ],
-      },
-    },
-  })) {
-    if (message.type !== "result") {
-      continue;
+    })) {
+      if (message.type === "assistant") {
+        const entries = extractLogEntries(
+          message as SDKAssistantMessageLike,
+        );
+        if (entries.length > 0) {
+          agentLog.push(...entries);
+          await flushAgentLog(listingId, agentLog);
+        }
+      }
+
+      if (message.type === "result") {
+        totalCost = message.total_cost_usd;
+
+        if (message.is_error) {
+          const errorMsg =
+            "errors" in message
+              ? (message.errors as string[]).join("; ")
+              : "Agent execution failed";
+          throw new Error(errorMsg);
+        }
+      }
     }
 
-    totalCost = message.total_cost_usd;
+    await updatePipelineStep(listingId, "GENERATING");
 
-    if (message.is_error) {
-      const errorMsg =
-        "errors" in message
-          ? (message.errors as string[]).join("; ")
-          : "Agent execution failed";
-      throw new Error(errorMsg);
-    }
+    const outputPath = join(workDir, "listing-output.json");
+    const raw = await readFile(outputPath, "utf-8");
+    const parsed = JSON.parse(raw) as unknown;
+    const result = parseAgentOutput(parsed);
 
-    if (message.subtype === "success" && message.structured_output) {
-      await updatePipelineStep(listingId, "GENERATING");
-      result = parseAgentOutput(message.structured_output);
-    }
+    agentLog.push({
+      ts: Date.now(),
+      type: "complete",
+      content: "Listing generated",
+    });
+    await flushAgentLog(listingId, agentLog);
+
+    return { output: result, costUsd: totalCost };
+  } catch (error) {
+    agentLog.push({
+      ts: Date.now(),
+      type: "error",
+      content:
+        error instanceof Error ? error.message : "Unknown error occurred",
+    });
+    await flushAgentLog(listingId, agentLog);
+    throw error;
+  } finally {
+    await rm(workDir, { recursive: true, force: true }).catch(() => {});
   }
-
-  if (!result) {
-    throw new Error("Agent completed without producing structured output");
-  }
-
-  return { output: result, costUsd: totalCost };
 }

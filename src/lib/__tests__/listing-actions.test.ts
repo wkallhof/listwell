@@ -6,6 +6,8 @@ const mockInsert = vi.fn();
 const mockValues = vi.fn();
 const mockReturning = vi.fn();
 const mockUploadImage = vi.fn();
+const mockFindMany = vi.fn();
+const mockInngestSend = vi.fn();
 
 vi.mock("next/headers", () => ({
   headers: () => Promise.resolve(new Headers()),
@@ -22,6 +24,17 @@ vi.mock("@/lib/auth", () => ({
 vi.mock("@/db", () => ({
   db: {
     insert: (...args: unknown[]) => mockInsert(...args),
+    query: {
+      listingImages: {
+        findMany: (...args: unknown[]) => mockFindMany(...args),
+      },
+    },
+  },
+}));
+
+vi.mock("@/inngest/client", () => ({
+  inngest: {
+    send: (...args: unknown[]) => mockInngestSend(...args),
   },
 }));
 
@@ -98,6 +111,10 @@ describe("createListing", () => {
       url: "https://blob.test/img.jpg",
       key: "img-key",
     });
+    mockFindMany.mockResolvedValue([
+      { id: "img-1", blobUrl: "https://blob.test/img.jpg" },
+    ]);
+    mockInngestSend.mockResolvedValue(undefined);
 
     const { createListing } = await import("@/lib/listing-actions");
     const formData = new FormData();
@@ -121,6 +138,15 @@ describe("createListing", () => {
         pipelineStep: "PENDING",
       }),
     );
+    // Check Inngest event was sent
+    expect(mockInngestSend).toHaveBeenCalledWith({
+      name: "listing.submitted",
+      data: {
+        listingId: "listing-1",
+        imageUrls: ["https://blob.test/img.jpg"],
+        userDescription: "A nice camera",
+      },
+    });
   });
 
   it("creates listing with null description when not provided", async () => {
@@ -130,6 +156,10 @@ describe("createListing", () => {
       url: "https://blob.test/img.jpg",
       key: "img-key",
     });
+    mockFindMany.mockResolvedValue([
+      { id: "img-1", blobUrl: "https://blob.test/img.jpg" },
+    ]);
+    mockInngestSend.mockResolvedValue(undefined);
 
     const { createListing } = await import("@/lib/listing-actions");
     const formData = new FormData();
@@ -144,6 +174,15 @@ describe("createListing", () => {
     expect(mockValues).toHaveBeenCalledWith(
       expect.objectContaining({
         rawDescription: null,
+      }),
+    );
+    // Inngest event should have null description
+    expect(mockInngestSend).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: "listing.submitted",
+        data: expect.objectContaining({
+          userDescription: null,
+        }),
       }),
     );
   });

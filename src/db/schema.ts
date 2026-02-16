@@ -11,6 +11,7 @@ import {
   timestamp,
 } from "drizzle-orm/pg-core";
 import { createId } from "@paralleldrive/cuid2";
+import type { AgentLogEntry } from "@/types";
 
 // ─── Auth Tables (BetterAuth) ────────────────────────────────────────────────
 
@@ -200,6 +201,7 @@ export const listings = pgTable("listings", {
     .notNull()
     .default("PENDING"),
   pipelineError: text("pipeline_error"),
+  agentLog: json("agent_log").$type<AgentLogEntry[]>(),
   inngestRunId: text("inngest_run_id"),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()

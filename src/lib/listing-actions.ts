@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { listings, listingImages } from "@/db/schema";
 import { uploadImage } from "@/lib/blob";
+import { inngest } from "@/inngest/client";
 
 interface CreateListingResult {
   success: boolean;
@@ -60,6 +61,20 @@ export async function createListing(
       });
     }),
   );
+
+  // Trigger AI pipeline
+  const imageRecords = await db.query.listingImages.findMany({
+    where: (img, { eq }) => eq(img.listingId, listing.id),
+  });
+
+  await inngest.send({
+    name: "listing.submitted",
+    data: {
+      listingId: listing.id,
+      imageUrls: imageRecords.map((img) => img.blobUrl),
+      userDescription: description,
+    },
+  });
 
   return { success: true, listingId: listing.id };
 }

@@ -43,7 +43,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
           <Toaster position="top-center" />
         </ThemeProvider>
         <Script id="sw-register" strategy="afterInteractive">
-          {`if ('serviceWorker' in navigator) {
+          {`if ('serviceWorker' in navigator && location.hostname !== 'localhost') {
             navigator.serviceWorker.register('/sw.js');
           }`}
         </Script>

@@ -163,5 +163,38 @@ When searching for comparable prices:
 - Competitive disparagement
 - Platform promises about buyer protection
 - Personal information (full name, phone, exact address)
-- Prohibited trigger words for marketplace moderation when avoidable (certain words trigger Facebook's automated moderation — "gun" even in toy listings, color names like "mocha" or "nude," medical terms. Use alternatives when possible.)`;
+- Prohibited trigger words for marketplace moderation when avoidable (certain words trigger Facebook's automated moderation — "gun" even in toy listings, color names like "mocha" or "nude," medical terms. Use alternatives when possible.)
+
+## Output Format
+
+CRITICAL: When you have completed your analysis, research, and listing generation, you MUST write the final output to a file called \`listing-output.json\` using the Write tool. This is your LAST action.
+
+The JSON must conform to this exact schema:
+
+\`\`\`json
+{
+  "title": "string — Marketplace listing title, 65 chars max, Title Case, Brand + Item Type + Key Spec + Condition",
+  "description": "string — Natural, first-person listing description, 80-150 words, conversational tone",
+  "suggestedPrice": "number — Suggested listing price in USD (includes 10-15% negotiation buffer)",
+  "priceRangeLow": "number — Low end of market price range in USD",
+  "priceRangeHigh": "number — High end of market price range in USD",
+  "category": "string — Item category (e.g., Electronics, Furniture, Tools, Clothing)",
+  "condition": "string — One of: New, Like New, Good, Fair, Poor",
+  "brand": "string — Brand name identified from item or packaging",
+  "model": "string (optional) — Model name or number if identifiable",
+  "researchNotes": "string — Market research notes for the seller: market overview, pricing rationale, sell-faster tips, shipping note",
+  "comparables": [
+    {
+      "title": "string — Title of the comparable listing",
+      "price": "number — Sale or asking price in USD",
+      "source": "string — Where it was found (e.g., eBay Sold, FB Marketplace, Amazon)",
+      "url": "string (optional) — URL of the comparable listing",
+      "condition": "string (optional) — Condition of the comparable item",
+      "soldDate": "string (optional) — Date sold if available, YYYY-MM-DD format"
+    }
+  ]
+}
+\`\`\`
+
+Do NOT output the JSON to the conversation. You MUST use the Write tool to write it to \`listing-output.json\`. This is essential for the system to process your results.`;
 }

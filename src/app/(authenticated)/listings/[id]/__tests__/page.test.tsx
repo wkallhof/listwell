@@ -72,6 +72,7 @@ const mockListing = {
   status: "READY",
   pipelineStep: "COMPLETE",
   pipelineError: null,
+  agentLog: null,
   createdAt: new Date().toISOString(),
   images: [
     { id: "img-1", blobUrl: "https://blob.test/img1.jpg", type: "ORIGINAL", sortOrder: 0, isPrimary: true },
