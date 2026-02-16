@@ -539,7 +539,7 @@
   - Files: src/app/layout.tsx, relevant pages
   - Screens: `docs/screens.md` § Toast Messages
   - Test: Each action triggers correct toast type and message
-- [ ] 4.3.3: Add loading and skeleton states across all screens
+- [x] 4.3.3: Add loading and skeleton states across all screens
   - Screens: `docs/design-system.md` § Motion & Transitions
   - Test: Skeleton loading appears while data loads
 - [ ] 4.3.4: Optimize image loading (lazy loading, proper sizing, blur placeholders)
@@ -722,7 +722,7 @@
 | 4.2.2 | 2026-02-15 | (batch) | Inline price editing |
 | 4.3.1 | 2026-02-15 | (batch) | Title-$Price inline + condition/brand/model |
 | 4.3.2 | 2026-02-15 | (batch) | Toasts aligned to spec table |
-| 4.3.3 |           |        |       |
+| 4.3.3 | 2026-02-15 | (batch) | Feed + detail loading.tsx skeletons |
 | 4.3.4 |           |        |       |
 | 4.3.5 |           |        |       |
 | 5.1.1 |           |        |       |
