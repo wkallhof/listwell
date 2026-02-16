@@ -57,7 +57,7 @@ describe("listing agent prompt", () => {
   it("includes market research notes template", () => {
     const prompt = buildListingAgentPrompt();
     expect(prompt).toContain("Market Research Notes");
-    expect(prompt).toContain("relisting reminder");
+    expect(prompt).toContain("Relisting reminder");
     expect(prompt).toContain("7-10 days");
   });
 
@@ -72,6 +72,59 @@ describe("listing agent prompt", () => {
     const prompt = buildListingAgentPrompt();
     expect(prompt).toContain("Must Never Generate");
     expect(prompt).toContain("Pressure tactics");
+  });
+
+  it("includes category-specific listing tactics", () => {
+    const prompt = buildListingAgentPrompt();
+    expect(prompt).toContain("Category-Specific Listing Tactics");
+    expect(prompt).toContain("Furniture");
+    expect(prompt).toContain("dimensions (H x W x D)");
+    expect(prompt).toContain("Electronics");
+    expect(prompt).toContain("model number");
+    expect(prompt).toContain("Tools");
+    expect(prompt).toContain("voltage/power");
+    expect(prompt).toContain("Clothing & Accessories");
+    expect(prompt).toContain("Kids & Baby Items");
+  });
+
+  it("includes seasonal timing awareness", () => {
+    const prompt = buildListingAgentPrompt();
+    expect(prompt).toContain("Seasonal");
+    expect(prompt).toContain("college move-in");
+    expect(prompt).toContain("spring cleaning");
+  });
+
+  it("includes cross-posting guidance", () => {
+    const prompt = buildListingAgentPrompt();
+    expect(prompt).toContain("Cross-post");
+    expect(prompt).toContain("buy/sell groups");
+  });
+
+  it("includes pricing tactic recommendations (OBO, Firm, bundle)", () => {
+    const prompt = buildListingAgentPrompt();
+    expect(prompt).toContain("Pricing tactic");
+    expect(prompt).toContain("OBO");
+    expect(prompt).toContain("Firm");
+    expect(prompt).toContain("bundle");
+  });
+
+  it("includes platform-specific optimization notes", () => {
+    const prompt = buildListingAgentPrompt();
+    expect(prompt).toContain("Platform tips");
+    expect(prompt).toContain("Facebook Marketplace");
+    expect(prompt).toContain("eBay");
+    expect(prompt).toContain("Craigslist");
+    expect(prompt).toContain("peak times");
+    expect(prompt).toContain("shipping weight");
+  });
+
+  it("includes prominent relisting reminder instruction", () => {
+    const prompt = buildListingAgentPrompt();
+    expect(prompt).toContain("Relisting reminder");
+    expect(prompt).toContain("ALWAYS include");
+    expect(prompt).toContain("7-10 days");
+    expect(prompt).toContain("delete the listing and repost");
+    expect(prompt).toContain("swap the lead photo");
   });
 });
 

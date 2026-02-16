@@ -569,19 +569,19 @@
 
 ### 5.1 Enhanced Prompts
 
-- [ ] 5.1.1: Refine consolidated agent system prompt with advanced selling strategy rules (the base selling strategy is integrated in Phase 2; this adds deeper category-specific tactics, seasonal timing, and cross-posting guidance)
+- [x] 5.1.1: Refine consolidated agent system prompt with advanced selling strategy rules (the base selling strategy is integrated in Phase 2; this adds deeper category-specific tactics, seasonal timing, and cross-posting guidance)
   - Files: src/lib/ai/prompts/listing-agent-prompt.ts
   - Ref: `docs/selling-strategy.md` — all sections
   - Test: Generated listings show improved category-specific tactics and market awareness
-- [ ] 5.1.2: Add pricing strategy suggestions in market notes (OBO, firm, bundle discount recommendations)
-  - Files: src/inngest/functions/generate-listing.ts
+- [x] 5.1.2: Add pricing strategy suggestions in market notes (OBO, firm, bundle discount recommendations)
+  - Files: src/lib/ai/prompts/listing-agent-prompt.ts
   - Ref: `docs/selling-strategy.md` § Pricing Strategy, § Market Notes Template
   - Test: Market notes include pricing tactic advice
-- [ ] 5.1.3: Add platform-specific optimization notes (Facebook Marketplace, eBay, Craigslist tips)
-  - Files: src/inngest/functions/generate-listing.ts
+- [x] 5.1.3: Add platform-specific optimization notes (Facebook Marketplace, eBay, Craigslist tips)
+  - Files: src/lib/ai/prompts/listing-agent-prompt.ts
   - Ref: `docs/selling-strategy.md` § Platform-Specific Optimization
   - Test: Market notes include platform-specific advice
-- [ ] 5.1.4: Add relisting reminder to market notes
+- [x] 5.1.4: Add relisting reminder to market notes
   - Ref: `docs/selling-strategy.md` § The Relisting Reminder
   - Test: Every market notes section includes relisting advice
 
@@ -725,9 +725,9 @@
 | 4.3.3 | 2026-02-15 | (batch) | Feed + detail loading.tsx skeletons |
 | 4.3.4 | 2026-02-15 |        |       |
 | 4.3.5 | 2026-02-15 |        |       |
-| 5.1.1 |           |        |       |
-| 5.1.2 |           |        |       |
-| 5.1.3 |           |        |       |
-| 5.1.4 |           |        |       |
+| 5.1.1 | 2026-02-16 | (batch) | Category tactics, seasonal timing, cross-posting |
+| 5.1.2 | 2026-02-16 | (batch) | OBO/Firm/bundle pricing tactics in prompt |
+| 5.1.3 | 2026-02-16 | (batch) | FB/eBay/CL platform tips in prompt |
+| 5.1.4 | 2026-02-16 | (batch) | Relisting reminder with ALWAYS instruction |
 | 5.2.1 |           |        |       |
 | 5.2.2 |           |        |       |
