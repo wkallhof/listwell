@@ -209,27 +209,27 @@
 
 ### 1.3 Shared Components
 
-- [ ] 1.3.1: Create ListingStatusBadge component with status color mapping
+- [x] 1.3.1: Create ListingStatusBadge component with status color mapping
   - Files: src/components/listing-status-badge.tsx
   - Screens: `docs/screens.md` § Shared Components — `docs/design-system.md` § Status Colors
   - Test: Renders correct colors/icons for each status (DRAFT, PROCESSING, READY, LISTED, SOLD, ARCHIVED, ERROR)
-- [ ] 1.3.2: Create CopyButton component with clipboard + toast feedback
+- [x] 1.3.2: Create CopyButton component with clipboard + toast feedback
   - Files: src/components/copy-button.tsx
   - Screens: `docs/screens.md` § CopyButton — `docs/design-system.md`
   - Test: Copies text, shows Check icon for 2s, triggers Sonner toast
-- [ ] 1.3.3: Create BottomBar component (fixed bottom action container)
+- [x] 1.3.3: Create BottomBar component (fixed bottom action container)
   - Files: src/components/bottom-bar.tsx
   - Screens: `docs/screens.md` § BottomBar — `docs/design-system.md` § Bottom Action Bar
   - Test: Renders fixed at bottom with blur backdrop
-- [ ] 1.3.4: Create EmptyState component
+- [x] 1.3.4: Create EmptyState component
   - Files: src/components/empty-state.tsx
   - Screens: `docs/screens.md` § EmptyState — `docs/design-system.md`
   - Test: Renders icon, title, and description centered
-- [ ] 1.3.5: Create FAB (Floating Action Button) component
+- [x] 1.3.5: Create FAB (Floating Action Button) component
   - Files: src/components/fab.tsx
   - Screens: `docs/screens.md` § FAB — `docs/design-system.md` § Floating Action Button
   - Test: Renders fixed bottom-right with Plus icon
-- [ ] 1.3.6: Write tests for all shared components
+- [x] 1.3.6: Write tests for all shared components
   - Files: src/components/__tests__/*.test.tsx
   - Test: Tests pass with ≥80% coverage
 
@@ -650,12 +650,12 @@
 | 1.2.6 | 2026-02-15 | (batch) | DELETE /api/listings/[id]/images |
 | 1.2.7 | 2026-02-15 | (batch) | Blob upload/delete helpers |
 | 1.2.8 | 2026-02-15 | (batch) | 20 API + blob tests |
-| 1.3.1 |           |        |       |
-| 1.3.2 |           |        |       |
-| 1.3.3 |           |        |       |
-| 1.3.4 |           |        |       |
-| 1.3.5 |           |        |       |
-| 1.3.6 |           |        |       |
+| 1.3.1 | 2026-02-15 | (batch) | ListingStatusBadge w/ 7 statuses |
+| 1.3.2 | 2026-02-15 | (batch) | CopyButton w/ clipboard + toast |
+| 1.3.3 | 2026-02-15 | (batch) | BottomBar fixed container |
+| 1.3.4 | 2026-02-15 | (batch) | EmptyState centered placeholder |
+| 1.3.5 | 2026-02-15 | (batch) | FAB floating action button |
+| 1.3.6 | 2026-02-15 | (batch) | 23 component tests |
 | 1.4.1 |           |        |       |
 | 1.4.2 |           |        |       |
 | 1.4.3 |           |        |       |
