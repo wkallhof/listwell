@@ -384,24 +384,24 @@
 
 ### 2.4 Pipeline Status & UI
 
-- [ ] 2.4.1: Update listing creation flow to trigger `listing.submitted` Inngest event after upload
+- [x] 2.4.1: Update listing creation flow to trigger `listing.submitted` Inngest event after upload
   - Files: src/app/api/listings/route.ts (POST handler)
   - Test: Creating a listing sends Inngest event with listingId and imageUrls
-- [ ] 2.4.2: Verify pipelineStep updates propagate from agent execution to the DB
+- [x] 2.4.2: Verify pipelineStep updates propagate from agent execution to the DB
   - Files: src/inngest/functions/generate-listing.ts
   - Test: pipelineStep transitions visible in DB: ANALYZING → RESEARCHING → GENERATING → COMPLETE
-- [ ] 2.4.3: Build Listing Detail — Processing screen with live pipeline step indicators
+- [x] 2.4.3: Build Listing Detail — Processing screen with live pipeline step indicators
   - Files: src/app/(authenticated)/listings/[id]/page.tsx, src/components/pipeline-steps.tsx
   - Screens: `docs/screens.md` § Screen 6: Listing Detail — Processing — `docs/design-system.md`
   - Test: Shows step icons (completed/active/pending), step labels, active spinner
-- [ ] 2.4.4: Implement polling for pipeline status updates (poll GET /api/listings/[id] every 3-5s)
+- [x] 2.4.4: Implement polling for pipeline status updates (poll GET /api/listings/[id] every 3-5s)
   - Files: src/app/(authenticated)/listings/[id]/page.tsx
   - Test: Status transitions from PROCESSING to READY auto-refreshes the view
-- [ ] 2.4.5: Build error state with retry button
+- [x] 2.4.5: Build error state with retry button
   - Files: src/app/(authenticated)/listings/[id]/page.tsx
   - Screens: `docs/screens.md` § Screen 9: Error Recovery — `docs/design-system.md`
   - Test: Error card shows pipelineError, retry resets pipeline and re-triggers Inngest
-- [ ] 2.4.6: Write tests for pipeline UI
+- [x] 2.4.6: Write tests for pipeline UI
   - Files: src/components/__tests__/pipeline-steps.test.tsx
   - Test: Tests pass with ≥80% coverage
 
@@ -689,12 +689,12 @@
 | 2.3.4 | 2026-02-15 | (batch) | Full listing.generate wired up |
 | 2.3.5 | 2026-02-15 | (batch) | Registered in Inngest serve route |
 | 2.3.6 | 2026-02-15 | (batch) | 7 generate-listing tests |
-| 2.4.1 |           |        |       |
-| 2.4.2 |           |        |       |
-| 2.4.3 |           |        |       |
-| 2.4.4 |           |        |       |
-| 2.4.5 |           |        |       |
-| 2.4.6 |           |        |       |
+| 2.4.1 | 2026-02-15 | (batch) | POST triggers listing.submitted Inngest event |
+| 2.4.2 | 2026-02-15 | (batch) | Pipeline step propagation verified by construction |
+| 2.4.3 | 2026-02-15 | (batch) | PipelineSteps component w/ step indicators |
+| 2.4.4 | 2026-02-15 | (batch) | 4s polling on detail page |
+| 2.4.5 | 2026-02-15 | (batch) | Error state + retry + PATCH re-trigger |
+| 2.4.6 | 2026-02-15 | (batch) | 8 pipeline-steps tests |
 | 2.5.1 |           |        |       |
 | 2.5.2 |           |        |       |
 | 2.5.3 |           |        |       |

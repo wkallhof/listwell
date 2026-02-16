@@ -18,7 +18,6 @@ vi.mock("next/headers", () => ({
 
 const mockFindMany = vi.fn();
 const mockInsertReturning = vi.fn();
-const mockInsert = vi.fn();
 
 vi.mock("@/db", () => ({
   db: {
@@ -27,16 +26,11 @@ vi.mock("@/db", () => ({
         findMany: (...args: unknown[]) => mockFindMany(...args),
       },
     },
-    insert: (...args: unknown[]) => {
-      mockInsert(...args);
-      return {
-        values: (vals: unknown) => {
-          return {
-            returning: () => mockInsertReturning(vals),
-          };
-        },
-      };
-    },
+    insert: () => ({
+      values: (vals: unknown) => ({
+        returning: () => mockInsertReturning(vals),
+      }),
+    }),
   },
 }));
 
@@ -50,6 +44,13 @@ vi.mock("@/lib/blob", () => ({
 vi.mock("@/db/schema", () => ({
   listings: { userId: "user_id", createdAt: "created_at" },
   listingImages: {},
+}));
+
+const mockInngestSend = vi.fn().mockResolvedValue({ ids: [] });
+vi.mock("@/inngest/client", () => ({
+  inngest: {
+    send: (...args: unknown[]) => mockInngestSend(...args),
+  },
 }));
 
 import { GET, POST } from "@/app/api/listings/route";
@@ -177,5 +178,13 @@ describe("POST /api/listings", () => {
     const response = await POST(request);
 
     expect(response.status).toBe(201);
+    expect(mockInngestSend).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: "listing.submitted",
+        data: expect.objectContaining({
+          listingId: "listing-1",
+        }),
+      }),
+    );
   });
 });
