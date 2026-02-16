@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ImageCarousel } from "@/components/image-carousel";
+import { ImageEnhancementSheet } from "@/components/image-enhancement-sheet";
 import { ListingStatusBadge } from "@/components/listing-status-badge";
 import { CopyButton } from "@/components/copy-button";
 import { BottomBar } from "@/components/bottom-bar";
@@ -55,6 +56,7 @@ interface ListingImage {
   type: string;
   sortOrder: number;
   isPrimary: boolean;
+  parentImageId: string | null;
 }
 
 interface ListingDetail {
@@ -109,6 +111,37 @@ export default function ListingDetailPage() {
   const [editValue, setEditValue] = useState("");
   const [saving, setSaving] = useState(false);
   const editInputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
+  const [enhanceSheetOpen, setEnhanceSheetOpen] = useState(false);
+  const [enhanceImageId, setEnhanceImageId] = useState<string | null>(null);
+
+  function handleOpenEnhanceSheet(imageId: string) {
+    setEnhanceImageId(imageId);
+    setEnhanceSheetOpen(true);
+  }
+
+  function handleVariantsChange(variants: { id: string; blobUrl: string }[]) {
+    if (!listing || !enhanceImageId) return;
+
+    // Rebuild images: keep non-enhanced-for-this-parent images, then add new variants
+    const otherImages = listing.images.filter(
+      (img) => !(img.type === "ENHANCED" && img.parentImageId === enhanceImageId),
+    );
+
+    const parentImage = listing.images.find((img) => img.id === enhanceImageId);
+    const variantImages: ListingImage[] = variants.map((v) => ({
+      id: v.id,
+      blobUrl: v.blobUrl,
+      type: "ENHANCED",
+      sortOrder: parentImage?.sortOrder ?? 0,
+      isPrimary: false,
+      parentImageId: enhanceImageId,
+    }));
+
+    setListing({
+      ...listing,
+      images: [...otherImages, ...variantImages],
+    });
+  }
 
   function startEditing(field: "title" | "description" | "price") {
     if (!listing) return;
@@ -462,7 +495,7 @@ export default function ListingDetailPage() {
 
       {/* Image Carousel */}
       <div className="px-5">
-        <ImageCarousel images={images} />
+        <ImageCarousel images={images} onEnhance={handleOpenEnhanceSheet} />
       </div>
 
       <div className="mt-4 space-y-5 px-5">
@@ -702,6 +735,27 @@ export default function ListingDetailPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Image Enhancement Sheet */}
+      {enhanceImageId && (
+        <ImageEnhancementSheet
+          open={enhanceSheetOpen}
+          onOpenChange={setEnhanceSheetOpen}
+          listingId={listing.id}
+          imageId={enhanceImageId}
+          originalUrl={
+            images.find((img) => img.id === enhanceImageId)?.blobUrl ?? ""
+          }
+          variants={images
+            .filter(
+              (img) =>
+                img.type === "ENHANCED" &&
+                img.parentImageId === enhanceImageId,
+            )
+            .map((img) => ({ id: img.id, blobUrl: img.blobUrl }))}
+          onVariantsChange={handleVariantsChange}
+        />
+      )}
     </div>
   );
 }

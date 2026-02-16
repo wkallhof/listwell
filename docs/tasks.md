@@ -42,7 +42,7 @@
 - Phase 0: [x] Complete
 - Phase 1: [x] Complete
 - Phase 2: [x] Complete
-- Phase 3: [ ] Not Started
+- Phase 3: [x] Complete
 - Phase 4: [x] Complete
 - Phase 5: [ ] Not Started
 - **MVP Status:** Not Started
@@ -469,35 +469,35 @@
 
 ### 3.2 Enhancement UI
 
-- [ ] 3.2.1: Build Image Enhancement Sheet component (bottom drawer over detail screen)
+- [x] 3.2.1: Build Image Enhancement Sheet component (bottom drawer over detail screen)
   - Files: src/components/image-enhancement-sheet.tsx
   - Screens: `docs/screens.md` § Screen 8: Image Enhancement — `docs/design-system.md`
   - Test: Sheet opens from detail screen, shows original image, enhance button, variants grid
-- [ ] 3.2.2: Add "Enhance" button overlay on original images in the detail screen carousel
+- [x] 3.2.2: Add "Enhance" button overlay on original images in the detail screen carousel
   - Files: src/app/(authenticated)/listings/[id]/page.tsx, src/components/image-carousel.tsx
   - Screens: `docs/screens.md` § Screen 7: Image Carousel → Enhance Button
   - Test: Enhance button visible on ORIGINAL type images only, opens enhancement sheet
-- [ ] 3.2.3: Implement enhancement request flow (trigger API, show loading state, display result)
+- [x] 3.2.3: Implement enhancement request flow (trigger API, show loading state, display result)
   - Files: src/components/image-enhancement-sheet.tsx
   - Test: "Generate Enhanced Version" triggers API, shows spinner, displays enhanced image on completion
-- [ ] 3.2.4: Implement enhanced variant deletion with undo toast
+- [x] 3.2.4: Implement enhanced variant deletion with undo toast
   - Files: src/components/image-enhancement-sheet.tsx
   - Screens: `docs/screens.md` § Confirmation Dialogs — Delete Enhanced Image
   - Test: Trash icon deletes variant, Sonner toast shows "Image deleted" with Undo button
-- [ ] 3.2.5: Write tests for enhancement UI components
+- [x] 3.2.5: Write tests for enhancement UI components
   - Files: src/components/__tests__/image-enhancement-sheet.test.tsx
   - Test: Tests pass with ≥80% coverage
 
 **Phase 3 Checkpoint:**
 
-- [ ] Tapping "Enhance" on an original image opens enhancement sheet
-- [ ] "Generate Enhanced Version" produces a Gemini-enhanced image
-- [ ] Multiple variants can be generated per original
-- [ ] Enhanced variants can be deleted with undo
-- [ ] Originals are never modified
-- [ ] All tests pass with ≥80% code coverage on Phase 3 code
-- [ ] No TypeScript errors
-- [ ] Commit: "feat: complete image enhancement (Phase 3)"
+- [x] Tapping "Enhance" on an original image opens enhancement sheet
+- [x] "Generate Enhanced Version" produces a Gemini-enhanced image
+- [x] Multiple variants can be generated per original
+- [x] Enhanced variants can be deleted with undo
+- [x] Originals are never modified
+- [x] All tests pass with ≥80% code coverage on Phase 3 code
+- [x] No TypeScript errors
+- [x] Commit: "feat: complete image enhancement (Phase 3)"
 
 ---
 
@@ -708,11 +708,11 @@
 | 3.1.4 | 2026-02-16 | (batch) | Registered in Inngest serve route |
 | 3.1.5 | 2026-02-16 | (batch) | POST /api/listings/[id]/enhance + auth + validation |
 | 3.1.6 | 2026-02-16 | (batch) | 25 tests (gemini, prompt, enhance-image, route) |
-| 3.2.1 |           |        |       |
-| 3.2.2 |           |        |       |
-| 3.2.3 |           |        |       |
-| 3.2.4 |           |        |       |
-| 3.2.5 |           |        |       |
+| 3.2.1 | 2026-02-16 | (batch) | Enhancement sheet w/ original + variants grid |
+| 3.2.2 | 2026-02-16 | (batch) | Sparkles enhance button on ORIGINAL images |
+| 3.2.3 | 2026-02-16 | (batch) | Enhance API trigger + polling for result |
+| 3.2.4 | 2026-02-16 | (batch) | Optimistic delete + undo toast + deferred API call |
+| 3.2.5 | 2026-02-16 | (batch) | 29 UI tests (15 sheet + 14 carousel) ≥80% coverage |
 | 4.1.1 | 2026-02-15 | (batch) | Selected OpenAI Whisper API |
 | 4.1.2 | 2026-02-15 | (batch) | POST /api/transcribe + validation |
 | 4.1.3 | 2026-02-15 | (batch) | VoiceInput w/ mic, recording, transcribing states |
