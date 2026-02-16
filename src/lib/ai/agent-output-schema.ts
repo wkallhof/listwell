@@ -6,10 +6,11 @@ const comparableSchema = z.object({
   source: z
     .string()
     .describe("Where it was found (e.g., eBay Sold, FB Marketplace, Amazon)"),
-  url: z.string().optional().describe("URL of the comparable listing"),
-  condition: z.string().optional().describe("Condition of the comparable item"),
+  url: z.string().nullable().optional().describe("URL of the comparable listing"),
+  condition: z.string().nullable().optional().describe("Condition of the comparable item"),
   soldDate: z
     .string()
+    .nullable()
     .optional()
     .describe("Date sold, if available (YYYY-MM-DD format)"),
 });
@@ -45,6 +46,7 @@ export const listingAgentOutputSchema = z.object({
     .describe("Brand name identified from item or packaging"),
   model: z
     .string()
+    .nullable()
     .optional()
     .describe("Model name or number if identifiable"),
   researchNotes: z
