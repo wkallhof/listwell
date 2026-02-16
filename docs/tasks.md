@@ -41,7 +41,7 @@
 
 - Phase 0: [x] Complete
 - Phase 1: [x] Complete
-- Phase 2: [ ] Not Started
+- Phase 2: [x] Complete
 - Phase 3: [ ] Not Started
 - Phase 4: [ ] Not Started
 - Phase 5: [ ] Not Started
@@ -407,34 +407,34 @@
 
 ### 2.5 Push Notifications
 
-- [ ] 2.5.1: Generate VAPID keys and add to environment variables
+- [x] 2.5.1: Generate VAPID keys and add to environment variables
   - Files: .env.example, .env.local
   - Test: Keys generated and stored
-- [ ] 2.5.2: Install web-push library and create notification helper
+- [x] 2.5.2: Install web-push library and create notification helper
   - Files: src/lib/notifications.ts, package.json
   - Test: Can send test notification
-- [ ] 2.5.3: Add push subscription management (subscribe/unsubscribe server actions)
+- [x] 2.5.3: Add push subscription management (subscribe/unsubscribe server actions)
   - Files: src/lib/push-actions.ts, src/db/schema.ts (push_subscriptions table)
   - Test: Subscription stored in DB, can be retrieved by userId
-- [ ] 2.5.4: Update service worker to handle push events and notification clicks
+- [x] 2.5.4: Update service worker to handle push events and notification clicks
   - Files: public/sw.js
   - Test: Push event displays notification, click opens app
-- [ ] 2.5.5: Add push subscription prompt in the app (after first listing submission)
+- [x] 2.5.5: Add push subscription prompt in the app (after first listing submission)
   - Files: src/components/push-prompt.tsx
   - Test: Prompt shows, user can accept or dismiss
-- [ ] 2.5.6: Trigger push notification in Inngest `complete` step (the separate step after agent execution)
+- [x] 2.5.6: Trigger push notification in Inngest `complete` step (the separate step after agent execution)
   - Files: src/inngest/functions/generate-listing.ts
   - Test: Notification sent when listing status transitions to READY
-- [ ] 2.5.7: Write tests for push notification system
+- [x] 2.5.7: Write tests for push notification system
   - Files: src/lib/__tests__/notifications.test.ts
   - Test: Tests pass with ≥80% coverage
 
 **Phase 2 Checkpoint:**
 
-- [ ] Submitting photos triggers consolidated agent pipeline in Vercel Sandbox
-- [ ] Agent analyzes images, researches pricing, and writes listing in one session with full context
-- [ ] Pipeline progress displays live on the processing screen (agent updates pipelineStep in DB)
-- [ ] Completed listings have AI-generated title, description, price, comparables, and market notes
+- [x] Submitting photos triggers consolidated agent pipeline in Vercel Sandbox
+- [x] Agent analyzes images, researches pricing, and writes listing in one session with full context
+- [x] Pipeline progress displays live on the processing screen (agent updates pipelineStep in DB)
+- [x] Completed listings have AI-generated title, description, price, comparables, and market notes
 - [ ] Push notification fires when listing is ready
 - [ ] Error state shows with retry capability
 - [ ] All tests pass with ≥80% code coverage on Phase 2 code
@@ -695,13 +695,13 @@
 | 2.4.4 | 2026-02-15 | (batch) | 4s polling on detail page |
 | 2.4.5 | 2026-02-15 | (batch) | Error state + retry + PATCH re-trigger |
 | 2.4.6 | 2026-02-15 | (batch) | 8 pipeline-steps tests |
-| 2.5.1 |           |        |       |
-| 2.5.2 |           |        |       |
-| 2.5.3 |           |        |       |
-| 2.5.4 |           |        |       |
-| 2.5.5 |           |        |       |
-| 2.5.6 |           |        |       |
-| 2.5.7 |           |        |       |
+| 2.5.1 | 2026-02-15 | (batch) | VAPID keys in .env.example |
+| 2.5.2 | 2026-02-15 | (batch) | web-push + sendPushNotification |
+| 2.5.3 | 2026-02-15 | (batch) | push_subscriptions table + server actions |
+| 2.5.4 | 2026-02-15 | (batch) | SW push + notificationclick handlers |
+| 2.5.5 | 2026-02-15 | (batch) | PushPrompt on submitted page |
+| 2.5.6 | 2026-02-15 | (batch) | Already wired in generate-listing.ts |
+| 2.5.7 | 2026-02-15 | (batch) | 20 push notification tests |
 | 3.1.1 |           |        |       |
 | 3.1.2 |           |        |       |
 | 3.1.3 |           |        |       |

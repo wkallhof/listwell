@@ -37,3 +37,45 @@ self.addEventListener("fetch", (event) => {
     ),
   );
 });
+
+// Push notification handler
+self.addEventListener("push", (event) => {
+  if (!event.data) return;
+
+  let payload;
+  try {
+    payload = event.data.json();
+  } catch {
+    payload = { title: "Listwell", body: event.data.text() };
+  }
+
+  const options = {
+    body: payload.body || "",
+    icon: payload.icon || "/icon-192x192.png",
+    badge: payload.badge || "/icon-192x192.png",
+    data: payload.data || {},
+    vibrate: [200, 100, 200],
+  };
+
+  event.waitUntil(self.registration.showNotification(payload.title || "Listwell", options));
+});
+
+// Notification click handler
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+
+  const url = event.notification.data?.url || "/";
+
+  event.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clients) => {
+      // Focus existing window if one is open
+      for (const client of clients) {
+        if (client.url.includes(url) && "focus" in client) {
+          return client.focus();
+        }
+      }
+      // Otherwise open a new window
+      return self.clients.openWindow(url);
+    }),
+  );
+});
