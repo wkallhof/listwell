@@ -159,7 +159,7 @@ export async function runListingAgent(
     for await (const message of query({
       prompt: buildUserPrompt(imageUrls, userDescription),
       options: {
-        systemPrompt: buildListingAgentPrompt(),
+        systemPrompt: buildListingAgentPrompt(workDir),
         model: "claude-sonnet-4-5-20250929",
         permissionMode: "bypassPermissions",
         allowDangerouslySkipPermissions: true,

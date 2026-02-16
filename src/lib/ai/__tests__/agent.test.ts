@@ -38,55 +38,55 @@ import type { RunAgentInput } from "../agent";
 
 describe("listing agent prompt", () => {
   it("includes title construction rules", () => {
-    const prompt = buildListingAgentPrompt();
+    const prompt = buildListingAgentPrompt("/tmp/test");
     expect(prompt).toContain("Title Construction");
     expect(prompt).toContain("65 characters max");
     expect(prompt).toContain("Brand + Item Type + Key Spec + Condition");
   });
 
   it("includes description writing guidelines", () => {
-    const prompt = buildListingAgentPrompt();
+    const prompt = buildListingAgentPrompt("/tmp/test");
     expect(prompt).toContain("Description Writing");
     expect(prompt).toContain("First-person perspective");
     expect(prompt).toContain("80-150 words");
   });
 
   it("includes pricing strategy", () => {
-    const prompt = buildListingAgentPrompt();
+    const prompt = buildListingAgentPrompt("/tmp/test");
     expect(prompt).toContain("Pricing Strategy");
     expect(prompt).toContain("10-15%");
     expect(prompt).toContain("Negotiation Buffer");
   });
 
   it("includes condition assessment framework", () => {
-    const prompt = buildListingAgentPrompt();
+    const prompt = buildListingAgentPrompt("/tmp/test");
     expect(prompt).toContain("Condition Assessment");
     expect(prompt).toContain("Like New");
     expect(prompt).toContain("round condition down");
   });
 
   it("includes market research notes template", () => {
-    const prompt = buildListingAgentPrompt();
+    const prompt = buildListingAgentPrompt("/tmp/test");
     expect(prompt).toContain("Market Research Notes");
     expect(prompt).toContain("Relisting reminder");
     expect(prompt).toContain("7-10 days");
   });
 
   it("includes web research instructions", () => {
-    const prompt = buildListingAgentPrompt();
+    const prompt = buildListingAgentPrompt("/tmp/test");
     expect(prompt).toContain("Web Research Instructions");
     expect(prompt).toContain("eBay");
     expect(prompt).toContain("comparable");
   });
 
   it("includes content safety rules", () => {
-    const prompt = buildListingAgentPrompt();
+    const prompt = buildListingAgentPrompt("/tmp/test");
     expect(prompt).toContain("Must Never Generate");
     expect(prompt).toContain("Pressure tactics");
   });
 
   it("includes category-specific listing tactics", () => {
-    const prompt = buildListingAgentPrompt();
+    const prompt = buildListingAgentPrompt("/tmp/test");
     expect(prompt).toContain("Category-Specific Listing Tactics");
     expect(prompt).toContain("Furniture");
     expect(prompt).toContain("dimensions (H x W x D)");
@@ -99,20 +99,20 @@ describe("listing agent prompt", () => {
   });
 
   it("includes seasonal timing awareness", () => {
-    const prompt = buildListingAgentPrompt();
+    const prompt = buildListingAgentPrompt("/tmp/test");
     expect(prompt).toContain("Seasonal");
     expect(prompt).toContain("college move-in");
     expect(prompt).toContain("spring cleaning");
   });
 
   it("includes cross-posting guidance", () => {
-    const prompt = buildListingAgentPrompt();
+    const prompt = buildListingAgentPrompt("/tmp/test");
     expect(prompt).toContain("Cross-post");
     expect(prompt).toContain("buy/sell groups");
   });
 
   it("includes pricing tactic recommendations (OBO, Firm, bundle)", () => {
-    const prompt = buildListingAgentPrompt();
+    const prompt = buildListingAgentPrompt("/tmp/test");
     expect(prompt).toContain("Pricing tactic");
     expect(prompt).toContain("OBO");
     expect(prompt).toContain("Firm");
@@ -120,7 +120,7 @@ describe("listing agent prompt", () => {
   });
 
   it("includes platform-specific optimization notes", () => {
-    const prompt = buildListingAgentPrompt();
+    const prompt = buildListingAgentPrompt("/tmp/test");
     expect(prompt).toContain("Platform tips");
     expect(prompt).toContain("Facebook Marketplace");
     expect(prompt).toContain("eBay");
@@ -130,7 +130,7 @@ describe("listing agent prompt", () => {
   });
 
   it("includes prominent relisting reminder instruction", () => {
-    const prompt = buildListingAgentPrompt();
+    const prompt = buildListingAgentPrompt("/tmp/test");
     expect(prompt).toContain("Relisting reminder");
     expect(prompt).toContain("ALWAYS include");
     expect(prompt).toContain("7-10 days");
@@ -139,11 +139,17 @@ describe("listing agent prompt", () => {
   });
 
   it("includes output format instructions for file-based output", () => {
-    const prompt = buildListingAgentPrompt();
+    const prompt = buildListingAgentPrompt("/tmp/test");
     expect(prompt).toContain("Output Format");
     expect(prompt).toContain("listing-output.json");
     expect(prompt).toContain("Write tool");
     expect(prompt).toContain("CRITICAL");
+  });
+
+  it("includes the absolute output path in the prompt", () => {
+    const prompt = buildListingAgentPrompt("/tmp/my-agent-dir");
+    expect(prompt).toContain("/tmp/my-agent-dir/listing-output.json");
+    expect(prompt).toContain("FULL ABSOLUTE path");
   });
 });
 

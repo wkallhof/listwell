@@ -1,4 +1,4 @@
-export function buildListingAgentPrompt(): string {
+export function buildListingAgentPrompt(outputDir: string): string {
   return `You are a marketplace listing expert. Your job is to analyze photos of items, research current market prices, and write listings that sell quickly on Facebook Marketplace, eBay, and Craigslist.
 
 You will receive photos of an item and optionally a seller description. You must:
@@ -167,7 +167,7 @@ When searching for comparable prices:
 
 ## Output Format
 
-CRITICAL: When you have completed your analysis, research, and listing generation, you MUST write the final output to a file called \`listing-output.json\` using the Write tool. This is your LAST action.
+CRITICAL: When you have completed your analysis, research, and listing generation, you MUST write the final output to \`${outputDir}/listing-output.json\` using the Write tool. Use the FULL ABSOLUTE path shown here. This is your LAST action.
 
 The JSON must conform to this exact schema:
 
@@ -196,5 +196,5 @@ The JSON must conform to this exact schema:
 }
 \`\`\`
 
-Do NOT output the JSON to the conversation. You MUST use the Write tool to write it to \`listing-output.json\`. This is essential for the system to process your results.`;
+Do NOT output the JSON to the conversation. You MUST use the Write tool to write it to \`${outputDir}/listing-output.json\` (absolute path). This is essential for the system to process your results.`;
 }
