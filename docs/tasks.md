@@ -39,7 +39,7 @@
 
 ## Progress Summary
 
-- Phase 0: [ ] Not Started
+- Phase 0: [x] Complete
 - Phase 1: [ ] Not Started
 - Phase 2: [ ] Not Started
 - Phase 3: [ ] Not Started
@@ -53,100 +53,100 @@
 
 ### 0.0 Pre-flight
 
-- [ ] 0.0.1: Read CLAUDE.md and confirm understanding of project conventions
-- [ ] 0.0.2: Verify no uncommitted changes in working directory
+- [x] 0.0.1: Read CLAUDE.md and confirm understanding of project conventions
+- [x] 0.0.2: Verify no uncommitted changes in working directory
 
 ### 0.1 Project Initialization
 
-- [ ] 0.1.1: Initialize Next.js project with App Router and TypeScript (strict mode)
+- [x] 0.1.1: Initialize Next.js project with App Router and TypeScript (strict mode)
   - Files: package.json, tsconfig.json, next.config.ts, src/app/layout.tsx, src/app/page.tsx
   - Test: `npm run dev` starts without errors
-- [ ] 0.1.2: Configure ESLint with Next.js recommended rules
+- [x] 0.1.2: Configure ESLint with Next.js recommended rules
   - Files: eslint.config.mjs, package.json
   - Test: `npm run lint` passes
-- [ ] 0.1.3: Configure Prettier for code formatting
+- [x] 0.1.3: Configure Prettier for code formatting
   - Files: .prettierrc, .prettierignore, package.json
   - Test: `npm run format` works
-- [ ] 0.1.4: Configure Vitest as test framework with React Testing Library
+- [x] 0.1.4: Configure Vitest as test framework with React Testing Library
   - Files: vitest.config.ts, vitest.setup.ts, package.json
   - Test: `npm run test` executes (0 tests OK)
-- [ ] 0.1.5: Set up Tailwind CSS v4 with design system CSS variables from `docs/design-system.md`
+- [x] 0.1.5: Set up Tailwind CSS v4 with design system CSS variables from `docs/design-system.md`
   - Files: src/app/globals.css, tailwind.config.ts (if needed)
   - Screens: `docs/design-system.md` § Color Tokens, Typography
   - Test: Tailwind classes render correctly in dev
 
 ### 0.2 shadcn/ui & Design System
 
-- [ ] 0.2.1: Initialize shadcn/ui with project configuration
+- [x] 0.2.1: Initialize shadcn/ui with project configuration
   - Files: components.json, src/lib/utils.ts
   - Test: shadcn CLI works (`npx shadcn@latest add button`)
-- [ ] 0.2.2: Install core shadcn/ui components needed for Phase 1
+- [x] 0.2.2: Install core shadcn/ui components needed for Phase 1
   - Components: Button, Card, CardHeader, CardContent, CardFooter, Badge, Input, Label, Tabs, TabsList, TabsTrigger, TabsContent, Textarea, Skeleton, DropdownMenu, Sheet, AlertDialog, Sonner (toast)
   - Files: src/components/ui/*
   - Test: Components import without errors
-- [ ] 0.2.3: Configure next-themes for dark mode support (class strategy)
+- [x] 0.2.3: Configure next-themes for dark mode support (class strategy)
   - Files: src/app/layout.tsx, src/components/theme-provider.tsx
   - Screens: `docs/design-system.md` § Dark Mode
   - Test: Dark mode toggle switches theme correctly
-- [ ] 0.2.4: Apply design system color tokens (light + dark) to globals.css
+- [x] 0.2.4: Apply design system color tokens (light + dark) to globals.css
   - Files: src/app/globals.css
   - Screens: `docs/design-system.md` § Color Tokens
   - Test: CSS variables defined for both :root and .dark
 
 ### 0.3 Project Structure
 
-- [ ] 0.3.1: Create folder structure per PRD conventions
+- [x] 0.3.1: Create folder structure per PRD conventions
   - Folders: src/app/, src/components/ui/, src/components/, src/lib/, src/db/, src/inngest/, src/types/
   - Test: Folders exist
-- [ ] 0.3.2: Verify build succeeds with `npm run build`
-- [ ] 0.3.3: Verify dev server starts without errors
-- [ ] 0.3.4: Verify test runner executes successfully
+- [x] 0.3.2: Verify build succeeds with `npm run build`
+- [x] 0.3.3: Verify dev server starts without errors
+- [x] 0.3.4: Verify test runner executes successfully
 
 ### 0.4 Database Setup
 
-- [ ] 0.4.1: Create Docker Compose file for local PostgreSQL
+- [x] 0.4.1: Create Docker Compose file for local PostgreSQL
   - Files: docker-compose.yml
   - Test: `docker compose up -d` starts PostgreSQL
-- [ ] 0.4.2: Install Drizzle ORM and Neon serverless driver
+- [x] 0.4.2: Install Drizzle ORM and Neon serverless driver
   - Files: package.json
   - Test: Packages installed
-- [ ] 0.4.3: Configure Drizzle with Neon serverless driver
+- [x] 0.4.3: Configure Drizzle with Neon serverless driver
   - Files: src/db/index.ts, drizzle.config.ts
   - Test: DB connection works (select 1)
-- [ ] 0.4.4: Create Drizzle schema for listings table with all fields from PRD data model
+- [x] 0.4.4: Create Drizzle schema for listings table with all fields from PRD data model
   - Fields: id (cuid), userId, rawDescription, title, description, suggestedPrice, priceRangeLow, priceRangeHigh, category, condition, brand, model, researchNotes, comparables (json), status (enum), pipelineStep (enum), pipelineError, inngestRunId, createdAt, updatedAt
   - Files: src/db/schema.ts
   - Test: TypeScript compiles, schema exports correctly
-- [ ] 0.4.5: Create Drizzle schema for listing_images table with all fields from PRD data model
+- [x] 0.4.5: Create Drizzle schema for listing_images table with all fields from PRD data model
   - Fields: id (cuid), listingId (FK), type (enum: ORIGINAL/ENHANCED), blobUrl, blobKey, parentImageId (FK to self), sortOrder, isPrimary, geminiPrompt, createdAt
   - Files: src/db/schema.ts
   - Test: TypeScript compiles, relations defined correctly
-- [ ] 0.4.6: Run initial migration to create tables
+- [x] 0.4.6: Run initial migration to create tables
   - Files: migrations/
   - Test: `npx drizzle-kit push` or `npx drizzle-kit migrate` succeeds
-- [ ] 0.4.7: Write tests for schema validation and basic DB operations
+- [x] 0.4.7: Write tests for schema validation and basic DB operations
   - Files: src/db/__tests__/schema.test.ts
   - Test: Tests pass with ≥80% coverage on schema
 
 ### 0.5 Development Tooling
 
-- [ ] 0.5.1: Create .env.example with all required environment variables
+- [x] 0.5.1: Create .env.example with all required environment variables
   - Vars: DATABASE_URL, NEXT_PUBLIC_APP_URL, BETTER_AUTH_SECRET, VERCEL_BLOB_READ_WRITE_TOKEN, INNGEST_EVENT_KEY, INNGEST_SIGNING_KEY, ANTHROPIC_API_KEY, GEMINI_API_KEY, NEXT_PUBLIC_VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY
   - Files: .env.example, .gitignore
-- [ ] 0.5.2: Create .env.local from .env.example with local development values
+- [x] 0.5.2: Create .env.local from .env.example with local development values
   - Files: .env.local
-- [ ] 0.5.3: Update .gitignore for Next.js, env files, and node_modules
+- [x] 0.5.3: Update .gitignore for Next.js, env files, and node_modules
   - Files: .gitignore
 
 **Phase 0 Checkpoint:**
 
-- [ ] Fresh clone + `npm install` + `docker compose up -d` + `npm run dev` works
-- [ ] All scripts functional: dev, build, test, lint, typecheck
-- [ ] Database connection verified with local PostgreSQL
-- [ ] Design system tokens applied (light + dark mode)
-- [ ] shadcn/ui components installed and importable
-- [ ] Code coverage infrastructure configured (≥80% threshold)
-- [ ] Commit: "chore: complete project foundation (Phase 0)"
+- [x] Fresh clone + `npm install` + `docker compose up -d` + `npm run dev` works
+- [x] All scripts functional: dev, build, test, lint, typecheck
+- [x] Database connection verified with local PostgreSQL
+- [x] Design system tokens applied (light + dark mode)
+- [x] shadcn/ui components installed and importable
+- [x] Code coverage infrastructure configured (≥80% threshold)
+- [x] Commit: "chore: complete project foundation (Phase 0)"
 
 ---
 
@@ -609,31 +609,31 @@
 
 | Task  | Completed | Commit | Notes |
 | ----- | --------- | ------ | ----- |
-| 0.0.1 |           |        |       |
-| 0.0.2 |           |        |       |
-| 0.1.1 |           |        |       |
-| 0.1.2 |           |        |       |
-| 0.1.3 |           |        |       |
-| 0.1.4 |           |        |       |
-| 0.1.5 |           |        |       |
-| 0.2.1 |           |        |       |
-| 0.2.2 |           |        |       |
-| 0.2.3 |           |        |       |
-| 0.2.4 |           |        |       |
-| 0.3.1 |           |        |       |
-| 0.3.2 |           |        |       |
-| 0.3.3 |           |        |       |
-| 0.3.4 |           |        |       |
-| 0.4.1 |           |        |       |
-| 0.4.2 |           |        |       |
-| 0.4.3 |           |        |       |
-| 0.4.4 |           |        |       |
-| 0.4.5 |           |        |       |
-| 0.4.6 |           |        |       |
-| 0.4.7 |           |        |       |
-| 0.5.1 |           |        |       |
-| 0.5.2 |           |        |       |
-| 0.5.3 |           |        |       |
+| 0.0.1 | 2026-02-15 | (phase commit) | Read CLAUDE.md |
+| 0.0.2 | 2026-02-15 | (phase commit) | Working tree clean |
+| 0.1.1 | 2026-02-15 | (phase commit) | Next.js 16.1.6, App Router, TS strict |
+| 0.1.2 | 2026-02-15 | (phase commit) | ESLint + eslint-config-prettier |
+| 0.1.3 | 2026-02-15 | (phase commit) | Prettier + tailwindcss plugin |
+| 0.1.4 | 2026-02-15 | (phase commit) | Vitest 4 + RTL + jsdom 26 |
+| 0.1.5 | 2026-02-15 | (phase commit) | Tailwind v4 + design system HSL tokens |
+| 0.2.1 | 2026-02-15 | (phase commit) | shadcn/ui new-york style |
+| 0.2.2 | 2026-02-15 | (phase commit) | 12 core components installed |
+| 0.2.3 | 2026-02-15 | (phase commit) | next-themes class strategy |
+| 0.2.4 | 2026-02-15 | (phase commit) | Light + dark tokens from design-system.md |
+| 0.3.1 | 2026-02-15 | (phase commit) | All folders created per PRD |
+| 0.3.2 | 2026-02-15 | (phase commit) | Build passes |
+| 0.3.3 | 2026-02-15 | (phase commit) | Dev server starts |
+| 0.3.4 | 2026-02-15 | (phase commit) | Test runner passes |
+| 0.4.1 | 2026-02-15 | (phase commit) | Docker Compose on port 5433 |
+| 0.4.2 | 2026-02-15 | (phase commit) | drizzle-orm + @neondatabase/serverless + postgres |
+| 0.4.3 | 2026-02-15 | (phase commit) | Neon for prod, postgres.js for local |
+| 0.4.4 | 2026-02-15 | (phase commit) | 20-field listings table with enums |
+| 0.4.5 | 2026-02-15 | (phase commit) | listing_images with FK + self-ref relation |
+| 0.4.6 | 2026-02-15 | (phase commit) | drizzle-kit push succeeded |
+| 0.4.7 | 2026-02-15 | (phase commit) | 20 tests passing |
+| 0.5.1 | 2026-02-15 | (phase commit) | All 10 env vars documented |
+| 0.5.2 | 2026-02-15 | (phase commit) | Local dev values |
+| 0.5.3 | 2026-02-15 | (phase commit) | Next.js + env + coverage ignores |
 | 1.1.1 |           |        |       |
 | 1.1.2 |           |        |       |
 | 1.1.3 |           |        |       |

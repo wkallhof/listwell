@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: listwell-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: listwell
+      POSTGRES_PASSWORD: listwell
+      POSTGRES_DB: listwell
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
