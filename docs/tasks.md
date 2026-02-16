@@ -505,19 +505,19 @@
 
 ### 4.1 Voice-to-Text
 
-- [ ] 4.1.1: Evaluate and select voice-to-text provider (Whisper API vs. Deepgram)
+- [x] 4.1.1: Evaluate and select voice-to-text provider (Whisper API vs. Deepgram)
   - Test: Build quick test of both, compare quality and UX on mobile
-- [ ] 4.1.2: Implement `/api/transcribe` endpoint — accepts audio blob, returns transcript
+- [x] 4.1.2: Implement `/api/transcribe` endpoint — accepts audio blob, returns transcript
   - Files: src/app/api/transcribe/route.ts
   - Test: POST with audio file returns text transcription
-- [ ] 4.1.3: Build voice-input component with mic button, recording state, and live indicator
+- [x] 4.1.3: Build voice-input component with mic button, recording state, and live indicator
   - Files: src/components/voice-input.tsx
   - Screens: `docs/screens.md` § Screen 4: Mic Button, Recording Indicator — `docs/design-system.md`
   - Test: Mic toggles recording, red pulse when active, "Listening..." text shown
-- [ ] 4.1.4: Integrate voice input into Describe screen — recorded audio → transcription → appends to textarea
+- [x] 4.1.4: Integrate voice input into Describe screen — recorded audio → transcription → appends to textarea
   - Files: src/app/(authenticated)/new/describe/page.tsx
   - Test: Speak → tap stop → transcript text appears in textarea
-- [ ] 4.1.5: Write tests for voice input components and API
+- [x] 4.1.5: Write tests for voice input components and API
   - Files: src/components/__tests__/voice-input.test.tsx, src/app/api/transcribe/__tests__/route.test.ts
   - Test: Tests pass with ≥80% coverage
 
@@ -713,11 +713,11 @@
 | 3.2.3 |           |        |       |
 | 3.2.4 |           |        |       |
 | 3.2.5 |           |        |       |
-| 4.1.1 |           |        |       |
-| 4.1.2 |           |        |       |
-| 4.1.3 |           |        |       |
-| 4.1.4 |           |        |       |
-| 4.1.5 |           |        |       |
+| 4.1.1 | 2026-02-15 | (batch) | Selected OpenAI Whisper API |
+| 4.1.2 | 2026-02-15 | (batch) | POST /api/transcribe + validation |
+| 4.1.3 | 2026-02-15 | (batch) | VoiceInput w/ mic, recording, transcribing states |
+| 4.1.4 | 2026-02-15 | (batch) | Mic button in describe textarea + transcript append |
+| 4.1.5 | 2026-02-15 | (batch) | 19 tests (13 component + 6 API) |
 | 4.2.1 |           |        |       |
 | 4.2.2 |           |        |       |
 | 4.3.1 |           |        |       |
