@@ -1,5 +1,6 @@
 ---
 description: Build React components, pages, and layouts following the project's design system conventions
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash(npm run lint:*), Bash(npm run typecheck:*), AskUserQuestion
 ---
 
 # Frontend Development Skill

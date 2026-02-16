@@ -4,7 +4,7 @@ argument-hint: [<pr-number>]
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, WebFetch, Task
 ---
 
-# Review PR Command
+# Review PR Skill
 
 Review a GitHub PR, analyze feedback from AI reviewers (Gemini, etc.), determine which issues are valid, and resolve them.
 

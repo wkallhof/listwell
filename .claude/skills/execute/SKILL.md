@@ -4,7 +4,7 @@ argument-hint: [<task-id>|phase|to <task-id>]
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, AskUserQuestion, mcp__context7__resolve-library-id, mcp__context7__query-docs, WebSearch
 ---
 
-# Execute Command
+# Execute Skill
 
 Execute the next incomplete task from docs/tasks.md with full protocol compliance.
 

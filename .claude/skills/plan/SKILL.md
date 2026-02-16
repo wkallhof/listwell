@@ -1,5 +1,7 @@
 ---
 description: Generate technical implementation plan and task list from PRD and screens documents
+argument-hint: [refresh]
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash(ls:*), Bash(mkdir:*), AskUserQuestion, mcp__context7__resolve-library-id, mcp__context7__query-docs, WebSearch
 ---
 
 # Plan Management Skill
@@ -29,9 +31,13 @@ Transform product requirements into:
 Full plan generation from scratch:
 
 1. **Gather Requirements**
-   - Read `docs/prd.md` completely - contains all technical decisions
-   - Read `docs/screens.md` for UI/UX specifications
-   - Read `docs/design-system.md` for design tokens, typography, color system, and component patterns
+   - List all files in the `docs/` directory
+   - Read **every** document in `docs/` — each may contain context that informs the plan (e.g., PRD, screens, design system, selling strategy, research notes, etc.)
+   - Pay special attention to:
+     - `docs/prd.md` — product requirements and technical stack
+     - `docs/screens.md` — UI/UX specifications and screen flows
+     - `docs/design-system.md` — design tokens, typography, color system, and component patterns
+   - Incorporate insights from all other docs (business strategy, user research, competitive analysis, etc.) into phase prioritization and technical decisions
    - Identify tech stack, phases, and constraints
 
 2. **Research Library Documentation**
@@ -81,8 +87,8 @@ Update existing plan while preserving progress:
    - Identify completed vs pending tasks
 
 2. **Detect Changes**
-   - Compare PRD/screens to existing plan
-   - Note new requirements or decisions
+   - Read all files in `docs/` and compare to existing plan
+   - Note new requirements, decisions, or supplemental context
    - Identify obsolete tasks
 
 3. **Update Documents**
@@ -103,6 +109,10 @@ Update existing plan while preserving progress:
 | `docs/prd.md`           | Product requirements and technical stack              |
 | `docs/screens.md`       | UI/UX specifications and screen flows                 |
 | `docs/design-system.md` | Design tokens, colors, typography, component patterns |
+
+### All Other Docs (read automatically)
+
+All files in the `docs/` directory are read during planning. Any document not listed above is treated as supplemental context that may inform priorities, phasing, business constraints, or technical decisions.
 
 ### Optional Files (for refresh)
 
