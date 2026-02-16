@@ -587,7 +587,7 @@
 
 ### 5.2 Quality & Refinement
 
-- [ ] 5.2.1: Refine Gemini enhancement prompts based on category-specific guidance
+- [x] 5.2.1: Refine Gemini enhancement prompts based on category-specific guidance
   - Files: src/lib/ai/enhancement-prompt.ts
   - Ref: `docs/selling-strategy.md` § Image Enhancement Guidance, § Category-Specific Notes
   - Test: Enhancement prompts include category-specific instructions
@@ -729,5 +729,5 @@
 | 5.1.2 | 2026-02-16 | (batch) | OBO/Firm/bundle pricing tactics in prompt |
 | 5.1.3 | 2026-02-16 | (batch) | FB/eBay/CL platform tips in prompt |
 | 5.1.4 | 2026-02-16 | (batch) | Relisting reminder with ALWAYS instruction |
-| 5.2.1 |           |        |       |
+| 5.2.1 | 2026-02-16 | (batch) | Category-aware Gemini enhancement prompts |
 | 5.2.2 |           |        |       |
