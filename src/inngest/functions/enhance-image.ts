@@ -1,11 +1,11 @@
 import { eq } from "drizzle-orm";
-import { put } from "@vercel/blob";
 
 import { db } from "@/db";
 import { listingImages, listings } from "@/db/schema";
 import { inngest } from "@/inngest/client";
 import { enhanceImage } from "@/lib/ai/gemini";
 import { buildEnhancementPrompt } from "@/lib/ai/enhancement-prompt";
+import { uploadBuffer } from "@/lib/blob";
 
 export const enhanceImageFunction = inngest.createFunction(
   {
@@ -74,14 +74,10 @@ export const enhanceImageFunction = inngest.createFunction(
       const fileName = `enhanced-${Date.now()}.${ext}`;
       const imageBuffer = Buffer.from(enhanced.imageBase64, "base64");
 
-      const blob = await put(
-        `listings/${listingId}/${fileName}`,
+      const blob = await uploadBuffer(
         imageBuffer,
-        {
-          access: "public",
-          contentType: enhanced.mimeType,
-          addRandomSuffix: true,
-        },
+        `listings/${listingId}/${fileName}`,
+        enhanced.mimeType,
       );
 
       const existingVariants = await db.query.listingImages.findMany({
@@ -94,7 +90,7 @@ export const enhanceImageFunction = inngest.createFunction(
           listingId,
           type: "ENHANCED",
           blobUrl: blob.url,
-          blobKey: blob.pathname,
+          blobKey: blob.key,
           parentImageId: imageId,
           sortOrder,
           isPrimary: false,

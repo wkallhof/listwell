@@ -27,7 +27,7 @@ Listwell is a mobile-first progressive web app that turns photos of items into r
 | UI Components  | shadcn/ui                               | Tailwind-based, accessible               |
 | Styling        | Tailwind CSS                            | Design system tokens in globals.css      |
 | Icons          | Lucide React                            | Default size={20}, stroke-width 2        |
-| Image Storage  | Vercel Blob                             | Client uploads with presigned URLs       |
+| Image Storage  | Vercel Blob / Cloudflare R2             | Swappable via STORAGE_PROVIDER env var   |
 | Background Jobs| Inngest                                 | Event-driven, step functions             |
 | AI Agent       | Vercel Sandbox + Claude AgentSDK        | Consolidated: image analysis + web research + listing generation in one session |
 | Image Enhance  | Google Gemini API                       | Contextual photo cleanup                 |
@@ -284,7 +284,13 @@ Required variables (see .env.example):
 DATABASE_URL=                    # PostgreSQL connection string
 NEXT_PUBLIC_APP_URL=             # App URL (http://localhost:3000 for dev)
 BETTER_AUTH_SECRET=              # BetterAuth secret key
-VERCEL_BLOB_READ_WRITE_TOKEN=   # Vercel Blob storage token
+STORAGE_PROVIDER=                # "vercel-blob" (default) or "r2"
+VERCEL_BLOB_READ_WRITE_TOKEN=   # Vercel Blob storage token (when using vercel-blob)
+CLOUDFLARE_ACCOUNT_ID=           # Cloudflare R2 account ID (when using r2)
+R2_ACCESS_KEY_ID=                # R2 API token access key (when using r2)
+R2_SECRET_ACCESS_KEY=            # R2 API token secret key (when using r2)
+R2_BUCKET_NAME=                  # R2 bucket name (when using r2)
+R2_PUBLIC_URL=                   # R2 public URL, e.g. https://pub-xxx.r2.dev (when using r2)
 INNGEST_EVENT_KEY=               # Inngest event key
 INNGEST_SIGNING_KEY=             # Inngest signing key
 ANTHROPIC_API_KEY=               # Claude API key
