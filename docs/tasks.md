@@ -447,23 +447,23 @@
 
 ### 3.1 Gemini Integration
 
-- [ ] 3.1.1: Install Google Generative AI SDK and create Gemini image editing helper
+- [x] 3.1.1: Install Google Generative AI SDK and create Gemini image editing helper
   - Files: src/lib/ai/gemini.ts, package.json
   - Test: Gemini client initializes with API key
-- [ ] 3.1.2: Create image enhancement prompt template informed by selling strategy
+- [x] 3.1.2: Create image enhancement prompt template informed by selling strategy
   - Files: src/lib/ai/enhancement-prompt.ts
   - Ref: `docs/selling-strategy.md` § Image Enhancement Guidance
   - Test: Prompt generates contextual enhancement instructions
-- [ ] 3.1.3: Implement `image.enhance` Inngest function with steps: download-original, enhance-with-gemini, upload-enhanced
+- [x] 3.1.3: Implement `image.enhance` Inngest function with steps: download-original, enhance-with-gemini, upload-enhanced
   - Files: src/inngest/functions/enhance-image.ts
   - Test: Given test image, returns enhanced version stored in Vercel Blob with new ListingImage record
-- [ ] 3.1.4: Register enhance-image function in Inngest serve route
+- [x] 3.1.4: Register enhance-image function in Inngest serve route
   - Files: src/app/api/inngest/route.ts
   - Test: Function appears in Inngest dev dashboard
-- [ ] 3.1.5: Create enhancement API route — POST /api/listings/[id]/enhance
+- [x] 3.1.5: Create enhancement API route — POST /api/listings/[id]/enhance
   - Files: src/app/api/listings/[id]/enhance/route.ts
   - Test: Triggers Inngest image.enhance.requested event with correct payload
-- [ ] 3.1.6: Write tests for Gemini integration and enhance function
+- [x] 3.1.6: Write tests for Gemini integration and enhance function
   - Files: src/inngest/functions/__tests__/enhance-image.test.ts, src/lib/ai/__tests__/gemini.test.ts
   - Test: Tests pass with ≥80% coverage
 
@@ -702,12 +702,12 @@
 | 2.5.5 | 2026-02-15 | (batch) | PushPrompt on submitted page |
 | 2.5.6 | 2026-02-15 | (batch) | Already wired in generate-listing.ts |
 | 2.5.7 | 2026-02-15 | (batch) | 20 push notification tests |
-| 3.1.1 |           |        |       |
-| 3.1.2 |           |        |       |
-| 3.1.3 |           |        |       |
-| 3.1.4 |           |        |       |
-| 3.1.5 |           |        |       |
-| 3.1.6 |           |        |       |
+| 3.1.1 | 2026-02-16 | (batch) | @google/genai SDK + enhanceImage helper |
+| 3.1.2 | 2026-02-16 | (batch) | Category-aware enhancement prompt |
+| 3.1.3 | 2026-02-16 | (batch) | 3-step Inngest function: download → enhance → upload |
+| 3.1.4 | 2026-02-16 | (batch) | Registered in Inngest serve route |
+| 3.1.5 | 2026-02-16 | (batch) | POST /api/listings/[id]/enhance + auth + validation |
+| 3.1.6 | 2026-02-16 | (batch) | 25 tests (gemini, prompt, enhance-image, route) |
 | 3.2.1 |           |        |       |
 | 3.2.2 |           |        |       |
 | 3.2.3 |           |        |       |
