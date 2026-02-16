@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
   ArrowLeft,
@@ -95,21 +95,35 @@ export default function ListingDetailPage() {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  const fetchListing = useCallback(async () => {
-    const response = await fetch(`/api/listings/${params.id}`);
-    if (!response.ok) {
-      toast.error("Failed to load listing");
-      router.push("/");
-      return;
-    }
-    const data = await response.json();
-    setListing(data);
-    setLoading(false);
-  }, [params.id, router]);
-
   useEffect(() => {
-    fetchListing();
-  }, [fetchListing]);
+    let cancelled = false;
+
+    fetch(`/api/listings/${params.id}`)
+      .then(async (response) => {
+        if (cancelled) return;
+        if (!response.ok) {
+          toast.error("Failed to load listing");
+          router.push("/");
+          return;
+        }
+        const data = await response.json();
+        if (!cancelled) {
+          setListing(data);
+          setLoading(false);
+        }
+      });
+
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params.id]);
+
+  async function refreshListing() {
+    const response = await fetch(`/api/listings/${params.id}`);
+    if (response.ok) {
+      const data = await response.json();
+      setListing(data);
+    }
+  }
 
   async function handleStatusUpdate(newStatus: string) {
     const response = await fetch(`/api/listings/${params.id}`, {
@@ -120,7 +134,7 @@ export default function ListingDetailPage() {
 
     if (response.ok) {
       toast.info(`Listing marked as ${newStatus.toLowerCase()}`);
-      fetchListing();
+      refreshListing();
     } else {
       toast.error("Failed to update listing");
     }
