@@ -49,7 +49,13 @@ export const enhanceImageFunction = inngest.createFunction(
 
         const buffer = await response.arrayBuffer();
         const base64 = Buffer.from(buffer).toString("base64");
-        const contentType = response.headers.get("content-type") ?? "image/jpeg";
+        const rawContentType = response.headers.get("content-type");
+        const contentType =
+          rawContentType && rawContentType !== "application/octet-stream"
+            ? rawContentType
+            : image.blobUrl.endsWith(".png")
+              ? "image/png"
+              : "image/jpeg";
 
         const enhancementPrompt = buildEnhancementPrompt({
           category: listing?.category,

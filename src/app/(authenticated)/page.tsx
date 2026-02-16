@@ -73,7 +73,7 @@ export default async function FeedPage() {
           description="Tap + to create your first one"
         />
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-4">
           {listings.map((listing) => {
             const primaryImage = listing.images.find((img) => img.isPrimary);
             return (

@@ -51,8 +51,8 @@ export function ListingCard({
   const showPrice = suggestedPrice && !isProcessing;
 
   return (
-    <Link href={`/listings/${id}`}>
-      <Card className="overflow-hidden">
+    <Link href={`/listings/${id}`} className="block">
+      <Card className="gap-0 overflow-hidden py-0">
         <div className="flex gap-3 p-3">
           <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg bg-muted">
             {primaryImageUrl ? (

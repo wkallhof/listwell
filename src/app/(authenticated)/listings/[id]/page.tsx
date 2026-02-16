@@ -14,6 +14,7 @@ import {
   X,
 } from "lucide-react";
 import { toast } from "sonner";
+import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -702,9 +703,9 @@ export default function ListingDetailPage() {
         {listing.researchNotes && (
           <div>
             <h3 className="mb-2 text-lg font-semibold">Market Notes</h3>
-            <p className="text-sm leading-relaxed text-muted-foreground">
-              {listing.researchNotes}
-            </p>
+            <div className="prose prose-sm prose-neutral dark:prose-invert max-w-none text-muted-foreground">
+              <ReactMarkdown>{listing.researchNotes}</ReactMarkdown>
+            </div>
           </div>
         )}
 
