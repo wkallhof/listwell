@@ -532,7 +532,7 @@
 
 ### 4.3 Copy & UX Polish
 
-- [ ] 4.3.1: Refine "Copy Full Listing" formatting for marketplace paste (title + price + description)
+- [x] 4.3.1: Refine "Copy Full Listing" formatting for marketplace paste (title + price + description)
   - Files: src/lib/listing-formatter.ts
   - Test: Formatted output matches expected marketplace-friendly format
 - [ ] 4.3.2: Add toast messages for all actions per screens.md toast table
@@ -720,7 +720,7 @@
 | 4.1.5 | 2026-02-15 | (batch) | 19 tests (13 component + 6 API) |
 | 4.2.1 | 2026-02-15 | (batch) | Inline title + description editing |
 | 4.2.2 | 2026-02-15 | (batch) | Inline price editing |
-| 4.3.1 |           |        |       |
+| 4.3.1 | 2026-02-15 | (batch) | Title-$Price inline + condition/brand/model |
 | 4.3.2 |           |        |       |
 | 4.3.3 |           |        |       |
 | 4.3.4 |           |        |       |
