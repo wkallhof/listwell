@@ -35,11 +35,12 @@ export function ImageGrid({
         {previewUrls.map((url, index) => (
           <div
             key={url}
-            className="relative aspect-square overflow-hidden rounded-lg"
+            className="animate-fade-in-scale relative aspect-square overflow-hidden rounded-lg"
           >
             <img
               src={url}
               alt={`Photo ${index + 1}`}
+              decoding="async"
               className="h-full w-full object-cover"
             />
             <Button

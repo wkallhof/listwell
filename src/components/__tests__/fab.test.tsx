@@ -47,4 +47,11 @@ describe("FAB", () => {
     expect(button.className).toContain("fixed");
     expect(button.className).toContain("rounded-full");
   });
+
+  it("has press scale animation", () => {
+    render(<FAB />);
+    const button = screen.getByRole("button");
+    expect(button.className).toContain("active:scale-95");
+    expect(button.className).toContain("duration-100");
+  });
 });

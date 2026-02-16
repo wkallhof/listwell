@@ -48,4 +48,29 @@ describe("ImageCarousel", () => {
 
     expect(screen.getByRole("region", { name: "Image carousel" })).toBeInTheDocument();
   });
+
+  it("loads first image eagerly and rest lazily", () => {
+    const { container } = render(<ImageCarousel images={mockImages} />);
+
+    const images = container.querySelectorAll("img");
+    expect(images[0]).toHaveAttribute("loading", "eager");
+    expect(images[1]).toHaveAttribute("loading", "lazy");
+    expect(images[2]).toHaveAttribute("loading", "lazy");
+  });
+
+  it("sets decoding=async on all images", () => {
+    const { container } = render(<ImageCarousel images={mockImages} />);
+
+    const images = container.querySelectorAll("img");
+    images.forEach((img) => {
+      expect(img).toHaveAttribute("decoding", "async");
+    });
+  });
+
+  it("has smooth scrolling enabled", () => {
+    render(<ImageCarousel images={mockImages} />);
+
+    const carousel = screen.getByRole("region", { name: "Image carousel" });
+    expect(carousel.className).toContain("scroll-smooth");
+  });
 });

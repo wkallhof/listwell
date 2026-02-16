@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { BottomBar } from "@/components/bottom-bar";
+import { VoiceInput } from "@/components/voice-input";
 import { useNewListing } from "@/lib/new-listing-context";
 import { createListing } from "@/lib/listing-actions";
 
@@ -89,6 +90,16 @@ export default function DescribePage() {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
+          <div className="absolute bottom-3 right-3">
+            <VoiceInput
+              onTranscript={(text) => {
+                setDescription(
+                  description ? `${description} ${text}` : text,
+                );
+              }}
+              disabled={submitting}
+            />
+          </div>
         </div>
 
         <p className="mt-3 text-xs text-muted-foreground">

@@ -42,11 +42,11 @@ export function ImageCarousel({ images }: ImageCarouselProps) {
     <div>
       <div
         ref={scrollRef}
-        className="flex snap-x snap-mandatory overflow-x-auto scrollbar-hide"
+        className="flex snap-x snap-mandatory scroll-smooth overflow-x-auto scrollbar-hide"
         role="region"
         aria-label="Image carousel"
       >
-        {images.map((image) => (
+        {images.map((image, index) => (
           <div
             key={image.id}
             className="w-full flex-shrink-0 snap-center"
@@ -55,6 +55,8 @@ export function ImageCarousel({ images }: ImageCarouselProps) {
               <img
                 src={image.blobUrl}
                 alt=""
+                loading={index === 0 ? "eager" : "lazy"}
+                decoding="async"
                 className="h-full w-full object-cover"
               />
             </div>
