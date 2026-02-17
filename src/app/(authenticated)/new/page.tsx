@@ -13,7 +13,7 @@ export default function CapturePage() {
 
   return (
     <div className="flex min-h-svh flex-col">
-      <header className="flex items-center px-5 pb-2 pt-4">
+      <header className="flex items-center px-5 pb-2 pt-[max(env(safe-area-inset-top,0px)+0.25rem,1rem)]">
         <Button variant="ghost" size="icon" onClick={() => router.push("/")}>
           <ArrowLeft size={20} />
         </Button>

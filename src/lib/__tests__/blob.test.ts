@@ -12,6 +12,7 @@ vi.mock("@vercel/blob", () => ({
 
 // --- AWS S3 mocks ---
 const mockSend = vi.fn();
+const mockGetSignedUrl = vi.fn();
 
 vi.mock("@aws-sdk/client-s3", () => {
   class MockS3Client {
@@ -46,11 +47,16 @@ vi.mock("@aws-sdk/client-s3", () => {
   };
 });
 
+vi.mock("@aws-sdk/s3-request-presigner", () => ({
+  getSignedUrl: (...args: unknown[]) => mockGetSignedUrl(...args),
+}));
+
 import {
   uploadImage,
   uploadBuffer,
   deleteImage,
   deleteImages,
+  createPresignedUploadUrl,
   _resetProviderCache,
 } from "@/lib/blob";
 
@@ -252,6 +258,26 @@ describe("blob helpers", () => {
         await deleteImages([]);
 
         expect(mockSend).not.toHaveBeenCalled();
+      });
+    });
+
+    describe("createPresignedUploadUrl", () => {
+      it("generates a presigned URL for a given key", async () => {
+        mockGetSignedUrl.mockResolvedValue(
+          "https://test-account.r2.cloudflarestorage.com/test-bucket/my-key?signature=abc",
+        );
+
+        const result = await createPresignedUploadUrl(
+          "listings/abc/photo.jpg",
+          "image/jpeg",
+        );
+
+        expect(mockGetSignedUrl).toHaveBeenCalledTimes(1);
+        expect(result.key).toBe("listings/abc/photo.jpg");
+        expect(result.publicUrl).toBe(
+          "https://pub-test.r2.dev/listings/abc/photo.jpg",
+        );
+        expect(result.presignedUrl).toContain("signature=abc");
       });
     });
   });

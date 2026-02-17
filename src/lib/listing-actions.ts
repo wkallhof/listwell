@@ -4,8 +4,18 @@ import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { listings, listingImages } from "@/db/schema";
-import { uploadImage } from "@/lib/blob";
 import { inngest } from "@/inngest/client";
+
+interface ImageInput {
+  key: string;
+  url: string;
+  filename: string;
+}
+
+interface CreateListingInput {
+  description?: string;
+  images: ImageInput[];
+}
 
 interface CreateListingResult {
   success: boolean;
@@ -14,7 +24,7 @@ interface CreateListingResult {
 }
 
 export async function createListing(
-  formData: FormData,
+  input: CreateListingInput,
 ): Promise<CreateListingResult> {
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -24,14 +34,13 @@ export async function createListing(
     return { success: false, error: "Unauthorized" };
   }
 
-  const description = formData.get("description") as string | null;
-  const files = formData.getAll("images") as File[];
+  const { description, images } = input;
 
-  if (files.length === 0) {
+  if (!images || images.length === 0) {
     return { success: false, error: "At least one image is required" };
   }
 
-  if (files.length > 5) {
+  if (images.length > 5) {
     return { success: false, error: "Maximum 5 images allowed" };
   }
 
@@ -46,16 +55,14 @@ export async function createListing(
     })
     .returning();
 
-  // Upload images and create records
+  // Create image records (images already uploaded to R2)
   await Promise.all(
-    files.map(async (file, index) => {
-      const { url, key } = await uploadImage(file, listing.id);
-
+    images.map(async (image, index) => {
       await db.insert(listingImages).values({
         listingId: listing.id,
         type: "ORIGINAL",
-        blobUrl: url,
-        blobKey: key,
+        blobUrl: image.url,
+        blobKey: image.key,
         sortOrder: index,
         isPrimary: index === 0,
       });
@@ -63,16 +70,12 @@ export async function createListing(
   );
 
   // Trigger AI pipeline
-  const imageRecords = await db.query.listingImages.findMany({
-    where: (img, { eq }) => eq(img.listingId, listing.id),
-  });
-
   await inngest.send({
     name: "listing.submitted",
     data: {
       listingId: listing.id,
-      imageUrls: imageRecords.map((img) => img.blobUrl),
-      userDescription: description,
+      imageUrls: images.map((img) => img.url),
+      userDescription: description ?? null,
     },
   });
 

@@ -10,12 +10,14 @@ import { BottomBar } from "@/components/bottom-bar";
 import { VoiceInput } from "@/components/voice-input";
 import { useNewListing } from "@/lib/new-listing-context";
 import { createListing } from "@/lib/listing-actions";
+import { uploadImages } from "@/lib/upload-client";
 
 export default function DescribePage() {
   const router = useRouter();
   const { photos, previewUrls, description, setDescription } =
     useNewListing();
   const [submitting, setSubmitting] = useState(false);
+  const [statusText, setStatusText] = useState("");
 
   // Redirect if no photos
   if (photos.length === 0 && typeof window !== "undefined") {
@@ -27,18 +29,24 @@ export default function DescribePage() {
     setSubmitting(true);
 
     try {
-      const formData = new FormData();
-      if (!skipDescription && description.trim()) {
-        formData.append("description", description.trim());
-      }
-      for (const photo of photos) {
-        formData.append("images", photo);
-      }
+      // Step 1: Upload images directly to R2
+      setStatusText("Uploading photos...");
+      const uploadedImages = await uploadImages(photos, (fraction) => {
+        const pct = Math.round(fraction * 100);
+        setStatusText(`Uploading photos... ${pct}%`);
+      });
 
-      const result = await createListing(formData);
+      // Step 2: Create listing with image metadata
+      setStatusText("Creating listing...");
+      const result = await createListing({
+        description: skipDescription ? undefined : description.trim() || undefined,
+        images: uploadedImages,
+      });
 
       if (!result.success) {
         toast.error(result.error ?? "Failed to create listing");
+        setSubmitting(false);
+        setStatusText("");
         return;
       }
 
@@ -48,12 +56,13 @@ export default function DescribePage() {
     } catch {
       toast.error("An unexpected error occurred");
       setSubmitting(false);
+      setStatusText("");
     }
   }
 
   return (
     <div className="flex min-h-svh flex-col">
-      <header className="flex items-center px-5 pb-2 pt-4">
+      <header className="flex items-center px-5 pb-2 pt-[max(env(safe-area-inset-top,0px)+0.25rem,1rem)]">
         <Button
           variant="ghost"
           size="icon"
@@ -72,6 +81,7 @@ export default function DescribePage() {
               key={url}
               className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg"
             >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={url}
                 alt={`Photo ${index + 1}`}
@@ -124,7 +134,7 @@ export default function DescribePage() {
             {submitting ? (
               <>
                 <Loader2 className="animate-spin" size={20} />
-                Uploading...
+                {statusText || "Uploading..."}
               </>
             ) : (
               "Generate Listing"

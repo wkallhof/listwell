@@ -153,6 +153,7 @@ export function ImageEnhancementSheet({
         <div className="flex-1 overflow-y-auto px-4">
           {/* Original Image */}
           <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-muted">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={originalUrl}
               alt="Original photo"
@@ -173,6 +174,7 @@ export function ImageEnhancementSheet({
                     key={variant.id}
                     className="relative aspect-[4/3] overflow-hidden rounded-lg ring-2 ring-transparent hover:ring-primary/30"
                   >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={variant.blobUrl}
                       alt="Enhanced variant"

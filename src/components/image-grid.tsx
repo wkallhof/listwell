@@ -37,6 +37,7 @@ export function ImageGrid({
             key={url}
             className="animate-fade-in-scale relative aspect-square overflow-hidden rounded-lg"
           >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={url}
               alt={`Photo ${index + 1}`}

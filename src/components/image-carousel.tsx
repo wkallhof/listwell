@@ -55,6 +55,7 @@ export function ImageCarousel({ images, onEnhance }: ImageCarouselProps) {
         {images.map((image, index) => (
           <div key={image.id} className="w-full flex-shrink-0 snap-center">
             <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-muted">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={image.blobUrl}
                 alt=""
@@ -119,6 +120,7 @@ export function ImageCarousel({ images, onEnhance }: ImageCarouselProps) {
           >
             <X size={24} />
           </Button>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={images[lightboxIndex].blobUrl}
             alt=""

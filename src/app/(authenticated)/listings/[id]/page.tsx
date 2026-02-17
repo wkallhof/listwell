@@ -315,7 +315,7 @@ export default function ListingDetailPage() {
   if (loading) {
     return (
       <div className="pb-28">
-        <header className="flex items-center px-5 pb-2 pt-4">
+        <header className="flex items-center px-5 pb-2 pt-[max(env(safe-area-inset-top,0px)+0.25rem,1rem)]">
           <Button variant="ghost" size="icon" onClick={() => router.push("/")}>
             <ArrowLeft size={20} />
           </Button>
@@ -344,7 +344,7 @@ export default function ListingDetailPage() {
   // Processing / Error view
   if (isProcessing || isError) {
     return (
-      <div className="min-h-svh px-5 pb-8 pt-4">
+      <div className="min-h-svh px-5 pb-8 pt-[max(env(safe-area-inset-top,0px)+0.25rem,1rem)]">
         <header className="flex items-center pb-4">
           <Button variant="ghost" size="icon" onClick={() => router.push("/")}>
             <ArrowLeft size={20} />
@@ -357,6 +357,7 @@ export default function ListingDetailPage() {
         {/* Photo Preview */}
         {primaryImage && (
           <div className="mb-6 aspect-[4/3] overflow-hidden rounded-lg bg-muted">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={primaryImage.blobUrl}
               alt="Item photo"
@@ -470,7 +471,7 @@ export default function ListingDetailPage() {
 
   return (
     <div className="pb-28">
-      <header className="flex items-center justify-between px-5 pb-2 pt-4">
+      <header className="flex items-center justify-between px-5 pb-2 pt-[max(env(safe-area-inset-top,0px)+0.25rem,1rem)]">
         <Button variant="ghost" size="icon" onClick={() => router.push("/")}>
           <ArrowLeft size={20} />
         </Button>

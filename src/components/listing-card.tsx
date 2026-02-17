@@ -56,6 +56,7 @@ export function ListingCard({
         <div className="flex gap-3 p-3">
           <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg bg-muted">
             {primaryImageUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={primaryImageUrl}
                 alt={title ?? "Listing image"}

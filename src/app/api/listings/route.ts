@@ -5,7 +5,6 @@ import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { listings, listingImages } from "@/db/schema";
 import { inngest } from "@/inngest/client";
-import { uploadImage } from "@/lib/blob";
 
 export async function GET() {
   const session = await auth.api.getSession({
@@ -27,6 +26,12 @@ export async function GET() {
   return NextResponse.json(userListings);
 }
 
+interface ImageInput {
+  key: string;
+  url: string;
+  filename: string;
+}
+
 export async function POST(request: NextRequest) {
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -36,18 +41,18 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const formData = await request.formData();
-  const description = formData.get("description") as string | null;
-  const files = formData.getAll("images") as File[];
+  const body = await request.json();
+  const description = body.description as string | null | undefined;
+  const images = body.images as ImageInput[] | undefined;
 
-  if (files.length === 0) {
+  if (!images || images.length === 0) {
     return NextResponse.json(
       { error: "At least one image is required" },
       { status: 400 },
     );
   }
 
-  if (files.length > 5) {
+  if (images.length > 5) {
     return NextResponse.json(
       { error: "Maximum 5 images allowed" },
       { status: 400 },
@@ -59,24 +64,22 @@ export async function POST(request: NextRequest) {
     .insert(listings)
     .values({
       userId: session.user.id,
-      rawDescription: description,
+      rawDescription: description ?? null,
       status: "DRAFT",
       pipelineStep: "PENDING",
     })
     .returning();
 
-  // Upload images and create records
+  // Create image records (images already uploaded to R2)
   const imageRecords = await Promise.all(
-    files.map(async (file, index) => {
-      const { url, key } = await uploadImage(file, listing.id);
-
+    images.map(async (image, index) => {
       const [imageRecord] = await db
         .insert(listingImages)
         .values({
           listingId: listing.id,
           type: "ORIGINAL",
-          blobUrl: url,
-          blobKey: key,
+          blobUrl: image.url,
+          blobKey: image.key,
           sortOrder: index,
           isPrimary: index === 0,
         })
@@ -92,7 +95,7 @@ export async function POST(request: NextRequest) {
     data: {
       listingId: listing.id,
       imageUrls: imageRecords.map((img) => img.blobUrl),
-      userDescription: description,
+      userDescription: description ?? null,
     },
   });
 

@@ -15,6 +15,7 @@ export function PullToRefresh({ children }: PullToRefreshProps) {
   const router = useRouter();
   const [pullDistance, setPullDistance] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
+  const [isPulling, setIsPulling] = useState(false);
   const startY = useRef(0);
   const pulling = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -26,6 +27,7 @@ export function PullToRefresh({ children }: PullToRefreshProps) {
       if (scrollTop <= 0) {
         startY.current = e.touches[0].clientY;
         pulling.current = true;
+        setIsPulling(true);
       }
     },
     [refreshing],
@@ -48,6 +50,7 @@ export function PullToRefresh({ children }: PullToRefreshProps) {
   const handleTouchEnd = useCallback(async () => {
     if (!pulling.current || refreshing) return;
     pulling.current = false;
+    setIsPulling(false);
 
     if (pullDistance >= THRESHOLD) {
       setRefreshing(true);
@@ -74,7 +77,7 @@ export function PullToRefresh({ children }: PullToRefreshProps) {
         className="flex items-center justify-center overflow-hidden transition-[height] duration-200"
         style={{
           height: pullDistance > 0 || refreshing ? `${pullDistance}px` : "0px",
-          transitionDuration: pulling.current ? "0ms" : "200ms",
+          transitionDuration: isPulling ? "0ms" : "200ms",
         }}
       >
         <Loader2

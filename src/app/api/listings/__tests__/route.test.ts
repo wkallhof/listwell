@@ -34,13 +34,6 @@ vi.mock("@/db", () => ({
   },
 }));
 
-vi.mock("@/lib/blob", () => ({
-  uploadImage: vi.fn().mockResolvedValue({
-    url: "https://blob.test/image.jpg",
-    key: "listings/test/image.jpg",
-  }),
-}));
-
 vi.mock("@/db/schema", () => ({
   listings: { userId: "user_id", createdAt: "created_at" },
   listingImages: {},
@@ -59,6 +52,14 @@ const mockSession = {
   user: { id: "user-1", email: "test@example.com", name: "Test" },
   session: { id: "session-1" },
 };
+
+function makePostRequest(body: unknown): NextRequest {
+  return new NextRequest("http://localhost:3000/api/listings", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
 
 describe("GET /api/listings", () => {
   beforeEach(() => {
@@ -100,12 +101,8 @@ describe("POST /api/listings", () => {
   it("returns 401 when not authenticated", async () => {
     mockGetSession.mockResolvedValue(null);
 
-    const formData = new FormData();
-    formData.append("images", new File(["data"], "photo.jpg"));
-
-    const request = new NextRequest("http://localhost:3000/api/listings", {
-      method: "POST",
-      body: formData,
+    const request = makePostRequest({
+      images: [{ key: "k", url: "https://r2.test/img.jpg", filename: "photo.jpg" }],
     });
 
     const response = await POST(request);
@@ -118,12 +115,7 @@ describe("POST /api/listings", () => {
   it("returns 400 when no images provided", async () => {
     mockGetSession.mockResolvedValue(mockSession);
 
-    const formData = new FormData();
-
-    const request = new NextRequest("http://localhost:3000/api/listings", {
-      method: "POST",
-      body: formData,
-    });
+    const request = makePostRequest({ images: [] });
 
     const response = await POST(request);
     const data = await response.json();
@@ -135,15 +127,13 @@ describe("POST /api/listings", () => {
   it("returns 400 when more than 5 images provided", async () => {
     mockGetSession.mockResolvedValue(mockSession);
 
-    const formData = new FormData();
-    for (let i = 0; i < 6; i++) {
-      formData.append("images", new File(["data"], `photo${i}.jpg`));
-    }
+    const images = Array.from({ length: 6 }, (_, i) => ({
+      key: `k${i}`,
+      url: `https://r2.test/img${i}.jpg`,
+      filename: `photo${i}.jpg`,
+    }));
 
-    const request = new NextRequest("http://localhost:3000/api/listings", {
-      method: "POST",
-      body: formData,
-    });
+    const request = makePostRequest({ images });
 
     const response = await POST(request);
     const data = await response.json();
@@ -162,17 +152,15 @@ describe("POST /api/listings", () => {
         {
           id: "img-1",
           listingId: "listing-1",
-          blobUrl: "https://blob.test/image.jpg",
+          blobUrl: "https://r2.test/image.jpg",
         },
       ]);
 
-    const formData = new FormData();
-    formData.append("description", "Test item");
-    formData.append("images", new File(["data"], "photo.jpg"));
-
-    const request = new NextRequest("http://localhost:3000/api/listings", {
-      method: "POST",
-      body: formData,
+    const request = makePostRequest({
+      description: "Test item",
+      images: [
+        { key: "listings/abc/photo.jpg", url: "https://r2.test/image.jpg", filename: "photo.jpg" },
+      ],
     });
 
     const response = await POST(request);

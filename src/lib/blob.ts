@@ -205,4 +205,44 @@ export async function deleteImages(blobUrls: string[]): Promise<void> {
   return provider.deleteMany(blobUrls);
 }
 
-export type { UploadResult, StorageProvider };
+// --- Presigned URL Generation (R2 only) ---
+
+interface PresignedUploadUrl {
+  presignedUrl: string;
+  key: string;
+  publicUrl: string;
+}
+
+export async function createPresignedUploadUrl(
+  key: string,
+  contentType: string,
+): Promise<PresignedUploadUrl> {
+  const { accountId, bucket, publicUrl } = getR2Config();
+  const { S3Client, PutObjectCommand } = await import("@aws-sdk/client-s3");
+  const { getSignedUrl } = await import("@aws-sdk/s3-request-presigner");
+
+  const client = new S3Client({
+    region: "auto",
+    endpoint: `https://${accountId}.r2.cloudflarestorage.com`,
+    credentials: {
+      accessKeyId: process.env.R2_ACCESS_KEY_ID ?? "",
+      secretAccessKey: process.env.R2_SECRET_ACCESS_KEY ?? "",
+    },
+  });
+
+  const command = new PutObjectCommand({
+    Bucket: bucket,
+    Key: key,
+    ContentType: contentType,
+  });
+
+  const presignedUrl = await getSignedUrl(client, command, { expiresIn: 600 });
+
+  return {
+    presignedUrl,
+    key,
+    publicUrl: `${publicUrl}/${key}`,
+  };
+}
+
+export type { UploadResult, PresignedUploadUrl, StorageProvider };

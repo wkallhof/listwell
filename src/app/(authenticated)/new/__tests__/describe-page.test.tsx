@@ -7,6 +7,7 @@ const mockReplace = vi.fn();
 const mockReset = vi.fn();
 const mockSetDescription = vi.fn();
 const mockCreateListing = vi.fn();
+const mockUploadImages = vi.fn();
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: mockPush, replace: mockReplace }),
@@ -33,6 +34,10 @@ vi.mock("@/lib/listing-actions", () => ({
   createListing: (...args: unknown[]) => mockCreateListing(...args),
 }));
 
+vi.mock("@/lib/upload-client", () => ({
+  uploadImages: (...args: unknown[]) => mockUploadImages(...args),
+}));
+
 vi.mock("@/components/bottom-bar", () => ({
   BottomBar: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="bottom-bar">{children}</div>
@@ -44,6 +49,9 @@ import { toast } from "sonner";
 
 beforeEach(() => {
   vi.clearAllMocks();
+  mockUploadImages.mockResolvedValue([
+    { key: "listings/abc/photo.jpg", url: "https://r2.test/photo.jpg", filename: "photo.jpg" },
+  ]);
 });
 
 describe("DescribePage", () => {
@@ -64,7 +72,7 @@ describe("DescribePage", () => {
     expect(screen.getByText("Generate Listing")).toBeInTheDocument();
   });
 
-  it("calls createListing on Generate Listing click", async () => {
+  it("uploads images then creates listing on Generate click", async () => {
     const user = userEvent.setup();
     mockCreateListing.mockResolvedValue({ success: true, listingId: "123" });
 
@@ -72,12 +80,22 @@ describe("DescribePage", () => {
 
     await user.click(screen.getByText("Generate Listing"));
 
-    expect(mockCreateListing).toHaveBeenCalledWith(expect.any(FormData));
-    expect(mockReset).not.toHaveBeenCalled();
+    // Verify upload was called first
+    expect(mockUploadImages).toHaveBeenCalledWith(
+      [expect.any(File)],
+      expect.any(Function),
+    );
+    // Then listing created with image metadata
+    expect(mockCreateListing).toHaveBeenCalledWith({
+      description: undefined,
+      images: [
+        { key: "listings/abc/photo.jpg", url: "https://r2.test/photo.jpg", filename: "photo.jpg" },
+      ],
+    });
     expect(mockPush).toHaveBeenCalledWith("/listings/123");
   });
 
-  it("calls createListing without description on Skip click", async () => {
+  it("uploads images then creates listing without description on Skip", async () => {
     const user = userEvent.setup();
     mockCreateListing.mockResolvedValue({ success: true, listingId: "123" });
 
@@ -85,11 +103,15 @@ describe("DescribePage", () => {
 
     await user.click(screen.getByText("Skip"));
 
-    expect(mockCreateListing).toHaveBeenCalledWith(expect.any(FormData));
+    expect(mockUploadImages).toHaveBeenCalled();
+    expect(mockCreateListing).toHaveBeenCalledWith({
+      description: undefined,
+      images: expect.any(Array),
+    });
     expect(mockPush).toHaveBeenCalledWith("/listings/123");
   });
 
-  it("shows error toast on failure", async () => {
+  it("shows error toast on listing creation failure", async () => {
     const user = userEvent.setup();
     mockCreateListing.mockResolvedValue({
       success: false,
@@ -104,9 +126,9 @@ describe("DescribePage", () => {
     expect(mockPush).not.toHaveBeenCalled();
   });
 
-  it("shows generic error on unexpected failure", async () => {
+  it("shows generic error on upload failure", async () => {
     const user = userEvent.setup();
-    mockCreateListing.mockRejectedValue(new Error("Network error"));
+    mockUploadImages.mockRejectedValue(new Error("Network error"));
 
     render(<DescribePage />);
 

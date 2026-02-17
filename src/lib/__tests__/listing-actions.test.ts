@@ -5,8 +5,6 @@ const mockGetSession = vi.fn();
 const mockInsert = vi.fn();
 const mockValues = vi.fn();
 const mockReturning = vi.fn();
-const mockUploadImage = vi.fn();
-const mockFindMany = vi.fn();
 const mockInngestSend = vi.fn();
 
 vi.mock("next/headers", () => ({
@@ -24,11 +22,6 @@ vi.mock("@/lib/auth", () => ({
 vi.mock("@/db", () => ({
   db: {
     insert: (...args: unknown[]) => mockInsert(...args),
-    query: {
-      listingImages: {
-        findMany: (...args: unknown[]) => mockFindMany(...args),
-      },
-    },
   },
 }));
 
@@ -43,10 +36,6 @@ vi.mock("@/db/schema", () => ({
   listingImages: { id: "listingImages" },
 }));
 
-vi.mock("@/lib/blob", () => ({
-  uploadImage: (...args: unknown[]) => mockUploadImage(...args),
-}));
-
 beforeEach(() => {
   vi.clearAllMocks();
 
@@ -59,13 +48,10 @@ describe("createListing", () => {
     mockGetSession.mockResolvedValue(null);
 
     const { createListing } = await import("@/lib/listing-actions");
-    const formData = new FormData();
-    formData.append(
-      "images",
-      new File(["x"], "photo.jpg", { type: "image/jpeg" }),
-    );
 
-    const result = await createListing(formData);
+    const result = await createListing({
+      images: [{ key: "k", url: "https://r2.test/img.jpg", filename: "photo.jpg" }],
+    });
 
     expect(result).toEqual({ success: false, error: "Unauthorized" });
   });
@@ -74,9 +60,8 @@ describe("createListing", () => {
     mockGetSession.mockResolvedValue({ user: { id: "user-1" } });
 
     const { createListing } = await import("@/lib/listing-actions");
-    const formData = new FormData();
 
-    const result = await createListing(formData);
+    const result = await createListing({ images: [] });
 
     expect(result).toEqual({
       success: false,
@@ -88,15 +73,14 @@ describe("createListing", () => {
     mockGetSession.mockResolvedValue({ user: { id: "user-1" } });
 
     const { createListing } = await import("@/lib/listing-actions");
-    const formData = new FormData();
-    for (let i = 0; i < 6; i++) {
-      formData.append(
-        "images",
-        new File(["x"], `photo${i}.jpg`, { type: "image/jpeg" }),
-      );
-    }
 
-    const result = await createListing(formData);
+    const images = Array.from({ length: 6 }, (_, i) => ({
+      key: `k${i}`,
+      url: `https://r2.test/img${i}.jpg`,
+      filename: `photo${i}.jpg`,
+    }));
+
+    const result = await createListing({ images });
 
     expect(result).toEqual({
       success: false,
@@ -104,30 +88,21 @@ describe("createListing", () => {
     });
   });
 
-  it("creates listing and uploads images on success", async () => {
+  it("creates listing and image records on success", async () => {
     mockGetSession.mockResolvedValue({ user: { id: "user-1" } });
     mockReturning.mockResolvedValue([{ id: "listing-1" }]);
-    mockUploadImage.mockResolvedValue({
-      url: "https://blob.test/img.jpg",
-      key: "img-key",
-    });
-    mockFindMany.mockResolvedValue([
-      { id: "img-1", blobUrl: "https://blob.test/img.jpg" },
-    ]);
     mockInngestSend.mockResolvedValue(undefined);
 
     const { createListing } = await import("@/lib/listing-actions");
-    const formData = new FormData();
-    formData.append("description", "A nice camera");
-    formData.append(
-      "images",
-      new File(["x"], "photo.jpg", { type: "image/jpeg" }),
-    );
 
-    const result = await createListing(formData);
+    const result = await createListing({
+      description: "A nice camera",
+      images: [
+        { key: "listings/abc/photo.jpg", url: "https://r2.test/img.jpg", filename: "photo.jpg" },
+      ],
+    });
 
     expect(result).toEqual({ success: true, listingId: "listing-1" });
-    expect(mockUploadImage).toHaveBeenCalledTimes(1);
     // Check listing was inserted with correct values
     expect(mockInsert).toHaveBeenCalled();
     expect(mockValues).toHaveBeenCalledWith(
@@ -143,7 +118,7 @@ describe("createListing", () => {
       name: "listing.submitted",
       data: {
         listingId: "listing-1",
-        imageUrls: ["https://blob.test/img.jpg"],
+        imageUrls: ["https://r2.test/img.jpg"],
         userDescription: "A nice camera",
       },
     });
@@ -152,23 +127,15 @@ describe("createListing", () => {
   it("creates listing with null description when not provided", async () => {
     mockGetSession.mockResolvedValue({ user: { id: "user-1" } });
     mockReturning.mockResolvedValue([{ id: "listing-2" }]);
-    mockUploadImage.mockResolvedValue({
-      url: "https://blob.test/img.jpg",
-      key: "img-key",
-    });
-    mockFindMany.mockResolvedValue([
-      { id: "img-1", blobUrl: "https://blob.test/img.jpg" },
-    ]);
     mockInngestSend.mockResolvedValue(undefined);
 
     const { createListing } = await import("@/lib/listing-actions");
-    const formData = new FormData();
-    formData.append(
-      "images",
-      new File(["x"], "photo.jpg", { type: "image/jpeg" }),
-    );
 
-    const result = await createListing(formData);
+    const result = await createListing({
+      images: [
+        { key: "listings/abc/photo.jpg", url: "https://r2.test/img.jpg", filename: "photo.jpg" },
+      ],
+    });
 
     expect(result).toEqual({ success: true, listingId: "listing-2" });
     expect(mockValues).toHaveBeenCalledWith(
