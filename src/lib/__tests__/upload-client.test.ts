@@ -194,6 +194,6 @@ describe("uploadImages", () => {
 
     xhrInstances[0].simulateError();
 
-    await expect(promise).rejects.toThrow("Upload failed");
+    await expect(promise).rejects.toThrow("Upload failed for photo.jpg");
   });
 });

@@ -126,15 +126,19 @@ describe("DescribePage", () => {
     expect(mockPush).not.toHaveBeenCalled();
   });
 
-  it("shows generic error on upload failure", async () => {
+  it("shows upload error message on upload failure", async () => {
     const user = userEvent.setup();
-    mockUploadImages.mockRejectedValue(new Error("Network error"));
+    mockUploadImages.mockRejectedValue(
+      new Error("Upload failed for photo.jpg. Check R2 CORS configuration."),
+    );
 
     render(<DescribePage />);
 
     await user.click(screen.getByText("Generate Listing"));
 
-    expect(toast.error).toHaveBeenCalledWith("An unexpected error occurred");
+    expect(toast.error).toHaveBeenCalledWith(
+      "Upload failed for photo.jpg. Check R2 CORS configuration.",
+    );
   });
 
   it("shows helper text", () => {

@@ -31,10 +31,21 @@ export default function DescribePage() {
     try {
       // Step 1: Upload images directly to R2
       setStatusText("Uploading photos...");
-      const uploadedImages = await uploadImages(photos, (fraction) => {
-        const pct = Math.round(fraction * 100);
-        setStatusText(`Uploading photos... ${pct}%`);
-      });
+      let uploadedImages;
+      try {
+        uploadedImages = await uploadImages(photos, (fraction) => {
+          const pct = Math.round(fraction * 100);
+          setStatusText(`Uploading photos... ${pct}%`);
+        });
+      } catch (uploadErr) {
+        const msg =
+          uploadErr instanceof Error ? uploadErr.message : "Upload failed";
+        console.error("[describe] Image upload failed:", uploadErr);
+        toast.error(msg);
+        setSubmitting(false);
+        setStatusText("");
+        return;
+      }
 
       // Step 2: Create listing with image metadata
       setStatusText("Creating listing...");
@@ -53,8 +64,11 @@ export default function DescribePage() {
       toast.info("Generating your listing...");
       router.push(`/listings/${result.listingId}`);
       // No reset() needed — context unmounts when leaving /new route group
-    } catch {
-      toast.error("An unexpected error occurred");
+    } catch (err) {
+      console.error("[describe] Listing creation failed:", err);
+      const msg =
+        err instanceof Error ? err.message : "An unexpected error occurred";
+      toast.error(msg);
       setSubmitting(false);
       setStatusText("");
     }

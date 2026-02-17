@@ -54,15 +54,27 @@ export async function POST(request: NextRequest) {
 
   const sessionId = randomBytes(8).toString("hex");
 
-  const uploads = await Promise.all(
-    files.map(async (file) => {
-      const suffix = randomBytes(6).toString("hex");
-      const safeName = file.filename.replace(/[^a-zA-Z0-9._-]/g, "_");
-      const key = `listings/${sessionId}/${suffix}-${safeName}`;
+  try {
+    const uploads = await Promise.all(
+      files.map(async (file) => {
+        const suffix = randomBytes(6).toString("hex");
+        const safeName = file.filename.replace(/[^a-zA-Z0-9._-]/g, "_");
+        const key = `listings/${sessionId}/${suffix}-${safeName}`;
 
-      return createPresignedUploadUrl(key, file.contentType);
-    }),
-  );
+        return createPresignedUploadUrl(key, file.contentType);
+      }),
+    );
 
-  return NextResponse.json({ uploads });
+    console.log(
+      `[presign] Generated ${uploads.length} presigned URL(s) for session ${sessionId}`,
+    );
+
+    return NextResponse.json({ uploads });
+  } catch (err) {
+    console.error("[presign] Failed to generate presigned URLs:", err);
+    return NextResponse.json(
+      { error: "Failed to generate upload URLs" },
+      { status: 500 },
+    );
+  }
 }

@@ -32,11 +32,24 @@ function uploadFileWithProgress(
       if (xhr.status >= 200 && xhr.status < 300) {
         resolve();
       } else {
+        console.error(
+          `[upload] PUT failed: status=${xhr.status}, response=${xhr.responseText}`,
+        );
         reject(new Error(`Upload failed with status ${xhr.status}`));
       }
     });
 
-    xhr.addEventListener("error", () => reject(new Error("Upload failed")));
+    xhr.addEventListener("error", () => {
+      console.error(
+        `[upload] XHR error for ${file.name} — likely CORS. status=${xhr.status}`,
+      );
+      reject(
+        new Error(
+          `Upload failed for ${file.name}. Check R2 CORS configuration.`,
+        ),
+      );
+    });
+
     xhr.addEventListener("abort", () => reject(new Error("Upload aborted")));
 
     xhr.send(file);
