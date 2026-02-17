@@ -360,7 +360,7 @@ export default function ListingDetailPage() {
             <img
               src={primaryImage.blobUrl}
               alt="Item photo"
-              className="h-full w-full object-cover"
+              className="h-full w-full object-contain"
             />
           </div>
         )}

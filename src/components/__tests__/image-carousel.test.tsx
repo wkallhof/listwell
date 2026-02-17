@@ -124,4 +124,69 @@ describe("ImageCarousel", () => {
     expect(dots[1]).toHaveAttribute("aria-selected", "true");
     expect(dots[0]).toHaveAttribute("aria-selected", "false");
   });
+
+  it("uses object-contain to show full images without cropping", () => {
+    const { container } = render(<ImageCarousel images={mockImages} />);
+
+    const images = container.querySelectorAll("img");
+    images.forEach((img) => {
+      expect(img).toHaveClass("object-contain");
+    });
+  });
+
+  it("opens lightbox when image is clicked", () => {
+    const { container } = render(<ImageCarousel images={mockImages} />);
+
+    const images = container.querySelectorAll("img");
+    fireEvent.click(images[0]);
+
+    expect(screen.getByRole("dialog", { name: "Fullscreen image" })).toBeInTheDocument();
+  });
+
+  it("shows close button in lightbox", () => {
+    const { container } = render(<ImageCarousel images={mockImages} />);
+
+    const images = container.querySelectorAll("img");
+    fireEvent.click(images[0]);
+
+    expect(screen.getByLabelText("Close fullscreen")).toBeInTheDocument();
+  });
+
+  it("closes lightbox when close button is clicked", () => {
+    const { container } = render(<ImageCarousel images={mockImages} />);
+
+    const images = container.querySelectorAll("img");
+    fireEvent.click(images[0]);
+
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByLabelText("Close fullscreen"));
+
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("closes lightbox when backdrop is clicked", () => {
+    const { container } = render(<ImageCarousel images={mockImages} />);
+
+    const images = container.querySelectorAll("img");
+    fireEvent.click(images[0]);
+
+    const backdrop = screen.getByRole("dialog");
+    fireEvent.click(backdrop);
+
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("closes lightbox on Escape key", () => {
+    const { container } = render(<ImageCarousel images={mockImages} />);
+
+    const images = container.querySelectorAll("img");
+    fireEvent.click(images[0]);
+
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+
+    fireEvent.keyDown(document, { key: "Escape" });
+
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
 });
