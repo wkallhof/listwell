@@ -1,11 +1,6 @@
 // @vitest-environment node
-import { describe, expect, it, vi, beforeEach } from "vitest";
-
-// Mock the claude-agent-sdk
-const mockQuery = vi.fn();
-vi.mock("@anthropic-ai/claude-agent-sdk", () => ({
-  query: (...args: unknown[]) => mockQuery(...args),
-}));
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import { Writable } from "node:stream";
 
 // Mock the database
 const mockUpdate = vi.fn();
@@ -21,20 +16,29 @@ vi.mock("@/db/schema", () => ({
   listings: { id: "id" },
 }));
 
-// Mock fs/promises
-const mockMkdtemp = vi.fn();
-const mockReadFile = vi.fn();
-const mockRm = vi.fn();
-vi.mock("node:fs/promises", () => ({
-  mkdtemp: (...args: unknown[]) => mockMkdtemp(...args),
-  readFile: (...args: unknown[]) => mockReadFile(...args),
-  rm: (...args: unknown[]) => mockRm(...args),
+// Mock @vercel/sandbox
+const mockRunCommand = vi.fn();
+const mockWriteFiles = vi.fn();
+const mockReadFileToBuffer = vi.fn();
+const mockStop = vi.fn();
+const mockSandboxInstance = {
+  runCommand: mockRunCommand,
+  writeFiles: mockWriteFiles,
+  readFileToBuffer: mockReadFileToBuffer,
+  stop: mockStop,
+};
+const mockSandboxCreate = vi.fn().mockResolvedValue(mockSandboxInstance);
+
+vi.mock("@vercel/sandbox", () => ({
+  Sandbox: {
+    create: (...args: unknown[]) => mockSandboxCreate(...args),
+  },
 }));
 
 import { buildListingAgentPrompt } from "../prompts/listing-agent-prompt";
 import { listingAgentOutputSchema } from "../agent-output-schema";
 import { extractLogEntries } from "../agent";
-import type { RunAgentInput } from "../agent";
+import type { RunAgentInput, ContentBlock } from "../agent";
 
 describe("listing agent prompt", () => {
   it("includes title construction rules", () => {
@@ -236,17 +240,12 @@ describe("listing agent output schema", () => {
 });
 
 describe("extractLogEntries", () => {
-  it("extracts text entries from assistant messages", () => {
-    const message = {
-      type: "assistant" as const,
-      message: {
-        content: [
-          { type: "text", text: "Analyzing the item photos..." },
-        ],
-      },
-    };
+  it("extracts text entries from content blocks", () => {
+    const blocks: ContentBlock[] = [
+      { type: "text", text: "Analyzing the item photos..." },
+    ];
 
-    const entries = extractLogEntries(message);
+    const entries = extractLogEntries(blocks);
 
     expect(entries).toHaveLength(1);
     expect(entries[0].type).toBe("text");
@@ -255,33 +254,23 @@ describe("extractLogEntries", () => {
 
   it("truncates text entries to 200 chars", () => {
     const longText = "A".repeat(300);
-    const message = {
-      type: "assistant" as const,
-      message: {
-        content: [{ type: "text", text: longText }],
-      },
-    };
+    const blocks: ContentBlock[] = [{ type: "text", text: longText }];
 
-    const entries = extractLogEntries(message);
+    const entries = extractLogEntries(blocks);
 
     expect(entries[0].content).toHaveLength(200);
   });
 
   it("extracts WebSearch tool_use entries", () => {
-    const message = {
-      type: "assistant" as const,
-      message: {
-        content: [
-          {
-            type: "tool_use",
-            name: "WebSearch",
-            input: { query: "DeWalt drill price eBay" },
-          },
-        ],
+    const blocks: ContentBlock[] = [
+      {
+        type: "tool_use",
+        name: "WebSearch",
+        input: { query: "DeWalt drill price eBay" },
       },
-    };
+    ];
 
-    const entries = extractLogEntries(message);
+    const entries = extractLogEntries(blocks);
 
     expect(entries).toHaveLength(1);
     expect(entries[0].type).toBe("search");
@@ -289,20 +278,15 @@ describe("extractLogEntries", () => {
   });
 
   it("extracts WebFetch tool_use entries", () => {
-    const message = {
-      type: "assistant" as const,
-      message: {
-        content: [
-          {
-            type: "tool_use",
-            name: "WebFetch",
-            input: { url: "https://ebay.com/listing/123" },
-          },
-        ],
+    const blocks: ContentBlock[] = [
+      {
+        type: "tool_use",
+        name: "WebFetch",
+        input: { url: "https://ebay.com/listing/123" },
       },
-    };
+    ];
 
-    const entries = extractLogEntries(message);
+    const entries = extractLogEntries(blocks);
 
     expect(entries).toHaveLength(1);
     expect(entries[0].type).toBe("fetch");
@@ -310,42 +294,32 @@ describe("extractLogEntries", () => {
   });
 
   it("extracts Write tool_use entries", () => {
-    const message = {
-      type: "assistant" as const,
-      message: {
-        content: [
-          {
-            type: "tool_use",
-            name: "Write",
-            input: { file_path: "listing-output.json" },
-          },
-        ],
+    const blocks: ContentBlock[] = [
+      {
+        type: "tool_use",
+        name: "Write",
+        input: { file_path: "listing-output.json" },
       },
-    };
+    ];
 
-    const entries = extractLogEntries(message);
+    const entries = extractLogEntries(blocks);
 
     expect(entries).toHaveLength(1);
     expect(entries[0].type).toBe("write");
     expect(entries[0].content).toBe("Writing listing output");
   });
 
-  it("handles multiple content blocks in one message", () => {
-    const message = {
-      type: "assistant" as const,
-      message: {
-        content: [
-          { type: "text", text: "Let me search for prices" },
-          {
-            type: "tool_use",
-            name: "WebSearch",
-            input: { query: "drill prices" },
-          },
-        ],
+  it("handles multiple content blocks", () => {
+    const blocks: ContentBlock[] = [
+      { type: "text", text: "Let me search for prices" },
+      {
+        type: "tool_use",
+        name: "WebSearch",
+        input: { query: "drill prices" },
       },
-    };
+    ];
 
-    const entries = extractLogEntries(message);
+    const entries = extractLogEntries(blocks);
 
     expect(entries).toHaveLength(2);
     expect(entries[0].type).toBe("text");
@@ -353,52 +327,35 @@ describe("extractLogEntries", () => {
   });
 
   it("ignores unknown tool types", () => {
-    const message = {
-      type: "assistant" as const,
-      message: {
-        content: [
-          {
-            type: "tool_use",
-            name: "UnknownTool",
-            input: {},
-          },
-        ],
+    const blocks: ContentBlock[] = [
+      {
+        type: "tool_use",
+        name: "UnknownTool",
+        input: {},
       },
-    };
+    ];
 
-    const entries = extractLogEntries(message);
+    const entries = extractLogEntries(blocks);
 
     expect(entries).toHaveLength(0);
   });
 
   it("handles empty content array", () => {
-    const message = {
-      type: "assistant" as const,
-      message: {
-        content: [],
-      },
-    };
-
-    const entries = extractLogEntries(message);
+    const entries = extractLogEntries([]);
 
     expect(entries).toHaveLength(0);
   });
 
   it("uses fallback for missing query in WebSearch", () => {
-    const message = {
-      type: "assistant" as const,
-      message: {
-        content: [
-          {
-            type: "tool_use",
-            name: "WebSearch",
-            input: {},
-          },
-        ],
+    const blocks: ContentBlock[] = [
+      {
+        type: "tool_use",
+        name: "WebSearch",
+        input: {},
       },
-    };
+    ];
 
-    const entries = extractLogEntries(message);
+    const entries = extractLogEntries(blocks);
 
     expect(entries[0].content).toBe("Searching: ...");
   });
@@ -418,26 +375,82 @@ describe("runListingAgent", () => {
     comparables: [],
   };
 
+  const savedApiKey = process.env.ANTHROPIC_API_KEY;
+
   beforeEach(() => {
     vi.clearAllMocks();
     mockSet.mockReturnValue({ where: vi.fn() });
-    mockMkdtemp.mockResolvedValue("/tmp/listwell-agent-abc123");
-    mockRm.mockResolvedValue(undefined);
+    mockStop.mockResolvedValue(undefined);
+    mockWriteFiles.mockResolvedValue(undefined);
+    mockSandboxCreate.mockResolvedValue(mockSandboxInstance);
+    process.env.ANTHROPIC_API_KEY = "sk-test-key";
   });
 
-  it("reads output from file after agent completes", async () => {
-    mockReadFile.mockResolvedValue(JSON.stringify(validOutput));
+  afterEach(() => {
+    if (savedApiKey !== undefined) {
+      process.env.ANTHROPIC_API_KEY = savedApiKey;
+    } else {
+      delete process.env.ANTHROPIC_API_KEY;
+    }
+  });
 
-    mockQuery.mockReturnValue({
-      [Symbol.asyncIterator]: async function* () {
-        yield {
-          type: "result",
-          subtype: "success",
-          total_cost_usd: 0.05,
-          is_error: false,
+  function setupMocks(options?: {
+    output?: Record<string, unknown>;
+    streamMessages?: unknown[];
+    installFails?: boolean;
+    outputMissing?: boolean;
+  }) {
+    const {
+      output = validOutput,
+      streamMessages,
+      installFails = false,
+      outputMissing = false,
+    } = options ?? {};
+
+    // Default stream: just a result message
+    const defaultStream = [
+      { type: "result", is_error: false },
+    ];
+    const messages = streamMessages ?? defaultStream;
+
+    mockRunCommand.mockImplementation(
+      async (...args: unknown[]) => {
+        // Object form = detached CLI execution
+        if (typeof args[0] === "object" && args[0] !== null) {
+          const opts = args[0] as { stdout?: Writable };
+          if (opts.stdout) {
+            for (const msg of messages) {
+              opts.stdout.write(JSON.stringify(msg) + "\n");
+            }
+          }
+          return {};
+        }
+
+        // Simple form = CLI install
+        if (installFails) {
+          return {
+            exitCode: 1,
+            stderr: async () => "install failed",
+          };
+        }
+        return {
+          exitCode: 0,
+          stderr: async () => "",
         };
       },
-    });
+    );
+
+    if (outputMissing) {
+      mockReadFileToBuffer.mockResolvedValue(null);
+    } else {
+      mockReadFileToBuffer.mockResolvedValue(
+        Buffer.from(JSON.stringify(output)),
+      );
+    }
+  }
+
+  it("creates sandbox, installs CLI, and reads output", async () => {
+    setupMocks();
 
     const { runListingAgent } = await import("../agent");
 
@@ -452,32 +465,44 @@ describe("runListingAgent", () => {
 
     const result = await runListingAgent(input);
 
-    expect(mockQuery).toHaveBeenCalledTimes(1);
-    const callArgs = mockQuery.mock.calls[0][0];
-    expect(callArgs.prompt).toContain("img1.jpg");
-    expect(callArgs.prompt).toContain("img2.jpg");
-    expect(callArgs.prompt).toContain("My old drill, works great");
-    expect(callArgs.options.model).toBe("claude-sonnet-4-5-20250929");
-    expect(callArgs.options.cwd).toBe("/tmp/listwell-agent-abc123");
-    expect(callArgs.options.tools).toContain("Write");
+    // Verify sandbox was created
+    expect(mockSandboxCreate).toHaveBeenCalledWith({
+      runtime: "node22",
+      timeout: 300_000,
+    });
+
+    // Verify CLI was installed
+    expect(mockRunCommand).toHaveBeenCalledWith("sh", [
+      "-c",
+      "curl -fsSL https://claude.ai/install.sh | bash",
+    ]);
+
+    // Verify CLAUDE.md and prompt were written
+    expect(mockWriteFiles).toHaveBeenCalledTimes(1);
+    const writtenFiles = mockWriteFiles.mock.calls[0][0] as Array<{
+      path: string;
+      content: Buffer;
+    }>;
+    expect(writtenFiles).toHaveLength(2);
+    expect(writtenFiles[0].path).toBe("CLAUDE.md");
+    expect(writtenFiles[1].path).toBe("user-prompt.txt");
+    const promptContent = writtenFiles[1].content.toString();
+    expect(promptContent).toContain("img1.jpg");
+    expect(promptContent).toContain("img2.jpg");
+    expect(promptContent).toContain("My old drill, works great");
+
+    // Verify output was read
+    expect(mockReadFileToBuffer).toHaveBeenCalledWith({
+      path: "/vercel/sandbox/listing-output.json",
+    });
+
     expect(result.output.title).toBe("Test Item");
-    expect(result.costUsd).toBe(0.05);
+    expect(result.costUsd).toBe(0);
   });
 
   it("handles missing user description", async () => {
-    mockReadFile.mockResolvedValue(
-      JSON.stringify({ ...validOutput, title: "Unknown Item" }),
-    );
-
-    mockQuery.mockReturnValue({
-      [Symbol.asyncIterator]: async function* () {
-        yield {
-          type: "result",
-          subtype: "success",
-          total_cost_usd: 0.03,
-          is_error: false,
-        };
-      },
+    setupMocks({
+      output: { ...validOutput, title: "Unknown Item" },
     });
 
     const { runListingAgent } = await import("../agent");
@@ -490,24 +515,42 @@ describe("runListingAgent", () => {
 
     const result = await runListingAgent(input);
 
-    const callArgs = mockQuery.mock.calls[0][0];
-    expect(callArgs.prompt).toContain(
+    const writtenFiles = mockWriteFiles.mock.calls[0][0] as Array<{
+      path: string;
+      content: Buffer;
+    }>;
+    const promptContent = writtenFiles[1].content.toString();
+    expect(promptContent).toContain(
       "No description provided. Analyze the photos to identify the item.",
     );
     expect(result.output.title).toBe("Unknown Item");
   });
 
+  it("throws on CLI install failure", async () => {
+    setupMocks({ installFails: true });
+
+    const { runListingAgent } = await import("../agent");
+
+    const input: RunAgentInput = {
+      listingId: "test-install-fail",
+      imageUrls: ["https://blob.example.com/img.jpg"],
+      userDescription: null,
+    };
+
+    await expect(runListingAgent(input)).rejects.toThrow(
+      "Failed to install Claude CLI",
+    );
+  });
+
   it("throws on agent error result", async () => {
-    mockQuery.mockReturnValue({
-      [Symbol.asyncIterator]: async function* () {
-        yield {
+    setupMocks({
+      streamMessages: [
+        {
           type: "result",
-          subtype: "error_during_execution",
-          total_cost_usd: 0.01,
           is_error: true,
           errors: ["API rate limit exceeded"],
-        };
-      },
+        },
+      ],
     });
 
     const { runListingAgent } = await import("../agent");
@@ -524,18 +567,7 @@ describe("runListingAgent", () => {
   });
 
   it("throws when output file is missing", async () => {
-    mockReadFile.mockRejectedValue(new Error("ENOENT: no such file"));
-
-    mockQuery.mockReturnValue({
-      [Symbol.asyncIterator]: async function* () {
-        yield {
-          type: "result",
-          subtype: "success",
-          total_cost_usd: 0.02,
-          is_error: false,
-        };
-      },
-    });
+    setupMocks({ outputMissing: true });
 
     const { runListingAgent } = await import("../agent");
 
@@ -545,22 +577,13 @@ describe("runListingAgent", () => {
       userDescription: null,
     };
 
-    await expect(runListingAgent(input)).rejects.toThrow("ENOENT");
+    await expect(runListingAgent(input)).rejects.toThrow(
+      "Agent did not produce output file",
+    );
   });
 
-  it("cleans up temp directory in finally block", async () => {
-    mockReadFile.mockResolvedValue(JSON.stringify(validOutput));
-
-    mockQuery.mockReturnValue({
-      [Symbol.asyncIterator]: async function* () {
-        yield {
-          type: "result",
-          subtype: "success",
-          total_cost_usd: 0.01,
-          is_error: false,
-        };
-      },
-    });
+  it("stops sandbox in finally block", async () => {
+    setupMocks();
 
     const { runListingAgent } = await import("../agent");
 
@@ -570,24 +593,11 @@ describe("runListingAgent", () => {
       userDescription: null,
     });
 
-    expect(mockRm).toHaveBeenCalledWith(
-      "/tmp/listwell-agent-abc123",
-      { recursive: true, force: true },
-    );
+    expect(mockStop).toHaveBeenCalledTimes(1);
   });
 
-  it("cleans up temp directory even on error", async () => {
-    mockQuery.mockReturnValue({
-      [Symbol.asyncIterator]: async function* () {
-        yield {
-          type: "result",
-          subtype: "error_during_execution",
-          total_cost_usd: 0.01,
-          is_error: true,
-          errors: ["Some error"],
-        };
-      },
-    });
+  it("stops sandbox even on error", async () => {
+    setupMocks({ installFails: true });
 
     const { runListingAgent } = await import("../agent");
 
@@ -599,26 +609,21 @@ describe("runListingAgent", () => {
       }),
     ).rejects.toThrow();
 
-    expect(mockRm).toHaveBeenCalledWith(
-      "/tmp/listwell-agent-abc123",
-      { recursive: true, force: true },
-    );
+    expect(mockStop).toHaveBeenCalledTimes(1);
   });
 
   it("accumulates log entries from assistant messages", async () => {
-    mockReadFile.mockResolvedValue(JSON.stringify(validOutput));
-
-    mockQuery.mockReturnValue({
-      [Symbol.asyncIterator]: async function* () {
-        yield {
+    setupMocks({
+      streamMessages: [
+        {
           type: "assistant",
           message: {
             content: [
               { type: "text", text: "Analyzing the photos..." },
             ],
           },
-        };
-        yield {
+        },
+        {
           type: "assistant",
           message: {
             content: [
@@ -629,14 +634,9 @@ describe("runListingAgent", () => {
               },
             ],
           },
-        };
-        yield {
-          type: "result",
-          subtype: "success",
-          total_cost_usd: 0.05,
-          is_error: false,
-        };
-      },
+        },
+        { type: "result", is_error: false },
+      ],
     });
 
     const { runListingAgent } = await import("../agent");
@@ -647,8 +647,49 @@ describe("runListingAgent", () => {
       userDescription: null,
     });
 
-    // DB update should have been called multiple times for log flushes
-    // Initial "Starting analysis..." + 2 assistant messages + final "Listing generated"
+    // DB update should have been called for log flushes and pipeline steps
     expect(mockUpdate).toHaveBeenCalled();
+  });
+
+  it("passes CLI command with correct flags", async () => {
+    setupMocks();
+
+    const { runListingAgent } = await import("../agent");
+
+    await runListingAgent({
+      listingId: "test-flags",
+      imageUrls: ["https://blob.example.com/img.jpg"],
+      userDescription: null,
+    });
+
+    // Find the detached runCommand call (object form)
+    const detachedCall = mockRunCommand.mock.calls.find(
+      (call: unknown[]) => typeof call[0] === "object",
+    );
+    expect(detachedCall).toBeDefined();
+
+    const opts = detachedCall![0] as { cmd: string; args: string[] };
+    const cliCommand = opts.args[1];
+    expect(cliCommand).toContain("--dangerously-skip-permissions");
+    expect(cliCommand).toContain("--output-format stream-json");
+    expect(cliCommand).toContain("--model claude-sonnet-4-5-20250929");
+    expect(cliCommand).toContain("--max-turns 15");
+    expect(cliCommand).toContain("--verbose");
+    expect(cliCommand).toContain("ANTHROPIC_API_KEY=");
+  });
+
+  it("throws when ANTHROPIC_API_KEY is missing", async () => {
+    setupMocks();
+    delete process.env.ANTHROPIC_API_KEY;
+
+    const { runListingAgent } = await import("../agent");
+
+    await expect(
+      runListingAgent({
+        listingId: "test-no-key",
+        imageUrls: ["https://blob.example.com/img.jpg"],
+        userDescription: null,
+      }),
+    ).rejects.toThrow("ANTHROPIC_API_KEY environment variable is required");
   });
 });

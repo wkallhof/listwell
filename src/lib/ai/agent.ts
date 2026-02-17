@@ -1,7 +1,5 @@
-import { query } from "@anthropic-ai/claude-agent-sdk";
-import { mkdtemp, readFile, rm } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { Sandbox } from "@vercel/sandbox";
+import { Writable } from "node:stream";
 import { eq } from "drizzle-orm";
 
 import { db } from "@/db";
@@ -23,6 +21,13 @@ export interface RunAgentInput {
 export interface RunAgentResult {
   output: ListingAgentOutput;
   costUsd: number;
+}
+
+export interface ContentBlock {
+  type: string;
+  text?: string;
+  name?: string;
+  input?: Record<string, unknown>;
 }
 
 type AgentPipelineStep = "ANALYZING" | "RESEARCHING" | "GENERATING";
@@ -61,9 +66,7 @@ function buildUserPrompt(
   ].join("\n");
 }
 
-function parseAgentOutput(
-  raw: unknown,
-): ListingAgentOutput {
+function parseAgentOutput(raw: unknown): ListingAgentOutput {
   const parsed = listingAgentOutputSchema.safeParse(raw);
 
   if (!parsed.success) {
@@ -75,27 +78,13 @@ function parseAgentOutput(
   return parsed.data;
 }
 
-interface ContentBlock {
-  type: string;
-  text?: string;
-  name?: string;
-  input?: Record<string, unknown>;
-}
-
-interface SDKAssistantMessageLike {
-  type: "assistant";
-  message: {
-    content: ContentBlock[];
-  };
-}
-
 export function extractLogEntries(
-  message: SDKAssistantMessageLike,
+  contentBlocks: ContentBlock[],
 ): AgentLogEntry[] {
   const entries: AgentLogEntry[] = [];
   const now = Date.now();
 
-  for (const block of message.message.content) {
+  for (const block of contentBlocks) {
     if (block.type === "text" && block.text) {
       entries.push({
         ts: now,
@@ -140,6 +129,9 @@ async function flushAgentLog(
     .where(eq(listings.id, listingId));
 }
 
+const SANDBOX_DIR = "/vercel/sandbox";
+const OUTPUT_FILENAME = "listing-output.json";
+
 export async function runListingAgent(
   input: RunAgentInput,
 ): Promise<RunAgentResult> {
@@ -147,70 +139,146 @@ export async function runListingAgent(
 
   await updatePipelineStep(listingId, "ANALYZING");
 
-  const workDir = await mkdtemp(join(tmpdir(), "listwell-agent-"));
   const agentLog: AgentLogEntry[] = [
     { ts: Date.now(), type: "status", content: "Starting analysis..." },
   ];
   await flushAgentLog(listingId, agentLog);
 
-  let totalCost = 0;
+  const sandbox = await Sandbox.create({
+    runtime: "node22",
+    timeout: 300_000,
+  });
 
   try {
-    for await (const message of query({
-      prompt: buildUserPrompt(imageUrls, userDescription),
-      options: {
-        systemPrompt: buildListingAgentPrompt(workDir),
-        model: "claude-sonnet-4-5-20250929",
-        permissionMode: "bypassPermissions",
-        allowDangerouslySkipPermissions: true,
-        allowedTools: ["WebSearch", "WebFetch", "Write"],
-        tools: ["WebSearch", "WebFetch", "Write"],
-        cwd: workDir,
-        maxTurns: 15,
-        hooks: {
-          PostToolUse: [
-            {
-              matcher: "WebSearch",
-              hooks: [
-                async () => {
-                  await updatePipelineStep(listingId, "RESEARCHING");
-                  return {};
-                },
-              ],
-            },
-          ],
-        },
-      },
-    })) {
-      if (message.type === "assistant") {
-        const entries = extractLogEntries(
-          message as SDKAssistantMessageLike,
-        );
-        if (entries.length > 0) {
-          agentLog.push(...entries);
-          await flushAgentLog(listingId, agentLog);
-        }
+    // Install Claude Code CLI
+    const installResult = await sandbox.runCommand("sh", [
+      "-c",
+      "curl -fsSL https://claude.ai/install.sh | bash",
+    ]);
+    if (installResult.exitCode !== 0) {
+      let stderr = "";
+      try {
+        stderr = await (installResult.stderr as () => Promise<string>)();
+      } catch {
+        // Failed to read stderr
       }
-
-      if (message.type === "result") {
-        totalCost = message.total_cost_usd;
-
-        if (message.is_error) {
-          const errorMsg =
-            "errors" in message
-              ? (message.errors as string[]).join("; ")
-              : "Agent execution failed";
-          throw new Error(errorMsg);
-        }
-      }
+      throw new Error(`Failed to install Claude CLI: ${stderr}`);
     }
 
+    // Write CLAUDE.md (agent instructions) and user prompt file
+    const systemPrompt = buildListingAgentPrompt(SANDBOX_DIR);
+    const userPrompt = buildUserPrompt(imageUrls, userDescription);
+
+    await sandbox.writeFiles([
+      { path: "CLAUDE.md", content: Buffer.from(systemPrompt) },
+      { path: "user-prompt.txt", content: Buffer.from(userPrompt) },
+    ]);
+
+    // Validate API key
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
+      throw new Error("ANTHROPIC_API_KEY environment variable is required");
+    }
+
+    // Build CLI command — read prompt from file to avoid shell escaping issues
+    const cliCommand = [
+      `ANTHROPIC_API_KEY="${apiKey}"`,
+      "claude",
+      '-p "$(cat /vercel/sandbox/user-prompt.txt)"',
+      "--dangerously-skip-permissions",
+      "--output-format stream-json",
+      "--model claude-sonnet-4-5-20250929",
+      "--max-turns 15",
+      "--verbose",
+    ].join(" ");
+
+    // Stream progress via Writable
+    let isCompleted = false;
+    let hasError = false;
+    let errorMessage = "";
+
+    const stdoutStream = new Writable({
+      write(chunk, _encoding, callback) {
+        const text = chunk.toString();
+        const lines = text.split("\n");
+
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed) continue;
+
+          try {
+            const parsed = JSON.parse(trimmed) as {
+              type?: string;
+              message?: { content?: ContentBlock[] };
+              is_error?: boolean;
+              errors?: string[];
+            };
+
+            if (
+              parsed.type === "assistant" &&
+              Array.isArray(parsed.message?.content)
+            ) {
+              const entries = extractLogEntries(parsed.message!.content!);
+              if (entries.length > 0) {
+                agentLog.push(...entries);
+                flushAgentLog(listingId, agentLog).catch(() => {});
+
+                for (const entry of entries) {
+                  if (entry.type === "search") {
+                    updatePipelineStep(listingId, "RESEARCHING").catch(
+                      () => {},
+                    );
+                  }
+                }
+              }
+            } else if (parsed.type === "result") {
+              isCompleted = true;
+              if (parsed.is_error) {
+                hasError = true;
+                errorMessage = Array.isArray(parsed.errors)
+                  ? parsed.errors.join("; ")
+                  : "Agent execution failed";
+              }
+            }
+          } catch {
+            // Not valid JSON, skip
+          }
+        }
+
+        callback();
+      },
+    });
+
+    // Run Claude CLI in detached mode with streaming output
+    await sandbox.runCommand({
+      cmd: "sh",
+      args: ["-c", cliCommand],
+      detached: true,
+      stdout: stdoutStream,
+    });
+
+    // Wait for CLI to complete (sandbox timeout is the safety net)
+    while (!isCompleted) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+
+    if (hasError) {
+      throw new Error(errorMessage);
+    }
+
+    // Read output file from sandbox
     await updatePipelineStep(listingId, "GENERATING");
 
-    const outputPath = join(workDir, "listing-output.json");
-    const raw = await readFile(outputPath, "utf-8");
-    const parsed = JSON.parse(raw) as unknown;
-    const result = parseAgentOutput(parsed);
+    const outputBuffer = await sandbox.readFileToBuffer({
+      path: `${SANDBOX_DIR}/${OUTPUT_FILENAME}`,
+    });
+
+    if (!outputBuffer) {
+      throw new Error("Agent did not produce output file");
+    }
+
+    const raw = JSON.parse(outputBuffer.toString()) as unknown;
+    const result = parseAgentOutput(raw);
 
     agentLog.push({
       ts: Date.now(),
@@ -219,7 +287,7 @@ export async function runListingAgent(
     });
     await flushAgentLog(listingId, agentLog);
 
-    return { output: result, costUsd: totalCost };
+    return { output: result, costUsd: 0 };
   } catch (error) {
     agentLog.push({
       ts: Date.now(),
@@ -230,6 +298,6 @@ export async function runListingAgent(
     await flushAgentLog(listingId, agentLog);
     throw error;
   } finally {
-    await rm(workDir, { recursive: true, force: true }).catch(() => {});
+    await sandbox.stop().catch(() => {});
   }
 }
