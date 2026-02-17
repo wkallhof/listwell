@@ -73,7 +73,7 @@ describe("DescribePage", () => {
     await user.click(screen.getByText("Generate Listing"));
 
     expect(mockCreateListing).toHaveBeenCalledWith(expect.any(FormData));
-    expect(mockReset).toHaveBeenCalled();
+    expect(mockReset).not.toHaveBeenCalled();
     expect(mockPush).toHaveBeenCalledWith("/listings/123");
   });
 

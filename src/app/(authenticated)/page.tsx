@@ -11,6 +11,7 @@ import {
 import { EmptyState } from "@/components/empty-state";
 import { ListingCard } from "@/components/listing-card";
 import { FAB } from "@/components/fab";
+import { PullToRefresh } from "@/components/pull-to-refresh";
 import { LogoutButton } from "./logout-button";
 
 interface ListingImage {
@@ -51,48 +52,50 @@ export default async function FeedPage() {
   const listings: Listing[] = response.ok ? await response.json() : [];
 
   return (
-    <main className="mx-auto min-h-svh w-full max-w-xl px-5 pb-24 pt-8">
-      <header className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Your Listings</h1>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <MoreVertical size={20} />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <LogoutButton />
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </header>
+    <PullToRefresh>
+      <main className="mx-auto min-h-svh w-full max-w-xl px-5 pb-24 pt-8">
+        <header className="mb-6 flex items-center justify-between">
+          <h1 className="text-2xl font-bold">Your Listings</h1>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <MoreVertical size={20} />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <LogoutButton />
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </header>
 
-      {listings.length === 0 ? (
-        <EmptyState
-          icon={ImagePlus}
-          title="No listings yet"
-          description="Tap + to create your first one"
-        />
-      ) : (
-        <div className="space-y-4">
-          {listings.map((listing) => {
-            const primaryImage = listing.images.find((img) => img.isPrimary);
-            return (
-              <ListingCard
-                key={listing.id}
-                id={listing.id}
-                title={listing.title}
-                status={listing.status}
-                suggestedPrice={listing.suggestedPrice}
-                pipelineStep={listing.pipelineStep}
-                createdAt={listing.createdAt}
-                primaryImageUrl={primaryImage?.blobUrl ?? null}
-              />
-            );
-          })}
-        </div>
-      )}
+        {listings.length === 0 ? (
+          <EmptyState
+            icon={ImagePlus}
+            title="No listings yet"
+            description="Tap + to create your first one"
+          />
+        ) : (
+          <div className="space-y-4">
+            {listings.map((listing) => {
+              const primaryImage = listing.images.find((img) => img.isPrimary);
+              return (
+                <ListingCard
+                  key={listing.id}
+                  id={listing.id}
+                  title={listing.title}
+                  status={listing.status}
+                  suggestedPrice={listing.suggestedPrice}
+                  pipelineStep={listing.pipelineStep}
+                  createdAt={listing.createdAt}
+                  primaryImageUrl={primaryImage?.blobUrl ?? null}
+                />
+              );
+            })}
+          </div>
+        )}
 
-      <FAB />
-    </main>
+        <FAB />
+      </main>
+    </PullToRefresh>
   );
 }

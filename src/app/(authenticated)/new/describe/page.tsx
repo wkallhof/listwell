@@ -13,7 +13,7 @@ import { createListing } from "@/lib/listing-actions";
 
 export default function DescribePage() {
   const router = useRouter();
-  const { photos, previewUrls, description, setDescription, reset } =
+  const { photos, previewUrls, description, setDescription } =
     useNewListing();
   const [submitting, setSubmitting] = useState(false);
 
@@ -43,11 +43,10 @@ export default function DescribePage() {
       }
 
       toast.info("Generating your listing...");
-      reset();
       router.push(`/listings/${result.listingId}`);
+      // No reset() needed — context unmounts when leaving /new route group
     } catch {
       toast.error("An unexpected error occurred");
-    } finally {
       setSubmitting(false);
     }
   }
