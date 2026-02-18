@@ -335,8 +335,9 @@ export default function ListingDetailPage() {
   const isProcessing =
     listing.status === "PROCESSING" ||
     (listing.status === "DRAFT" &&
-      listing.pipelineStep !== "PENDING" &&
-      listing.pipelineStep !== "ERROR");
+      listing.pipelineStep !== "ERROR" &&
+      // DRAFT + PENDING with no title = just submitted, awaiting agent pickup
+      (listing.pipelineStep !== "PENDING" || !listing.title));
   const isError = listing.pipelineStep === "ERROR";
   const images = [...listing.images].sort((a, b) => a.sortOrder - b.sortOrder);
   const primaryImage = images[0];
