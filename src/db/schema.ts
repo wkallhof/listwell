@@ -202,6 +202,7 @@ export const listings = pgTable("listings", {
     .default("PENDING"),
   pipelineError: text("pipeline_error"),
   agentLog: json("agent_log").$type<AgentLogEntry[]>(),
+  agentTranscriptUrl: text("agent_transcript_url"),
   inngestRunId: text("inngest_run_id"),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()

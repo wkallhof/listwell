@@ -35,6 +35,16 @@ vi.mock("@vercel/sandbox", () => ({
   },
 }));
 
+// Mock blob upload
+const mockUploadBuffer = vi.fn();
+vi.mock("@/lib/blob", () => ({
+  uploadBuffer: (...args: unknown[]) => mockUploadBuffer(...args),
+}));
+
+// Mock global fetch for image downloads
+const mockFetch = vi.fn();
+vi.stubGlobal("fetch", mockFetch);
+
 import { buildListingAgentPrompt } from "../prompts/listing-agent-prompt";
 import { listingAgentOutputSchema } from "../agent-output-schema";
 import { extractLogEntries } from "../agent";
@@ -154,6 +164,14 @@ describe("listing agent prompt", () => {
     const prompt = buildListingAgentPrompt("/tmp/my-agent-dir");
     expect(prompt).toContain("/tmp/my-agent-dir/listing-output.json");
     expect(prompt).toContain("FULL ABSOLUTE path");
+  });
+
+  it("includes image analysis instructions requiring Read tool", () => {
+    const prompt = buildListingAgentPrompt("/tmp/test");
+    expect(prompt).toContain("Image Analysis");
+    expect(prompt).toContain("Read tool");
+    expect(prompt).toContain("saved as local files");
+    expect(prompt).toContain("STOP immediately");
   });
 });
 
@@ -375,6 +393,8 @@ describe("runListingAgent", () => {
     comparables: [],
   };
 
+  const fakeImageBuffer = Buffer.from("fake-image-data");
+
   const savedApiKey = process.env.ANTHROPIC_API_KEY;
 
   beforeEach(() => {
@@ -384,6 +404,21 @@ describe("runListingAgent", () => {
     mockWriteFiles.mockResolvedValue(undefined);
     mockSandboxCreate.mockResolvedValue(mockSandboxInstance);
     process.env.ANTHROPIC_API_KEY = "sk-test-key";
+
+    // Default: successful image download
+    mockFetch.mockResolvedValue({
+      ok: true,
+      arrayBuffer: async () => fakeImageBuffer.buffer.slice(
+        fakeImageBuffer.byteOffset,
+        fakeImageBuffer.byteOffset + fakeImageBuffer.byteLength,
+      ),
+    });
+
+    // Default: successful transcript upload
+    mockUploadBuffer.mockResolvedValue({
+      url: "https://r2.example.com/transcripts/test.jsonl",
+      key: "transcripts/test.jsonl",
+    });
   });
 
   afterEach(() => {
@@ -449,6 +484,100 @@ describe("runListingAgent", () => {
     }
   }
 
+  it("downloads images server-side and writes them to sandbox", async () => {
+    setupMocks();
+
+    const { runListingAgent } = await import("../agent");
+
+    const input: RunAgentInput = {
+      listingId: "test-img-download",
+      imageUrls: [
+        "https://pub-abc.r2.dev/listings/123/photo1.jpg",
+        "https://pub-abc.r2.dev/listings/123/photo2.png",
+      ],
+      userDescription: "A test item",
+    };
+
+    await runListingAgent(input);
+
+    // Verify images were fetched server-side
+    expect(mockFetch).toHaveBeenCalledWith(
+      "https://pub-abc.r2.dev/listings/123/photo1.jpg",
+    );
+    expect(mockFetch).toHaveBeenCalledWith(
+      "https://pub-abc.r2.dev/listings/123/photo2.png",
+    );
+
+    // Verify image files were written to sandbox alongside CLAUDE.md and prompt
+    const writtenFiles = mockWriteFiles.mock.calls[0][0] as Array<{
+      path: string;
+      content: Buffer;
+    }>;
+    expect(writtenFiles).toHaveLength(4); // CLAUDE.md + prompt + 2 images
+    expect(writtenFiles[0].path).toBe("CLAUDE.md");
+    expect(writtenFiles[1].path).toBe("user-prompt.txt");
+    expect(writtenFiles[2].path).toBe("images/photo-1.jpg");
+    expect(writtenFiles[3].path).toBe("images/photo-2.png");
+  });
+
+  it("references local image paths in the prompt", async () => {
+    setupMocks();
+
+    const { runListingAgent } = await import("../agent");
+
+    await runListingAgent({
+      listingId: "test-local-paths",
+      imageUrls: ["https://pub-abc.r2.dev/listings/123/photo.jpg"],
+      userDescription: null,
+    });
+
+    const writtenFiles = mockWriteFiles.mock.calls[0][0] as Array<{
+      path: string;
+      content: Buffer;
+    }>;
+    const promptContent = writtenFiles[1].content.toString();
+
+    // Should reference local sandbox path, not the remote URL
+    expect(promptContent).toContain("/vercel/sandbox/images/photo-1.jpg");
+    expect(promptContent).not.toContain("pub-abc.r2.dev");
+    expect(promptContent).toContain("use Read tool to view each one");
+  });
+
+  it("throws when image download returns non-OK status", async () => {
+    mockFetch.mockResolvedValue({ ok: false, status: 403 });
+
+    setupMocks();
+
+    const { runListingAgent } = await import("../agent");
+
+    await expect(
+      runListingAgent({
+        listingId: "test-img-403",
+        imageUrls: ["https://pub-abc.r2.dev/listings/123/photo.jpg"],
+        userDescription: null,
+      }),
+    ).rejects.toThrow("Failed to download image 1: HTTP 403");
+  });
+
+  it("throws when image download returns empty body", async () => {
+    mockFetch.mockResolvedValue({
+      ok: true,
+      arrayBuffer: async () => new ArrayBuffer(0),
+    });
+
+    setupMocks();
+
+    const { runListingAgent } = await import("../agent");
+
+    await expect(
+      runListingAgent({
+        listingId: "test-img-empty",
+        imageUrls: ["https://pub-abc.r2.dev/listings/123/photo.jpg"],
+        userDescription: null,
+      }),
+    ).rejects.toThrow("Image 1 is empty (0 bytes)");
+  });
+
   it("creates sandbox, installs CLI, and reads output", async () => {
     setupMocks();
 
@@ -477,18 +606,16 @@ describe("runListingAgent", () => {
       "curl -fsSL https://claude.ai/install.sh | bash",
     ]);
 
-    // Verify CLAUDE.md and prompt were written
+    // Verify CLAUDE.md and prompt were written (plus 2 image files)
     expect(mockWriteFiles).toHaveBeenCalledTimes(1);
     const writtenFiles = mockWriteFiles.mock.calls[0][0] as Array<{
       path: string;
       content: Buffer;
     }>;
-    expect(writtenFiles).toHaveLength(2);
+    expect(writtenFiles).toHaveLength(4);
     expect(writtenFiles[0].path).toBe("CLAUDE.md");
     expect(writtenFiles[1].path).toBe("user-prompt.txt");
     const promptContent = writtenFiles[1].content.toString();
-    expect(promptContent).toContain("img1.jpg");
-    expect(promptContent).toContain("img2.jpg");
     expect(promptContent).toContain("My old drill, works great");
 
     // Verify output was read
@@ -691,5 +818,88 @@ describe("runListingAgent", () => {
         userDescription: null,
       }),
     ).rejects.toThrow("ANTHROPIC_API_KEY environment variable is required");
+  });
+
+  it("uploads transcript to R2 on success and returns URL", async () => {
+    setupMocks({
+      streamMessages: [
+        {
+          type: "assistant",
+          message: { content: [{ type: "text", text: "Analyzing..." }] },
+        },
+        { type: "result", is_error: false },
+      ],
+    });
+
+    const { runListingAgent } = await import("../agent");
+
+    const result = await runListingAgent({
+      listingId: "test-transcript",
+      imageUrls: ["https://blob.example.com/img.jpg"],
+      userDescription: null,
+    });
+
+    // Transcript should be uploaded
+    expect(mockUploadBuffer).toHaveBeenCalledTimes(1);
+    const [buffer, path, contentType] = mockUploadBuffer.mock.calls[0] as [
+      Buffer,
+      string,
+      string,
+    ];
+    expect(path).toBe("transcripts/test-transcript.jsonl");
+    expect(contentType).toBe("application/jsonl");
+
+    // Raw transcript lines should be in the buffer
+    const transcriptContent = buffer.toString();
+    expect(transcriptContent).toContain('"type":"assistant"');
+    expect(transcriptContent).toContain('"type":"result"');
+
+    expect(result.transcriptUrl).toBe(
+      "https://r2.example.com/transcripts/test.jsonl",
+    );
+  });
+
+  it("uploads transcript to R2 on error for debugging", async () => {
+    setupMocks({
+      streamMessages: [
+        {
+          type: "assistant",
+          message: { content: [{ type: "text", text: "Trying..." }] },
+        },
+        { type: "result", is_error: true, errors: ["Something went wrong"] },
+      ],
+    });
+
+    const { runListingAgent } = await import("../agent");
+
+    await expect(
+      runListingAgent({
+        listingId: "test-error-transcript",
+        imageUrls: ["https://blob.example.com/img.jpg"],
+        userDescription: null,
+      }),
+    ).rejects.toThrow("Something went wrong");
+
+    // Transcript should still be uploaded even on failure
+    expect(mockUploadBuffer).toHaveBeenCalledTimes(1);
+    const [, path] = mockUploadBuffer.mock.calls[0] as [Buffer, string];
+    expect(path).toBe("transcripts/test-error-transcript.jsonl");
+  });
+
+  it("returns null transcriptUrl when transcript upload fails", async () => {
+    setupMocks();
+    mockUploadBuffer.mockRejectedValue(new Error("R2 upload failed"));
+
+    const { runListingAgent } = await import("../agent");
+
+    const result = await runListingAgent({
+      listingId: "test-upload-fail",
+      imageUrls: ["https://blob.example.com/img.jpg"],
+      userDescription: null,
+    });
+
+    // Should not throw — transcript upload failure is non-critical
+    expect(result.transcriptUrl).toBeNull();
+    expect(result.output.title).toBe("Test Item");
   });
 });

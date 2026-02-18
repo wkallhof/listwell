@@ -57,7 +57,7 @@ export const generateListing = inngest.createFunction(
 
     // Step 2: Save results to DB, mark READY, send notification
     await step.run("complete", async () => {
-      const { output } = agentResult as RunAgentResult;
+      const { output, transcriptUrl } = agentResult as RunAgentResult;
 
       await db
         .update(listings)
@@ -73,6 +73,7 @@ export const generateListing = inngest.createFunction(
           model: output.model ?? null,
           researchNotes: output.researchNotes,
           comparables: output.comparables as Comparable[],
+          agentTranscriptUrl: transcriptUrl ?? null,
           status: "READY",
           pipelineStep: "COMPLETE",
           pipelineError: null,

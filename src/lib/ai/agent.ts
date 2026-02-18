@@ -1,9 +1,11 @@
 import { Sandbox } from "@vercel/sandbox";
 import { Writable } from "node:stream";
+import { extname } from "node:path";
 import { eq } from "drizzle-orm";
 
 import { db } from "@/db";
 import { listings } from "@/db/schema";
+import { uploadBuffer } from "@/lib/blob";
 import type { AgentLogEntry } from "@/types";
 
 import {
@@ -21,6 +23,7 @@ export interface RunAgentInput {
 export interface RunAgentResult {
   output: ListingAgentOutput;
   costUsd: number;
+  transcriptUrl: string | null;
 }
 
 export interface ContentBlock {
@@ -43,11 +46,11 @@ async function updatePipelineStep(
 }
 
 function buildUserPrompt(
-  imageUrls: string[],
+  localImagePaths: string[],
   userDescription: string | null,
 ): string {
-  const imageList = imageUrls
-    .map((url, i) => `- Image ${i + 1}: ${url}`)
+  const imageList = localImagePaths
+    .map((path, i) => `- Image ${i + 1}: ${path}`)
     .join("\n");
 
   const descriptionSection = userDescription
@@ -57,12 +60,14 @@ function buildUserPrompt(
   return [
     "Generate a marketplace listing for the following item.",
     "",
-    "## Photos",
+    "## Photos (local files — use Read tool to view each one)",
     imageList,
     "",
     descriptionSection,
     "",
-    "Please analyze the images, research comparable prices online, and generate a complete listing.",
+    "IMPORTANT: You MUST use the Read tool to view EVERY image file listed above before proceeding. The images are your primary source of information. If any image cannot be read, STOP and report the error.",
+    "",
+    "After viewing all images, research comparable prices online, and generate a complete listing.",
   ].join("\n");
 }
 
@@ -129,6 +134,59 @@ async function flushAgentLog(
     .where(eq(listings.id, listingId));
 }
 
+interface DownloadedImage {
+  localPath: string;
+  buffer: Buffer;
+}
+
+async function downloadImages(
+  imageUrls: string[],
+): Promise<DownloadedImage[]> {
+  const results: DownloadedImage[] = [];
+
+  for (let i = 0; i < imageUrls.length; i++) {
+    const url = imageUrls[i];
+    const ext = extname(new URL(url).pathname) || ".jpg";
+    const localPath = `images/photo-${i + 1}${ext}`;
+
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(
+        `Failed to download image ${i + 1}: HTTP ${response.status} from ${url}`,
+      );
+    }
+
+    const buffer = Buffer.from(await response.arrayBuffer());
+    if (buffer.length === 0) {
+      throw new Error(`Image ${i + 1} is empty (0 bytes) from ${url}`);
+    }
+
+    results.push({ localPath, buffer });
+  }
+
+  return results;
+}
+
+async function uploadTranscript(
+  listingId: string,
+  transcript: string[],
+): Promise<string | null> {
+  if (transcript.length === 0) return null;
+
+  try {
+    const content = Buffer.from(transcript.join("\n"));
+    const result = await uploadBuffer(
+      content,
+      `transcripts/${listingId}.jsonl`,
+      "application/jsonl",
+    );
+    return result.url;
+  } catch {
+    // Transcript upload is non-critical — don't fail the pipeline
+    return null;
+  }
+}
+
 const SANDBOX_DIR = "/vercel/sandbox";
 const OUTPUT_FILENAME = "listing-output.json";
 
@@ -144,10 +202,24 @@ export async function runListingAgent(
   ];
   await flushAgentLog(listingId, agentLog);
 
+  // Download images server-side before creating sandbox.
+  // This guarantees we can access R2 URLs and avoids relying on
+  // the sandbox's network access or Claude Code's WebFetch tool.
+  const downloadedImages = await downloadImages(imageUrls);
+
+  agentLog.push({
+    ts: Date.now(),
+    type: "status",
+    content: `Downloaded ${downloadedImages.length} image(s) for analysis`,
+  });
+  await flushAgentLog(listingId, agentLog);
+
   const sandbox = await Sandbox.create({
     runtime: "node22",
     timeout: 300_000,
   });
+
+  const rawTranscript: string[] = [];
 
   try {
     // Install Claude Code CLI
@@ -165,13 +237,20 @@ export async function runListingAgent(
       throw new Error(`Failed to install Claude CLI: ${stderr}`);
     }
 
-    // Write CLAUDE.md (agent instructions) and user prompt file
+    // Write CLAUDE.md, user prompt, and image files to sandbox
     const systemPrompt = buildListingAgentPrompt(SANDBOX_DIR);
-    const userPrompt = buildUserPrompt(imageUrls, userDescription);
+    const localImagePaths = downloadedImages.map(
+      (img) => `${SANDBOX_DIR}/${img.localPath}`,
+    );
+    const userPrompt = buildUserPrompt(localImagePaths, userDescription);
 
     await sandbox.writeFiles([
       { path: "CLAUDE.md", content: Buffer.from(systemPrompt) },
       { path: "user-prompt.txt", content: Buffer.from(userPrompt) },
+      ...downloadedImages.map((img) => ({
+        path: img.localPath,
+        content: img.buffer,
+      })),
     ]);
 
     // Validate API key
@@ -192,7 +271,7 @@ export async function runListingAgent(
       "--verbose",
     ].join(" ");
 
-    // Stream progress via Writable
+    // Stream progress via Writable — also accumulate raw transcript lines
     let isCompleted = false;
     let hasError = false;
     let errorMessage = "";
@@ -205,6 +284,8 @@ export async function runListingAgent(
         for (const line of lines) {
           const trimmed = line.trim();
           if (!trimmed) continue;
+
+          rawTranscript.push(trimmed);
 
           try {
             const parsed = JSON.parse(trimmed) as {
@@ -287,7 +368,10 @@ export async function runListingAgent(
     });
     await flushAgentLog(listingId, agentLog);
 
-    return { output: result, costUsd: 0 };
+    // Upload transcript to R2 (non-blocking, best-effort)
+    const transcriptUrl = await uploadTranscript(listingId, rawTranscript);
+
+    return { output: result, costUsd: 0, transcriptUrl };
   } catch (error) {
     agentLog.push({
       ts: Date.now(),
@@ -296,7 +380,16 @@ export async function runListingAgent(
         error instanceof Error ? error.message : "Unknown error occurred",
     });
     await flushAgentLog(listingId, agentLog);
-    throw error;
+
+    // Still upload transcript on failure — this is the most valuable case for debugging
+    const transcriptUrl = await uploadTranscript(listingId, rawTranscript);
+
+    const enrichedError =
+      error instanceof Error ? error : new Error("Unknown error occurred");
+    (enrichedError as Error & { transcriptUrl?: string }).transcriptUrl =
+      transcriptUrl ?? undefined;
+
+    throw enrichedError;
   } finally {
     await sandbox.stop().catch(() => {});
   }
