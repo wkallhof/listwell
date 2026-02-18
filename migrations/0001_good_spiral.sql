@@ -1,0 +1,1 @@
+ALTER TABLE "listings" ADD COLUMN "agent_transcript_url" text;
