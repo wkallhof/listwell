@@ -220,11 +220,14 @@ export async function runListingAgent(
     );
     const userPrompt = buildUserPrompt(localImagePaths, userDescription);
 
-    await sandbox.files.write("CLAUDE.md", systemPrompt);
-    await sandbox.files.write("user-prompt.txt", userPrompt);
+    await sandbox.files.write(`${SANDBOX_DIR}/CLAUDE.md`, systemPrompt);
+    await sandbox.files.write(`${SANDBOX_DIR}/user-prompt.txt`, userPrompt);
     for (const img of downloadedImages) {
       const bytes = Uint8Array.from(img.buffer);
-      await sandbox.files.write(img.localPath, bytes.buffer as ArrayBuffer);
+      await sandbox.files.write(
+        `${SANDBOX_DIR}/${img.localPath}`,
+        bytes.buffer as ArrayBuffer,
+      );
     }
 
     const cliCommand = [
@@ -240,63 +243,77 @@ export async function runListingAgent(
     let hasError = false;
     let errorMessage = "";
     let stdoutBuffer = "";
+    const stderrChunks: string[] = [];
+
+    function processLine(line: string): void {
+      const trimmed = line.trim();
+      if (!trimmed) return;
+
+      rawTranscript.push(trimmed);
+
+      try {
+        const parsed = JSON.parse(trimmed) as {
+          type?: string;
+          message?: { content?: ContentBlock[] };
+          is_error?: boolean;
+          errors?: string[];
+        };
+
+        if (
+          parsed.type === "assistant" &&
+          Array.isArray(parsed.message?.content)
+        ) {
+          const entries = extractLogEntries(parsed.message!.content!);
+          if (entries.length > 0) {
+            agentLog.push(...entries);
+            flushAgentLog(listingId, agentLog).catch(() => {});
+
+            for (const entry of entries) {
+              if (entry.type === "search") {
+                updatePipelineStep(listingId, "RESEARCHING").catch(
+                  () => {},
+                );
+              }
+            }
+          }
+        } else if (parsed.type === "result") {
+          if (parsed.is_error) {
+            hasError = true;
+            errorMessage = Array.isArray(parsed.errors)
+              ? parsed.errors.join("; ")
+              : "Agent execution failed";
+          }
+        }
+      } catch {
+        // Not valid JSON, skip
+      }
+    }
 
     const proc = await sandbox.commands.run(cliCommand, {
+      cwd: SANDBOX_DIR,
       onStdout: (data) => {
         stdoutBuffer += data;
         const lines = stdoutBuffer.split("\n");
-        // Keep incomplete last line in buffer
         stdoutBuffer = lines.pop() ?? "";
-
         for (const line of lines) {
-          const trimmed = line.trim();
-          if (!trimmed) continue;
-
-          rawTranscript.push(trimmed);
-
-          try {
-            const parsed = JSON.parse(trimmed) as {
-              type?: string;
-              message?: { content?: ContentBlock[] };
-              is_error?: boolean;
-              errors?: string[];
-            };
-
-            if (
-              parsed.type === "assistant" &&
-              Array.isArray(parsed.message?.content)
-            ) {
-              const entries = extractLogEntries(parsed.message!.content!);
-              if (entries.length > 0) {
-                agentLog.push(...entries);
-                flushAgentLog(listingId, agentLog).catch(() => {});
-
-                for (const entry of entries) {
-                  if (entry.type === "search") {
-                    updatePipelineStep(listingId, "RESEARCHING").catch(
-                      () => {},
-                    );
-                  }
-                }
-              }
-            } else if (parsed.type === "result") {
-              if (parsed.is_error) {
-                hasError = true;
-                errorMessage = Array.isArray(parsed.errors)
-                  ? parsed.errors.join("; ")
-                  : "Agent execution failed";
-              }
-            }
-          } catch {
-            // Not valid JSON, skip
-          }
+          processLine(line);
         }
+      },
+      onStderr: (data) => {
+        stderrChunks.push(data);
       },
       timeoutMs: 300_000,
     });
 
+    // Process any remaining data in the buffer
+    if (stdoutBuffer.trim()) {
+      processLine(stdoutBuffer);
+    }
+
     if (proc.exitCode !== 0 || hasError) {
-      throw new Error(hasError ? errorMessage : `Claude CLI exited with code ${proc.exitCode}`);
+      const stderr = stderrChunks.join("");
+      const detail = hasError ? errorMessage : stderr || `exit code ${proc.exitCode}`;
+      throw new Error(`Claude CLI failed: ${detail}`);
     }
 
     await updatePipelineStep(listingId, "GENERATING");
