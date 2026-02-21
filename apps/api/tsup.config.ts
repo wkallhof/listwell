@@ -1,7 +1,7 @@
 import { defineConfig } from "tsup";
 
 export default defineConfig({
-  entry: ["src/index.ts"],
+  entry: ["src/index.ts", "src/migrate.ts"],
   format: ["esm"],
   dts: true,
   // Bundle workspace packages into the output so Node.js doesn't
