@@ -1,5 +1,4 @@
-import { Sandbox } from "@vercel/sandbox";
-import { Writable } from "node:stream";
+import { Sandbox } from "e2b";
 import { extname } from "node:path";
 import { eq } from "drizzle-orm";
 
@@ -178,7 +177,7 @@ async function uploadTranscript(
   }
 }
 
-const SANDBOX_DIR = "/vercel/sandbox";
+const SANDBOX_DIR = "/home/user";
 const OUTPUT_FILENAME = "listing-output.json";
 
 export async function runListingAgent(
@@ -203,25 +202,18 @@ export async function runListingAgent(
   await flushAgentLog(listingId, agentLog);
 
   const sandbox = await Sandbox.create({
-    runtime: "node22",
-    timeout: 300_000,
+    timeoutMs: 300_000,
   });
 
   const rawTranscript: string[] = [];
 
   try {
-    const installResult = await sandbox.runCommand("sh", [
-      "-c",
+    const installResult = await sandbox.commands.run(
       "curl -fsSL https://claude.ai/install.sh | bash",
-    ]);
+      { timeoutMs: 60_000 },
+    );
     if (installResult.exitCode !== 0) {
-      let stderr = "";
-      try {
-        stderr = await (installResult.stderr as () => Promise<string>)();
-      } catch {
-        // Failed to read stderr
-      }
-      throw new Error(`Failed to install Claude CLI: ${stderr}`);
+      throw new Error(`Failed to install Claude CLI: ${installResult.stderr}`);
     }
 
     const systemPrompt = buildListingAgentPrompt(SANDBOX_DIR);
@@ -230,14 +222,12 @@ export async function runListingAgent(
     );
     const userPrompt = buildUserPrompt(localImagePaths, userDescription);
 
-    await sandbox.writeFiles([
-      { path: "CLAUDE.md", content: Buffer.from(systemPrompt) },
-      { path: "user-prompt.txt", content: Buffer.from(userPrompt) },
-      ...downloadedImages.map((img) => ({
-        path: img.localPath,
-        content: img.buffer,
-      })),
-    ]);
+    await sandbox.files.write("CLAUDE.md", systemPrompt);
+    await sandbox.files.write("user-prompt.txt", userPrompt);
+    for (const img of downloadedImages) {
+      const bytes = Uint8Array.from(img.buffer);
+      await sandbox.files.write(img.localPath, bytes.buffer as ArrayBuffer);
+    }
 
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
@@ -245,9 +235,8 @@ export async function runListingAgent(
     }
 
     const cliCommand = [
-      `ANTHROPIC_API_KEY="${apiKey}"`,
       "claude",
-      '-p "$(cat /vercel/sandbox/user-prompt.txt)"',
+      `-p "$(cat ${SANDBOX_DIR}/user-prompt.txt)"`,
       "--dangerously-skip-permissions",
       "--output-format stream-json",
       "--model claude-sonnet-4-5-20250929",
@@ -255,14 +244,17 @@ export async function runListingAgent(
       "--verbose",
     ].join(" ");
 
-    let isCompleted = false;
     let hasError = false;
     let errorMessage = "";
+    let stdoutBuffer = "";
 
-    const stdoutStream = new Writable({
-      write(chunk, _encoding, callback) {
-        const text = chunk.toString();
-        const lines = text.split("\n");
+    const proc = await sandbox.commands.run(cliCommand, {
+      envs: { ANTHROPIC_API_KEY: apiKey },
+      onStdout: (data) => {
+        stdoutBuffer += data;
+        const lines = stdoutBuffer.split("\n");
+        // Keep incomplete last line in buffer
+        stdoutBuffer = lines.pop() ?? "";
 
         for (const line of lines) {
           const trimmed = line.trim();
@@ -296,7 +288,6 @@ export async function runListingAgent(
                 }
               }
             } else if (parsed.type === "result") {
-              isCompleted = true;
               if (parsed.is_error) {
                 hasError = true;
                 errorMessage = Array.isArray(parsed.errors)
@@ -308,37 +299,25 @@ export async function runListingAgent(
             // Not valid JSON, skip
           }
         }
-
-        callback();
       },
+      timeoutMs: 300_000,
     });
 
-    await sandbox.runCommand({
-      cmd: "sh",
-      args: ["-c", cliCommand],
-      detached: true,
-      stdout: stdoutStream,
-    });
-
-    while (!isCompleted) {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-    }
-
-    if (hasError) {
-      throw new Error(errorMessage);
+    if (proc.exitCode !== 0 || hasError) {
+      throw new Error(hasError ? errorMessage : `Claude CLI exited with code ${proc.exitCode}`);
     }
 
     await updatePipelineStep(listingId, "GENERATING");
 
-    const outputBuffer = await sandbox.readFileToBuffer({
-      path: `${SANDBOX_DIR}/${OUTPUT_FILENAME}`,
-    });
+    const outputText = await sandbox.files.read(
+      `${SANDBOX_DIR}/${OUTPUT_FILENAME}`,
+    );
 
-    if (!outputBuffer) {
+    if (!outputText) {
       throw new Error("Agent did not produce output file");
     }
 
-    const raw = JSON.parse(outputBuffer.toString()) as unknown;
+    const raw = JSON.parse(outputText) as unknown;
     const result = parseAgentOutput(raw);
 
     agentLog.push({
@@ -369,6 +348,6 @@ export async function runListingAgent(
 
     throw enrichedError;
   } finally {
-    await sandbox.stop().catch(() => {});
+    await sandbox.kill().catch(() => {});
   }
 }

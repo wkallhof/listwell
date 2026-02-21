@@ -40,7 +40,7 @@ Turborepo + pnpm monorepo with two apps and two shared packages:
 | Icons          | Lucide React                            | Default size={20}, stroke-width 2        |
 | Image Storage  | Vercel Blob / Cloudflare R2             | Swappable via STORAGE_PROVIDER env var   |
 | Background Jobs| Inngest                                 | Event-driven, step functions (in API)    |
-| AI Agent       | Vercel Sandbox + Claude AgentSDK        | Consolidated: image analysis + web research + listing generation in one session |
+| AI Agent       | E2B Sandbox + Claude CLI                | Consolidated: image analysis + web research + listing generation in one session |
 | Image Enhance  | Google Gemini API                       | Contextual photo cleanup                 |
 | Voice-to-Text  | Whisper API or Deepgram (TBD)           | Mobile voice dictation                   |
 | Notifications  | Web Push API + web-push                 | Service worker push notifications        |
@@ -328,6 +328,7 @@ R2_PUBLIC_URL=                          # (when using r2)
 INNGEST_EVENT_KEY=                      # Inngest event key
 INNGEST_SIGNING_KEY=                    # Inngest signing key
 ANTHROPIC_API_KEY=                      # Claude API key
+E2B_API_KEY=                            # E2B sandbox API key
 GEMINI_API_KEY=                         # Google Gemini API key
 VAPID_PRIVATE_KEY=                      # Web push VAPID private key
 NEXT_PUBLIC_VAPID_PUBLIC_KEY=           # Web push VAPID public key
