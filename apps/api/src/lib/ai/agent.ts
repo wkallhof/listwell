@@ -201,21 +201,19 @@ export async function runListingAgent(
   });
   await flushAgentLog(listingId, agentLog);
 
-  const sandbox = await Sandbox.create({
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) {
+    throw new Error("ANTHROPIC_API_KEY environment variable is required");
+  }
+
+  const sandbox = await Sandbox.create("claude", {
+    envs: { ANTHROPIC_API_KEY: apiKey },
     timeoutMs: 300_000,
   });
 
   const rawTranscript: string[] = [];
 
   try {
-    const installResult = await sandbox.commands.run(
-      "curl -fsSL https://claude.ai/install.sh | bash",
-      { timeoutMs: 60_000 },
-    );
-    if (installResult.exitCode !== 0) {
-      throw new Error(`Failed to install Claude CLI: ${installResult.stderr}`);
-    }
-
     const systemPrompt = buildListingAgentPrompt(SANDBOX_DIR);
     const localImagePaths = downloadedImages.map(
       (img) => `${SANDBOX_DIR}/${img.localPath}`,
@@ -227,11 +225,6 @@ export async function runListingAgent(
     for (const img of downloadedImages) {
       const bytes = Uint8Array.from(img.buffer);
       await sandbox.files.write(img.localPath, bytes.buffer as ArrayBuffer);
-    }
-
-    const apiKey = process.env.ANTHROPIC_API_KEY;
-    if (!apiKey) {
-      throw new Error("ANTHROPIC_API_KEY environment variable is required");
     }
 
     const cliCommand = [
@@ -249,7 +242,6 @@ export async function runListingAgent(
     let stdoutBuffer = "";
 
     const proc = await sandbox.commands.run(cliCommand, {
-      envs: { ANTHROPIC_API_KEY: apiKey },
       onStdout: (data) => {
         stdoutBuffer += data;
         const lines = stdoutBuffer.split("\n");
