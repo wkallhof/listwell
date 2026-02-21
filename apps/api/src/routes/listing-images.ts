@@ -2,12 +2,9 @@ import { Hono } from "hono";
 import { eq, and } from "drizzle-orm";
 import { db } from "@listwell/db";
 import { listings, listingImages } from "@listwell/db/schema";
-import { requireAuth } from "../middleware/auth";
 import { deleteImage } from "../lib/blob";
 
 export const listingImagesRoutes = new Hono();
-
-listingImagesRoutes.use(requireAuth);
 
 listingImagesRoutes.delete("/listings/:id/images", async (c) => {
   const user = c.get("user");

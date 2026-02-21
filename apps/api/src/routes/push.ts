@@ -2,11 +2,7 @@ import { Hono } from "hono";
 import { eq, and } from "drizzle-orm";
 import { db } from "@listwell/db";
 import { pushSubscriptions } from "@listwell/db/schema";
-import { requireAuth } from "../middleware/auth";
-
 export const pushRoutes = new Hono();
-
-pushRoutes.use(requireAuth);
 
 pushRoutes.post("/push/subscribe", async (c) => {
   const user = c.get("user");

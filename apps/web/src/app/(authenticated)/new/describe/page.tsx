@@ -68,7 +68,6 @@ export default function DescribePage() {
       const listing = await res.json();
       toast.info("Generating your listing...");
       router.push(`/listings/${listing.id}`);
-      // No reset() needed — context unmounts when leaving /new route group
     } catch (err) {
       console.error("[describe] Listing creation failed:", err);
       const msg =

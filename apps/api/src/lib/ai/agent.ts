@@ -82,6 +82,12 @@ function parseAgentOutput(raw: unknown): ListingAgentOutput {
   return parsed.data;
 }
 
+const TOOL_LOG_MAP: Record<string, { type: AgentLogEntry["type"]; field: string; prefix: string }> = {
+  WebSearch: { type: "search", field: "query", prefix: "Searching" },
+  WebFetch: { type: "fetch", field: "url", prefix: "Fetching" },
+  Write: { type: "write", field: "", prefix: "Writing listing output" },
+};
+
 export function extractLogEntries(
   contentBlocks: ContentBlock[],
 ): AgentLogEntry[] {
@@ -90,34 +96,21 @@ export function extractLogEntries(
 
   for (const block of contentBlocks) {
     if (block.type === "text" && block.text) {
-      entries.push({
-        ts: now,
-        type: "text",
-        content: block.text.slice(0, 200),
-      });
-    } else if (block.type === "tool_use" && block.name === "WebSearch") {
-      const queryText =
-        typeof block.input?.query === "string" ? block.input.query : "...";
-      entries.push({
-        ts: now,
-        type: "search",
-        content: `Searching: ${queryText}`,
-      });
-    } else if (block.type === "tool_use" && block.name === "WebFetch") {
-      const url =
-        typeof block.input?.url === "string" ? block.input.url : "...";
-      entries.push({
-        ts: now,
-        type: "fetch",
-        content: `Fetching: ${url}`,
-      });
-    } else if (block.type === "tool_use" && block.name === "Write") {
-      entries.push({
-        ts: now,
-        type: "write",
-        content: "Writing listing output",
-      });
+      entries.push({ ts: now, type: "text", content: block.text.slice(0, 200) });
+      continue;
     }
+
+    if (block.type !== "tool_use" || !block.name) continue;
+
+    const mapping = TOOL_LOG_MAP[block.name];
+    if (!mapping) continue;
+
+    const value = mapping.field && typeof block.input?.[mapping.field] === "string"
+      ? block.input[mapping.field] as string
+      : "";
+    const content = value ? `${mapping.prefix}: ${value}` : mapping.prefix;
+
+    entries.push({ ts: now, type: mapping.type, content });
   }
 
   return entries;

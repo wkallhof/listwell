@@ -1,6 +1,5 @@
 import { Hono } from "hono";
 import { randomBytes } from "crypto";
-import { requireAuth } from "../middleware/auth";
 import { createPresignedUploadUrl } from "../lib/blob";
 
 const MAX_FILES = 5;
@@ -17,8 +16,6 @@ interface FileRequest {
 }
 
 export const uploadRoutes = new Hono();
-
-uploadRoutes.use(requireAuth);
 
 uploadRoutes.post("/upload/presign", async (c) => {
   const body = await c.req.json();

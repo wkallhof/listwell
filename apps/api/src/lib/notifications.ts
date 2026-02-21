@@ -21,7 +21,8 @@ interface WebPushError {
 
 function isWebPushError(error: unknown): error is WebPushError {
   return (
-    error instanceof Object &&
+    typeof error === "object" &&
+    error !== null &&
     "statusCode" in error &&
     typeof (error as WebPushError).statusCode === "number"
   );

@@ -2,12 +2,9 @@ import { Hono } from "hono";
 import { eq, desc } from "drizzle-orm";
 import { db } from "@listwell/db";
 import { listings, listingImages } from "@listwell/db/schema";
-import { requireAuth } from "../middleware/auth";
 import { inngest } from "../inngest/client";
 
 export const listingsRoutes = new Hono();
-
-listingsRoutes.use(requireAuth);
 
 listingsRoutes.get("/listings", async (c) => {
   const user = c.get("user");

@@ -2,12 +2,9 @@ import { Hono } from "hono";
 import { eq, and } from "drizzle-orm";
 import { db } from "@listwell/db";
 import { listings, listingImages } from "@listwell/db/schema";
-import { requireAuth } from "../middleware/auth";
 import { inngest } from "../inngest/client";
 
 export const listingEnhanceRoutes = new Hono();
-
-listingEnhanceRoutes.use(requireAuth);
 
 listingEnhanceRoutes.post("/listings/:id/enhance", async (c) => {
   const user = c.get("user");
@@ -21,8 +18,7 @@ listingEnhanceRoutes.post("/listings/:id/enhance", async (c) => {
     return c.json({ error: "Listing not found" }, 404);
   }
 
-  const body = await c.req.json();
-  const { imageId } = body as { imageId: string };
+  const { imageId } = await c.req.json<{ imageId: string }>();
 
   if (!imageId) {
     return c.json({ error: "imageId is required" }, 400);

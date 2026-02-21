@@ -1,7 +1,5 @@
 import { Hono } from "hono";
 import OpenAI from "openai";
-import { requireAuth } from "../middleware/auth";
-
 const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB Whisper limit
 const ALLOWED_TYPES = new Set([
   "audio/webm",
@@ -15,8 +13,6 @@ const ALLOWED_TYPES = new Set([
 ]);
 
 export const transcribeRoutes = new Hono();
-
-transcribeRoutes.use(requireAuth);
 
 transcribeRoutes.post("/transcribe", async (c) => {
   const formData = await c.req.raw.formData();

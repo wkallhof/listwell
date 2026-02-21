@@ -13,10 +13,16 @@ import { uploadRoutes } from "./routes/upload";
 import { transcribeRoutes } from "./routes/transcribe";
 import { pushRoutes } from "./routes/push";
 import { inngestHandler } from "./inngest/handler";
+import { requireAuth } from "./middleware/auth";
 
-const app = new Hono().basePath("/api");
+const app = new Hono<{ Bindings: Record<string, string | undefined> }>().basePath("/api");
 
 // Middleware
+// Expose process.env as Hono context bindings so inngest/hono can read env vars
+app.use(async (c, next) => {
+  Object.assign(c.env, process.env);
+  return next();
+});
 app.use(logger());
 app.use(
   cors({
@@ -24,6 +30,14 @@ app.use(
     credentials: true,
   }),
 );
+
+// Auth middleware — scoped to protected paths only
+// (health, auth, and inngest remain public)
+app.use("/listings", requireAuth);
+app.use("/listings/*", requireAuth);
+app.use("/upload/*", requireAuth);
+app.use("/transcribe", requireAuth);
+app.use("/push/*", requireAuth);
 
 // Routes
 app.route("/", authRoutes);
