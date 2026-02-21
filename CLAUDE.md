@@ -4,6 +4,15 @@
 
 Listwell is a mobile-first progressive web app that turns photos of items into ready-to-post marketplace listings. Users snap photos, optionally describe items via voice or text, and an AI agent handles product identification, market pricing research, listing description writing, and photo enhancement. The output is a complete listing ready to copy into Facebook Marketplace, eBay, or Craigslist. Built as a personal tool with auth included for future multi-user expansion.
 
+## Architecture
+
+Turborepo + pnpm monorepo with two apps and two shared packages:
+
+- **`apps/web`** — Next.js frontend (App Router). No server-side business logic. Calls the Hono API via Next.js rewrites proxy (`/api/*` → API server). Server components use `apiFetch()` to forward cookies.
+- **`apps/api`** — Hono REST API (`@hono/node-server`). All business logic: auth, CRUD, AI agent, image enhancement, Inngest jobs, push notifications. Runs on port 4000.
+- **`packages/shared`** — Types (`AgentLogEntry`), Zod schemas (`listingAgentOutputSchema`), and utilities (`formatListingForClipboard`). Consumed as TS source (no build step).
+- **`packages/db`** — Drizzle schema, client factory, and migrations. Uses `DB_DRIVER=neon` for production Neon driver, `postgres` for local dev.
+
 ## Key Documents
 
 | Document                                       | Purpose                                          |
@@ -19,16 +28,18 @@ Listwell is a mobile-first progressive web app that turns photos of items into r
 
 | Layer          | Technology                              | Notes                                    |
 | -------------- | --------------------------------------- | ---------------------------------------- |
-| Framework      | Next.js (App Router)                    | Server components by default             |
+| Monorepo       | Turborepo + pnpm                        | Workspace packages, parallel tasks       |
+| Web Framework  | Next.js (App Router)                    | Frontend-only, proxies API via rewrites  |
+| API Framework  | Hono + @hono/node-server                | Standalone REST API on port 4000         |
 | Language       | TypeScript (strict mode)                | No `any` types                           |
 | Database       | PostgreSQL (Neon prod / Docker local)   | Serverless driver for production         |
 | ORM            | Drizzle ORM                             | Type-safe, zero runtime overhead         |
-| Authentication | BetterAuth (email/password)             | Drizzle adapter, PostgreSQL provider     |
+| Authentication | BetterAuth (email/password)             | Bearer plugin (API), cookies (web proxy) |
 | UI Components  | shadcn/ui                               | Tailwind-based, accessible               |
 | Styling        | Tailwind CSS                            | Design system tokens in globals.css      |
 | Icons          | Lucide React                            | Default size={20}, stroke-width 2        |
 | Image Storage  | Vercel Blob / Cloudflare R2             | Swappable via STORAGE_PROVIDER env var   |
-| Background Jobs| Inngest                                 | Event-driven, step functions             |
+| Background Jobs| Inngest                                 | Event-driven, step functions (in API)    |
 | AI Agent       | Vercel Sandbox + Claude AgentSDK        | Consolidated: image analysis + web research + listing generation in one session |
 | Image Enhance  | Google Gemini API                       | Contextual photo cleanup                 |
 | Voice-to-Text  | Whisper API or Deepgram (TBD)           | Mobile voice dictation                   |
@@ -36,96 +47,86 @@ Listwell is a mobile-first progressive web app that turns photos of items into r
 | Dark Mode      | next-themes                             | Class strategy, system preference default|
 | Toasts         | Sonner                                  | Top-center positioned                    |
 | Testing        | Vitest + React Testing Library          | ≥80% coverage required                   |
-| Hosting        | Vercel                                  | Production deployment                    |
+| Hosting        | Vercel (web) + Railway/Node (API)       | Separate deployments                     |
 
 ## Project Structure
 
 ```
-src/
-├── app/
-│   ├── globals.css              ← CSS variables (design system tokens)
-│   ├── layout.tsx               ← ThemeProvider, fonts, metadata
-│   ├── manifest.ts              ← PWA manifest
-│   ├── login/
-│   │   └── page.tsx             ← Login/Register screen
-│   ├── (authenticated)/
-│   │   ├── page.tsx             ← Listings Feed (home)
-│   │   ├── new/
-│   │   │   ├── page.tsx         ← Capture screen
-│   │   │   ├── describe/
-│   │   │   │   └── page.tsx     ← Describe screen
-│   │   │   └── submitted/
-│   │   │       └── page.tsx     ← Submitted confirmation
-│   │   └── listings/
-│   │       └── [id]/
-│   │           └── page.tsx     ← Listing detail (processing/ready)
-│   └── api/
-│       ├── auth/[...all]/route.ts
-│       ├── listings/
-│       │   ├── route.ts         ← GET (list), POST (create)
-│       │   └── [id]/
-│       │       ├── route.ts     ← GET, PATCH, DELETE
-│       │       ├── enhance/route.ts
-│       │       └── images/route.ts
-│       ├── inngest/route.ts
-│       └── transcribe/route.ts
-├── components/
-│   ├── ui/                      ← shadcn/ui primitives
-│   ├── listing-card.tsx
-│   ├── listing-status-badge.tsx
-│   ├── pipeline-steps.tsx
-│   ├── image-carousel.tsx
-│   ├── image-grid.tsx
-│   ├── image-enhancement-sheet.tsx
-│   ├── copy-button.tsx
-│   ├── voice-input.tsx
-│   ├── bottom-bar.tsx
-│   ├── fab.tsx
-│   ├── empty-state.tsx
-│   ├── push-prompt.tsx
-│   └── theme-provider.tsx
-├── db/
-│   ├── index.ts                 ← Drizzle client + Neon connection
-│   └── schema.ts               ← All table definitions
-├── inngest/
-│   ├── client.ts                ← Inngest client
-│   └── functions/
-│       ├── generate-listing.ts  ← listing.generate function
-│       └── enhance-image.ts     ← image.enhance function
-├── lib/
-│   ├── utils.ts                 ← cn() helper
-│   ├── auth.ts                  ← BetterAuth server config
-│   ├── auth-client.ts           ← BetterAuth client
-│   ├── auth-middleware.ts       ← Route protection
-│   ├── blob.ts                  ← Vercel Blob upload helpers
-│   ├── notifications.ts         ← Web push helpers
-│   ├── push-actions.ts          ← Push subscription server actions
-│   ├── listing-actions.ts       ← Listing creation server actions
-│   ├── listing-formatter.ts     ← Copy-to-clipboard formatting
-│   ├── new-listing-context.tsx  ← Multi-step form state
-│   └── ai/
-│       ├── agent.ts             ← Vercel Sandbox + AgentSDK setup
-│       ├── prompts/
-│       │   └── listing-agent-prompt.ts ← Consolidated agent system prompt
-│       ├── agent-output-schema.ts ← Structured output schema for agent results
-│       ├── gemini.ts            ← Gemini image editing client
-│       └── enhancement-prompt.ts← Gemini prompt template
-└── types/
-    └── index.ts                 ← Shared TypeScript types
-public/
-├── sw.js                        ← Service worker
-├── icon-192x192.png
-└── icon-512x512.png
-docs/
-├── prd.md
-├── screens.md
-├── design-system.md
-├── selling-strategy.md
-├── plan.md
-└── tasks.md
-migrations/                      ← Drizzle migration files
-docker-compose.yml               ← Local PostgreSQL
-drizzle.config.ts
+listwell/
+├── apps/
+│   ├── web/                         ← Next.js frontend
+│   │   ├── src/
+│   │   │   ├── app/
+│   │   │   │   ├── globals.css
+│   │   │   │   ├── layout.tsx
+│   │   │   │   ├── manifest.ts
+│   │   │   │   ├── login/page.tsx
+│   │   │   │   └── (authenticated)/
+│   │   │   │       ├── page.tsx             ← Feed (uses apiFetch)
+│   │   │   │       ├── new/page.tsx         ← Capture
+│   │   │   │       ├── new/describe/page.tsx← Describe + submit
+│   │   │   │       └── listings/[id]/page.tsx ← Detail (client fetch)
+│   │   │   ├── components/
+│   │   │   │   ├── ui/              ← shadcn/ui primitives
+│   │   │   │   └── *.tsx            ← App components
+│   │   │   └── lib/
+│   │   │       ├── api.ts           ← apiFetch() for server components
+│   │   │       ├── auth-client.ts   ← BetterAuth client
+│   │   │       ├── auth-middleware.ts← Route protection middleware
+│   │   │       ├── upload-client.ts ← Presigned URL upload
+│   │   │       ├── new-listing-context.tsx
+│   │   │       └── utils.ts
+│   │   ├── public/
+│   │   ├── next.config.ts           ← API rewrites proxy
+│   │   ├── vitest.config.ts
+│   │   └── package.json
+│   │
+│   └── api/                         ← Hono REST API
+│       └── src/
+│           ├── index.ts             ← Hono app + node-server (port 4000)
+│           ├── auth.ts              ← BetterAuth config (bearer plugin)
+│           ├── middleware/auth.ts    ← Session injection middleware
+│           ├── routes/
+│           │   ├── auth.ts          ← BetterAuth handler mount
+│           │   ├── health.ts        ← GET /health
+│           │   ├── listings.ts      ← GET/POST /listings
+│           │   ├── listing-detail.ts← GET/PATCH/DELETE /listings/:id
+│           │   ├── listing-images.ts← DELETE /listings/:id/images
+│           │   ├── listing-enhance.ts← POST /listings/:id/enhance
+│           │   ├── upload.ts        ← POST /upload/presign
+│           │   ├── transcribe.ts    ← POST /transcribe
+│           │   └── push.ts          ← POST/DELETE /push/subscribe
+│           ├── inngest/
+│           │   ├── client.ts
+│           │   ├── handler.ts       ← serve() with inngest/hono
+│           │   └── functions/
+│           └── lib/
+│               ├── blob.ts
+│               ├── notifications.ts
+│               └── ai/
+│
+├── packages/
+│   ├── shared/                      ← Types, schemas, utilities
+│   │   └── src/
+│   │       ├── index.ts
+│   │       ├── types.ts             ← AgentLogEntry
+│   │       ├── listing-formatter.ts
+│   │       └── schemas/
+│   │           └── agent-output.ts  ← Zod schema + type
+│   │
+│   └── db/                          ← Drizzle schema + client
+│       ├── src/
+│       │   ├── index.ts             ← DB client factory
+│       │   └── schema.ts            ← All table definitions
+│       ├── drizzle.config.ts
+│       └── migrations/
+│
+├── turbo.json
+├── pnpm-workspace.yaml
+├── package.json
+├── docker-compose.yml
+├── docs/
+└── CLAUDE.md
 ```
 
 ## Available Commands
@@ -133,28 +134,40 @@ drizzle.config.ts
 ### Development
 
 ```bash
-npm run dev        # Start Next.js dev server
-npm run build      # Production build
-npm run lint       # Run ESLint
-npm run typecheck  # Run TypeScript compiler check
-npm run format     # Run Prettier
+pnpm dev              # Start both web (3000) and API (4000) via Turborepo
+pnpm inngest:dev      # Start Inngest dev server pointing at API
+pnpm build            # Production build (all apps)
+pnpm lint             # Run ESLint (all apps)
+pnpm typecheck        # Run TypeScript compiler check (all apps)
+pnpm format           # Run Prettier
 ```
 
 ### Testing
 
 ```bash
-npm run test              # Run all tests
-npm run test -- --coverage # Run with coverage report
+pnpm test                                    # Run all tests (all apps)
+pnpm --filter @listwell/web test             # Run web tests only
+pnpm --filter @listwell/api test             # Run API tests only
+pnpm --filter @listwell/web test -- --coverage # Web tests with coverage
 ```
 
 ### Database
 
 ```bash
-docker compose up -d              # Start local PostgreSQL
-npx drizzle-kit push              # Push schema to database
-npx drizzle-kit generate          # Generate migration files
-npx drizzle-kit migrate           # Run migrations
-npx drizzle-kit studio            # Open Drizzle Studio
+docker compose up -d                                         # Start local PostgreSQL
+pnpm --filter @listwell/db exec drizzle-kit push             # Push schema to database
+pnpm --filter @listwell/db exec drizzle-kit generate         # Generate migration files
+pnpm --filter @listwell/db exec drizzle-kit migrate          # Run migrations
+pnpm --filter @listwell/db exec drizzle-kit studio           # Open Drizzle Studio
+```
+
+### Per-app Commands
+
+```bash
+pnpm --filter @listwell/web dev       # Start Next.js dev server only
+pnpm --filter @listwell/api dev       # Start Hono API dev server only
+pnpm --filter @listwell/web build     # Build web app only
+pnpm --filter @listwell/api build     # Build API app only
 ```
 
 ### Claude Code Skills
@@ -191,13 +204,27 @@ npx drizzle-kit studio            # Open Drizzle Studio
 - Use `type` for unions/intersections, `interface` for object shapes
 - Prefer `unknown` over `any` when type is truly unknown
 
-### React / Next.js
+### React / Next.js (apps/web)
 
 - Functional components only
 - Props interface named `{Component}Props`
-- Use server components by default (App Router)
-- Only use `"use client"` when interactivity is required (forms, state, event handlers)
-- Colocate component, styles, and tests when possible
+- Server components use `apiFetch()` from `@/lib/api` for data fetching
+- Client components use `fetch("/api/...")` (proxied to Hono API)
+- Only use `"use client"` when interactivity is required
+- No server actions — all mutations go through the API
+
+### Hono API (apps/api)
+
+- Routes use `requireAuth` middleware for protected endpoints
+- Access authenticated user via `c.get("user")`
+- Return JSON responses with `c.json(data, statusCode)`
+- All business logic lives in the API, not in the web app
+
+### Shared Packages
+
+- `@listwell/shared` — import types, schemas, utilities
+- `@listwell/db` — import DB client and schema (API only)
+- Packages consumed as TS source (no build step, workspace resolution)
 
 ### UI / Styling
 
@@ -215,7 +242,7 @@ npx drizzle-kit studio            # Open Drizzle Studio
 - Each function/component should have at least one test
 - Use descriptive test names: "should {behavior} when {condition}"
 - Prefer integration tests over unit tests for UI
-- Run `npm run test -- --coverage` to verify coverage thresholds
+- Run `pnpm --filter @listwell/web test -- --coverage` to verify coverage thresholds
 
 ### Git
 
@@ -227,9 +254,6 @@ npx drizzle-kit studio            # Open Drizzle Studio
 ## Current Focus
 
 See [docs/tasks.md](docs/tasks.md) for current implementation status.
-
-**Current Phase:** Phase 0
-**MVP Status:** Not Started
 
 ## Session Protocol
 
@@ -245,7 +269,7 @@ See [docs/tasks.md](docs/tasks.md) for current implementation status.
 
 1. Work on ONE task at a time
 2. Write code following conventions above
-3. Run `npm run test` and `npm run typecheck`
+3. Run `pnpm test` and `pnpm typecheck`
 4. If tests fail, fix before continuing
 5. Mark task complete in docs/tasks.md immediately
 
@@ -278,25 +302,35 @@ See [docs/tasks.md](docs/tasks.md) for current implementation status.
 
 ## Environment Variables
 
-Required variables (see .env.example):
+### Web App (`apps/web/.env.local`)
 
 ```
-DATABASE_URL=                    # PostgreSQL connection string
-NEXT_PUBLIC_APP_URL=             # App URL (http://localhost:3000 for dev)
-BETTER_AUTH_SECRET=              # BetterAuth secret key
-STORAGE_PROVIDER=                # "vercel-blob" (default) or "r2"
-VERCEL_BLOB_READ_WRITE_TOKEN=   # Vercel Blob storage token (when using vercel-blob)
-CLOUDFLARE_ACCOUNT_ID=           # Cloudflare R2 account ID (when using r2)
-R2_ACCESS_KEY_ID=                # R2 API token access key (when using r2)
-R2_SECRET_ACCESS_KEY=            # R2 API token secret key (when using r2)
-R2_BUCKET_NAME=                  # R2 bucket name (when using r2)
-R2_PUBLIC_URL=                   # R2 public URL, e.g. https://pub-xxx.r2.dev (when using r2)
-INNGEST_EVENT_KEY=               # Inngest event key
-INNGEST_SIGNING_KEY=             # Inngest signing key
-ANTHROPIC_API_KEY=               # Claude API key
-GEMINI_API_KEY=                  # Google Gemini API key
-NEXT_PUBLIC_VAPID_PUBLIC_KEY=    # Web push VAPID public key
-VAPID_PRIVATE_KEY=               # Web push VAPID private key
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+API_URL=http://localhost:4000           # Hono API URL for rewrites proxy
+BETTER_AUTH_SECRET=                     # BetterAuth secret key
+NEXT_PUBLIC_VAPID_PUBLIC_KEY=           # Web push VAPID public key
+```
+
+### API App (`apps/api/.env` or environment)
+
+```
+DATABASE_URL=                           # PostgreSQL connection string
+DB_DRIVER=                              # "neon" for production, omit for local
+BETTER_AUTH_SECRET=                     # BetterAuth secret key (same as web)
+WEB_URL=http://localhost:3000           # Web app URL for CORS + notifications
+STORAGE_PROVIDER=                       # "vercel-blob" or "r2"
+VERCEL_BLOB_READ_WRITE_TOKEN=           # (when using vercel-blob)
+CLOUDFLARE_ACCOUNT_ID=                  # (when using r2)
+R2_ACCESS_KEY_ID=                       # (when using r2)
+R2_SECRET_ACCESS_KEY=                   # (when using r2)
+R2_BUCKET_NAME=                         # (when using r2)
+R2_PUBLIC_URL=                          # (when using r2)
+INNGEST_EVENT_KEY=                      # Inngest event key
+INNGEST_SIGNING_KEY=                    # Inngest signing key
+ANTHROPIC_API_KEY=                      # Claude API key
+GEMINI_API_KEY=                         # Google Gemini API key
+VAPID_PRIVATE_KEY=                      # Web push VAPID private key
+NEXT_PUBLIC_VAPID_PUBLIC_KEY=           # Web push VAPID public key
 ```
 
 ## Troubleshooting
@@ -304,18 +338,26 @@ VAPID_PRIVATE_KEY=               # Web push VAPID private key
 ### Database connection fails
 
 - Ensure Docker is running: `docker compose up -d`
-- Check DATABASE_URL in .env.local
+- Check DATABASE_URL in API env
+- Local PostgreSQL runs on port 5433 (not 5432)
 - For Neon: ensure connection string includes `?sslmode=require`
 
 ### Tests fail on fresh clone
 
-- Run `npm install`
+- Run `pnpm install`
 - Run `docker compose up -d`
-- Run `npx drizzle-kit push`
-- Check .env.local has all required variables
+- Run `pnpm --filter @listwell/db exec drizzle-kit push`
+- Check env files have all required variables
 
 ### TypeScript errors
 
-- Run `npm run typecheck` for details
+- Run `pnpm typecheck` for details
+- Clean `.next` cache if stale references: `rm -rf apps/web/.next`
 - Ensure strict mode is respected
 - Check that all imports resolve correctly
+
+### API not responding
+
+- Ensure API is running: `pnpm --filter @listwell/api dev`
+- Check `API_URL` in `apps/web/.env.local` points to `http://localhost:4000`
+- Verify CORS config in API allows web origin

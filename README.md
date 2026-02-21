@@ -15,27 +15,48 @@ A mobile-first progressive web app that turns photos of items into ready-to-post
 
 | Layer | Technology |
 |-------|-----------|
-| Framework | Next.js 16 (App Router) |
+| Monorepo | [Turborepo](https://turbo.build) + [pnpm](https://pnpm.io) |
+| Web | Next.js 16 (App Router) |
+| API | [Hono](https://hono.dev) + @hono/node-server |
 | Language | TypeScript (strict mode) |
 | Database | PostgreSQL ([Neon](https://neon.tech) prod / Docker local) |
 | ORM | [Drizzle](https://orm.drizzle.team) |
-| Auth | [BetterAuth](https://www.better-auth.com) (email/password) |
+| Auth | [BetterAuth](https://www.better-auth.com) (email/password + bearer) |
 | UI | [shadcn/ui](https://ui.shadcn.com) + Tailwind CSS v4 |
-| Image Storage | Vercel Blob |
+| Image Storage | Cloudflare R2 / Vercel Blob |
 | Background Jobs | [Inngest](https://www.inngest.com) |
 | AI Agent | Vercel Sandbox + Claude AgentSDK |
 | Image Enhancement | Google Gemini API |
 | Notifications | Web Push API |
 | Testing | Vitest + React Testing Library |
-| Hosting | [Vercel](https://vercel.com) |
+
+## Architecture
+
+```
+listwell/
+├── apps/
+│   ├── web/          ← Next.js frontend (proxies /api/* to Hono)
+│   └── api/          ← Hono REST API (auth, CRUD, AI, jobs)
+├── packages/
+│   ├── shared/       ← Types, Zod schemas, utilities
+│   └── db/           ← Drizzle schema, client, migrations
+├── turbo.json
+├── pnpm-workspace.yaml
+└── docker-compose.yml
+```
+
+- **`apps/web`** — Frontend only. Server components fetch data via `apiFetch()` which forwards cookies through a Next.js rewrites proxy. Client components use `fetch("/api/...")` directly.
+- **`apps/api`** — All business logic: authentication, CRUD, AI agent orchestration, image enhancement, Inngest background jobs, push notifications. Runs on port 4000.
+- **`packages/shared`** — Shared TypeScript types, Zod validation schemas, and utility functions consumed as TS source by both apps.
+- **`packages/db`** — Drizzle ORM schema, database client factory, and migrations. Used by the API app.
 
 ## Getting Started
 
 ### Prerequisites
 
 - Node.js 20+
+- [pnpm](https://pnpm.io) 10+
 - Docker (for local PostgreSQL)
-- npm
 
 ### Setup
 
@@ -45,34 +66,45 @@ git clone https://github.com/your-username/listwell.git
 cd listwell
 
 # Install dependencies
-npm install
+pnpm install
 
 # Copy environment variables
-cp .env.example .env.local
-# Edit .env.local with your values (see Environment Variables below)
+cp .env.example apps/web/.env.local
+# Edit apps/web/.env.local with your web values
+# Set up apps/api/.env with API values (see Environment Variables below)
 
 # Start local PostgreSQL
 docker compose up -d
 
 # Push the database schema
-npx drizzle-kit push
+pnpm --filter @listwell/db exec drizzle-kit push
 
-# Start the dev server
-npm run dev
+# Start both dev servers
+pnpm dev
 ```
 
-The app will be available at [http://localhost:3000](http://localhost:3000).
+The web app will be at [http://localhost:3000](http://localhost:3000) and the API at [http://localhost:4000](http://localhost:4000).
 
 ### Environment Variables
 
-Copy `.env.example` to `.env.local` and fill in the values:
+#### Web App (`apps/web/.env.local`)
+
+| Variable | Description |
+|----------|-------------|
+| `NEXT_PUBLIC_APP_URL` | App URL (`http://localhost:3000` for dev) |
+| `API_URL` | Hono API URL (`http://localhost:4000` for dev) |
+| `BETTER_AUTH_SECRET` | Secret key for BetterAuth session encryption |
+| `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | Web push VAPID public key |
+
+#### API App (`apps/api/.env`)
 
 | Variable | Description |
 |----------|-------------|
 | `DATABASE_URL` | PostgreSQL connection string (local: `postgresql://listwell:listwell@localhost:5433/listwell`) |
-| `NEXT_PUBLIC_APP_URL` | App URL (`http://localhost:3000` for dev) |
-| `BETTER_AUTH_SECRET` | Secret key for BetterAuth session encryption |
-| `VERCEL_BLOB_READ_WRITE_TOKEN` | Vercel Blob storage token |
+| `DB_DRIVER` | Set to `neon` for production Neon driver, omit for local |
+| `BETTER_AUTH_SECRET` | Secret key for BetterAuth (same as web) |
+| `WEB_URL` | Web app URL (`http://localhost:3000` for dev) |
+| `STORAGE_PROVIDER` | `vercel-blob` or `r2` |
 | `INNGEST_EVENT_KEY` | Inngest event key |
 | `INNGEST_SIGNING_KEY` | Inngest signing key |
 | `ANTHROPIC_API_KEY` | Claude API key |
@@ -80,50 +112,46 @@ Copy `.env.example` to `.env.local` and fill in the values:
 | `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | Web push VAPID public key |
 | `VAPID_PRIVATE_KEY` | Web push VAPID private key |
 
+Storage-specific variables (R2 or Vercel Blob) are also required depending on `STORAGE_PROVIDER`.
+
 ## Development
 
 ```bash
-npm run dev          # Start dev server (Turbopack)
-npm run build        # Production build
-npm run lint         # ESLint
-npm run typecheck    # TypeScript compiler check
-npm run format       # Prettier
+pnpm dev              # Start web (3000) + API (4000) concurrently
+pnpm build            # Production build (all apps)
+pnpm lint             # ESLint (all apps)
+pnpm typecheck        # TypeScript compiler check (all apps)
+pnpm format           # Prettier
+pnpm inngest:dev      # Start Inngest dev server
 ```
 
 ### Testing
 
 ```bash
-npm run test                # Run all tests
-npm run test -- --coverage  # Run with coverage report
-npm run test:watch          # Watch mode
+pnpm test                                      # Run all tests
+pnpm --filter @listwell/web test               # Web tests only
+pnpm --filter @listwell/api test               # API tests only
+pnpm --filter @listwell/web test -- --coverage  # Web tests with coverage
 ```
 
 ### Database
 
 ```bash
-docker compose up -d         # Start local PostgreSQL
-docker compose down          # Stop PostgreSQL
-npx drizzle-kit push        # Push schema to database
-npx drizzle-kit generate    # Generate migration files
-npx drizzle-kit migrate     # Run migrations
-npx drizzle-kit studio      # Open Drizzle Studio (database GUI)
+docker compose up -d                                          # Start local PostgreSQL
+docker compose down                                           # Stop PostgreSQL
+pnpm --filter @listwell/db exec drizzle-kit push              # Push schema
+pnpm --filter @listwell/db exec drizzle-kit generate          # Generate migrations
+pnpm --filter @listwell/db exec drizzle-kit migrate           # Run migrations
+pnpm --filter @listwell/db exec drizzle-kit studio            # Database GUI
 ```
 
-## Project Structure
+### Per-app Commands
 
-```
-src/
-├── app/                    # Next.js App Router pages and API routes
-│   ├── login/              # Login/Register screen
-│   ├── (authenticated)/    # Protected routes (feed, new listing, detail)
-│   └── api/                # API endpoints (auth, listings, images)
-├── components/             # React components
-│   └── ui/                 # shadcn/ui primitives
-├── db/                     # Drizzle ORM client and schema
-├── inngest/                # Background job definitions
-├── lib/                    # Utilities, auth config, server actions
-│   └── ai/                 # AI agent setup and prompts
-└── types/                  # Shared TypeScript types
+```bash
+pnpm --filter @listwell/web dev       # Web dev server only
+pnpm --filter @listwell/api dev       # API dev server only
+pnpm --filter @listwell/web build     # Build web only
+pnpm --filter @listwell/api build     # Build API only
 ```
 
 ## License
