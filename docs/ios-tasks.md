@@ -366,22 +366,22 @@
 
 ### 2.5 New Listing — Capture
 
-- [ ] 2.5.1: Create `NewListingViewModel` observable for multi-step new listing flow
+- [x] 2.5.1: Create `NewListingViewModel` observable for multi-step new listing flow
   - Files: ViewModels/NewListingViewModel.swift
   - Implement: `@Observable @MainActor final class NewListingViewModel` — properties: `selectedImages: [UIImage]`, `description: String`, `isSubmitting`, `errorMessage`, `submittedListingId: String?`, methods: `addImage(_:)`, `removeImage(at:)`, `reset()`
   - Max 5 images, min 1 to proceed
   - Test: Can add/remove images, respects 5 limit
-- [ ] 2.5.2: Build `PhotoGridView` component for image thumbnail grid
+- [x] 2.5.2: Build `PhotoGridView` component for image thumbnail grid
   - Files: Views/NewListing/PhotoGridView.swift
   - Implement: LazyVGrid (3 columns, spacing 8) with image thumbnails (aspect ratio 1:1, rounded 8pt, object-fit cover) + remove button (X) overlay on each. Empty add slot with dashed border and `photo.badge.plus` icon when < 5 photos.
   - Ref: `docs/screens.md` § Screen 3: Photo Grid
   - Test: Grid shows images, X button removes, empty slot shows when under limit
-- [ ] 2.5.3: Build `CaptureView` with photo grid and capture buttons
+- [x] 2.5.3: Build `CaptureView` with photo grid and capture buttons
   - Files: Views/NewListing/CaptureView.swift
   - Implement: Navigation bar with back button + "Add Photos" title. PhotoGridView. Two buttons: "Take Photo" (camera SF Symbol, presents CameraView sheet) and "Choose from Library" (photo.badge.plus, presents PhotosPicker). Bottom bar with "Next" button (disabled when 0 photos, shows count "Next — N photo(s)"). Helper text: "Add 3-5 photos from different angles for best results"
   - Ref: `docs/screens.md` § Screen 3: New Listing — Capture
   - Test: Camera/gallery buttons trigger respective pickers, Next enabled only with ≥1 photo
-- [ ] 2.5.4: Write tests for CaptureView and PhotoGridView
+- [x] 2.5.4: Write tests for CaptureView and PhotoGridView
   - Files: ListwellTests/Views/CaptureViewTests.swift
   - Test: Tests pass with ≥80% coverage
 
@@ -784,10 +784,10 @@
 | 2.4.4 | 2026-02-22 | (batch) | Header + overflow menu + logout |
 | 2.4.5 | 2026-02-22 | (batch) | NavigationPath + navigationDestination |
 | 2.4.6 | 2026-02-22 | (batch) | 12 feed tests (6 ViewModel + 6 View) |
-| 2.5.1 |           |        |       |
-| 2.5.2 |           |        |       |
-| 2.5.3 |           |        |       |
-| 2.5.4 |           |        |       |
+| 2.5.1 | 2026-02-22 | (batch) | NewListingViewModel w/ add/remove/submit |
+| 2.5.2 | 2026-02-22 | (batch) | PhotoGridView 3-col grid + dashed add slot |
+| 2.5.3 | 2026-02-22 | (batch) | CaptureView w/ camera/gallery + PhotosPicker |
+| 2.5.4 | 2026-02-22 | (batch) | 13 tests (12 ViewModel + 1 Grid) |
 | 2.6.1 |           |        |       |
 | 2.6.2 |           |        |       |
 | 2.6.3 |           |        |       |
