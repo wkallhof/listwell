@@ -15,6 +15,7 @@
 		2BA9E45AF87C377076D082DD /* APIClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5FB0633F3FFF8C30AB3992 /* APIClientTests.swift */; };
 		30FA2E2D1A96487BFE2F81B7 /* TimeAgo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 074A374C42874E4BCBAFC080 /* TimeAgo.swift */; };
 		42F86AF78F6EBF54E2CBFF7F /* KeychainManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83FA06B45AF55FFDAE8EEB45 /* KeychainManagerTests.swift */; };
+		43B9028F1A937DA0B5F8CE08 /* ImageUploadServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F18009C2A978F760D56B2 /* ImageUploadServiceTests.swift */; };
 		50D5280832FE6B94FC9DA21E /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFE6936882B2EAA70F62EDE9 /* Constants.swift */; };
 		5E20FAD9B65430C50C8D12D5 /* Comparable.swift in Sources */ = {isa = PBXBuildFile; fileRef = F17CCF7A328A3E452B6E177E /* Comparable.swift */; };
 		604E59CCB0F6EF2AD400DF57 /* ListingsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E47095B1BCC6F36FAA9864A0 /* ListingsService.swift */; };
@@ -24,6 +25,7 @@
 		89706C6FF84BB8E35B242AD6 /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9FD4B47DADA3D7AB855A65D /* AuthViewModel.swift */; };
 		89C08CF98EDFF106B7435421 /* AgentLogEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B4B056BB0BF49854AB2EB2A /* AgentLogEntry.swift */; };
 		8BA9CFB948F1CAAE0B554796 /* ListingImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AC6EAF81A6CF9A984377A6D /* ListingImage.swift */; };
+		8DB340252DE67A01BD16C738 /* ImageUploadService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A1DF21DAD44008D84D90BBD /* ImageUploadService.swift */; };
 		AE0F6A54512D4803248C7CE2 /* AuthViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBD3C12838E5B5858F936B3C /* AuthViewModelTests.swift */; };
 		AF7731589EE66F0460BFBAFA /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B3C846BBF90DD6B98F13364 /* APIClient.swift */; };
 		BADF7B7B41E19A9D258842BD /* LoginViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33DECC066EDB7CE5C269896B /* LoginViewTests.swift */; };
@@ -59,11 +61,13 @@
 		1AC6EAF81A6CF9A984377A6D /* ListingImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListingImage.swift; sourceTree = "<group>"; };
 		2486EBB83BB928B1C6F866AA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		25DD5805CFE0ABBBC66D2300 /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
+		287F18009C2A978F760D56B2 /* ImageUploadServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageUploadServiceTests.swift; sourceTree = "<group>"; };
 		2DCB3C9A8F92A36F256EA3C5 /* ListingFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListingFormatter.swift; sourceTree = "<group>"; };
 		33DECC066EDB7CE5C269896B /* LoginViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewTests.swift; sourceTree = "<group>"; };
 		396CBA4552671D80BD8381D6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3B4B056BB0BF49854AB2EB2A /* AgentLogEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentLogEntry.swift; sourceTree = "<group>"; };
 		4067EFDA3FCE718893086967 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		4A1DF21DAD44008D84D90BBD /* ImageUploadService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageUploadService.swift; sourceTree = "<group>"; };
 		54612F11132171C09C05608D /* APIModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIModels.swift; sourceTree = "<group>"; };
 		6D5FB0633F3FFF8C30AB3992 /* APIClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClientTests.swift; sourceTree = "<group>"; };
 		83FA06B45AF55FFDAE8EEB45 /* KeychainManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainManagerTests.swift; sourceTree = "<group>"; };
@@ -159,6 +163,7 @@
 			children = (
 				9B3C846BBF90DD6B98F13364 /* APIClient.swift */,
 				25DD5805CFE0ABBBC66D2300 /* AuthService.swift */,
+				4A1DF21DAD44008D84D90BBD /* ImageUploadService.swift */,
 				173182EE1F48FEBA7C2BE055 /* KeychainManager.swift */,
 				E47095B1BCC6F36FAA9864A0 /* ListingsService.swift */,
 			);
@@ -187,6 +192,7 @@
 			children = (
 				6D5FB0633F3FFF8C30AB3992 /* APIClientTests.swift */,
 				0CB9212FB4E3E8EB5EACC992 /* AuthServiceTests.swift */,
+				287F18009C2A978F760D56B2 /* ImageUploadServiceTests.swift */,
 				83FA06B45AF55FFDAE8EEB45 /* KeychainManagerTests.swift */,
 				9A8A3EFB3409D3CB2E57428B /* ListingsServiceTests.swift */,
 			);
@@ -349,6 +355,7 @@
 				2BA9E45AF87C377076D082DD /* APIClientTests.swift in Sources */,
 				2A204708AE8C4EC2ED067264 /* AuthServiceTests.swift in Sources */,
 				AE0F6A54512D4803248C7CE2 /* AuthViewModelTests.swift in Sources */,
+				43B9028F1A937DA0B5F8CE08 /* ImageUploadServiceTests.swift in Sources */,
 				42F86AF78F6EBF54E2CBFF7F /* KeychainManagerTests.swift in Sources */,
 				24E8066DFF620B79A9BAF21F /* ListingFormatterTests.swift in Sources */,
 				FEBB59632E3D4AB993200B6B /* ListingsServiceTests.swift in Sources */,
@@ -371,6 +378,7 @@
 				50D5280832FE6B94FC9DA21E /* Constants.swift in Sources */,
 				BFF264AFC30DFB8BBC84B1B6 /* ContentView.swift in Sources */,
 				C0140D811ED340007C81AE0A /* Enums.swift in Sources */,
+				8DB340252DE67A01BD16C738 /* ImageUploadService.swift in Sources */,
 				CCC648FB6D3B0A8E461F38B6 /* KeychainManager.swift in Sources */,
 				F519C4C75C55212823D2AE2A /* Listing.swift in Sources */,
 				DDF46B04C937DDCADCCEE648 /* ListingFormatter.swift in Sources */,

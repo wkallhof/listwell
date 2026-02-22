@@ -287,20 +287,20 @@
 
 ### 2.2 Image Upload Service
 
-- [ ] 2.2.1: Create `ImageUploadService` with presigned URL request method
+- [x] 2.2.1: Create `ImageUploadService` with presigned URL request method
   - Files: Services/ImageUploadService.swift
   - Implement: `func requestPresignedURLs(files:token:) async throws -> [PresignedUpload]` — POST `/api/upload/presign`
   - Test: Returns presigned URLs for given file info
-- [ ] 2.2.2: Add direct upload to presigned URL method
+- [x] 2.2.2: Add direct upload to presigned URL method
   - Files: Services/ImageUploadService.swift
   - Implement: `func uploadImage(data:contentType:to presignedUrl:) async throws` — PUT to presigned URL with image data body and Content-Type header
   - Test: Upload completes without error (mock)
-- [ ] 2.2.3: Add full upload flow method combining presign + upload + image compression
+- [x] 2.2.3: Add full upload flow method combining presign + upload + image compression
   - Files: Services/ImageUploadService.swift
   - Implement: `func uploadImages(_ images: [UIImage], token:) async throws -> [ImageRef]` — compress to JPEG (0.8 quality, max 2048px), request presigned URLs, upload each in parallel with TaskGroup, return ImageRef array
   - Helper: `func compressImage(_ image: UIImage, maxDimension: CGFloat, quality: CGFloat) -> Data`
   - Test: Full flow returns ImageRef array with keys and URLs
-- [ ] 2.2.4: Write tests for ImageUploadService
+- [x] 2.2.4: Write tests for ImageUploadService
   - Files: ListwellTests/Services/ImageUploadServiceTests.swift
   - Test: Tests pass with ≥80% coverage, including compression and parallel upload
 
@@ -768,10 +768,10 @@
 | 2.1.3 | 2026-02-22 | (batch) | createListing POST /listings |
 | 2.1.4 | 2026-02-22 | (batch) | updateListing + deleteListing |
 | 2.1.5 | 2026-02-22 | (batch) | 12 ListingsService tests |
-| 2.2.1 |           |        |       |
-| 2.2.2 |           |        |       |
-| 2.2.3 |           |        |       |
-| 2.2.4 |           |        |       |
+| 2.2.1 | 2026-02-22 | (batch) | requestPresignedURLs POST /upload/presign |
+| 2.2.2 | 2026-02-22 | (batch) | uploadImage PUT to presigned URL |
+| 2.2.3 | 2026-02-22 | (batch) | uploadImages full flow + compression |
+| 2.2.4 | 2026-02-22 | (batch) | 9 ImageUploadService tests |
 | 2.3.1 |           |        |       |
 | 2.3.2 |           |        |       |
 | 2.3.3 |           |        |       |
