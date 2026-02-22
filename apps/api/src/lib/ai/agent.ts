@@ -269,18 +269,33 @@ export async function runListingAgent(
     });
     await flushAgentLog(listingId, agentLog);
 
+    // --- Network connectivity check ---
+    const netCheck = await sandbox.commands.run(
+      'curl -s -m 10 -o /dev/null -w "%{http_code}" https://api.anthropic.com/v1/messages 2>&1',
+      { timeoutMs: 15_000 },
+    );
+    agentLog.push({
+      ts: Date.now(),
+      type: "status",
+      content: `Anthropic API reachability: HTTP ${netCheck.stdout.trim()} (exit ${netCheck.exitCode})`,
+    });
+    await flushAgentLog(listingId, agentLog);
+
     // --- Build runner script ---
-    // Shell script avoids all quoting/expansion issues with $(cat ...)
     const runnerScript = [
       "#!/bin/bash",
-      "set -euo pipefail",
-      `PROMPT=$(cat ${SANDBOX_DIR}/user-prompt.txt)`,
-      `exec claude -p "$PROMPT" \\`,
+      'echo "[runner] Reading prompt..." >&2',
+      `PROMPT=$(cat ${SANDBOX_DIR}/user-prompt.txt) || { echo "[runner] FAILED to read prompt" >&2; exit 1; }`,
+      'echo "[runner] Prompt loaded (${#PROMPT} chars), starting claude..." >&2',
+      `claude -p "$PROMPT" \\`,
       "  --dangerously-skip-permissions \\",
       "  --output-format stream-json \\",
       "  --model sonnet \\",
       "  --max-turns 15 \\",
       "  --verbose",
+      "EXIT_CODE=$?",
+      'echo "[runner] claude exited with code $EXIT_CODE" >&2',
+      "exit $EXIT_CODE",
     ].join("\n");
 
     await sandbox.files.write(`${SANDBOX_DIR}/run-agent.sh`, runnerScript);
