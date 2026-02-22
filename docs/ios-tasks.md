@@ -46,7 +46,7 @@
 
 - Phase 0: [x] Complete
 - Phase 1: [x] Complete
-- Phase 2: [ ] Not Started
+- Phase 2: [x] Complete
 - Phase 3: [ ] Not Started
 - Phase 4: [ ] Not Started
 - Phase 5: [ ] Not Started
@@ -387,76 +387,76 @@
 
 ### 2.6 New Listing — Describe & Submit
 
-- [ ] 2.6.1: Build `DescribeView` with photo strip and text editor
+- [x] 2.6.1: Build `DescribeView` with photo strip and text editor
   - Files: Views/NewListing/DescribeView.swift
   - Implement: Navigation bar with back + "Describe It" title. Horizontal ScrollView of photo thumbnails (64x64, rounded). TextEditor with placeholder "Tell us about this item — brand, condition, why you're selling... (optional)" (min height 160pt). Helper text: "More detail = better results. But you can also skip this." Bottom bar with "Skip" (secondary) and "Generate Listing" (primary) buttons.
   - Ref: `docs/screens.md` § Screen 4: New Listing — Describe
   - Test: Thumbnail strip shows photos, text editor accepts input, both buttons present
-- [ ] 2.6.2: Implement listing submission flow in NewListingViewModel
+- [x] 2.6.2: Implement listing submission flow in NewListingViewModel
   - Files: ViewModels/NewListingViewModel.swift
   - Implement: `func submitListing(token:) async throws` — compress images → upload via ImageUploadService → create listing via ListingsService → set `submittedListingId`
   - Show upload progress via `uploadProgress: Double` property
   - Test: Submission calls upload + create in sequence, sets listingId on success
-- [ ] 2.6.3: Wire DescribeView submission to navigate to listing detail
+- [x] 2.6.3: Wire DescribeView submission to navigate to listing detail
   - Files: Views/NewListing/DescribeView.swift
   - Implement: "Generate Listing" and "Skip" both call `viewModel.submitListing()`. Show loading overlay during submission. On success, navigate to `ListingDetailView(listingId:)` and reset NewListingViewModel.
   - Test: Submit shows loading, navigates on success, shows error on failure
-- [ ] 2.6.4: Write tests for DescribeView and submission flow
+- [x] 2.6.4: Write tests for DescribeView and submission flow
   - Files: ListwellTests/Views/DescribeViewTests.swift, ListwellTests/ViewModels/NewListingViewModelTests.swift
   - Test: Tests pass with ≥80% coverage
 
 ### 2.7 Listing Detail — Ready State
 
-- [ ] 2.7.1: Create `ListingDetailViewModel` observable for detail screen data
+- [x] 2.7.1: Create `ListingDetailViewModel` observable for detail screen data
   - Files: ViewModels/ListingDetailViewModel.swift
   - Implement: `@Observable @MainActor final class ListingDetailViewModel` — properties: `listing: Listing?`, `isLoading`, `errorMessage`, methods: `func loadListing(id:)`, `func updateStatus(_:)`, `func deleteListing()`, `func copyFullListing()`
   - Test: loadListing fetches and stores listing data
-- [ ] 2.7.2: Build `ImageCarouselView` with horizontal paging and dot indicators
+- [x] 2.7.2: Build `ImageCarouselView` with horizontal paging and dot indicators
   - Files: Views/Detail/ImageCarouselView.swift
   - Implement: TabView with `.tabViewStyle(.page(indexDisplayMode: .never))` for swipe between images. Kingfisher `KFImage` for async loading. Custom dot indicators below (active = accent color, inactive = muted). Aspect ratio 4:3.
   - Ref: `docs/screens.md` § Image Carousel, `docs/design-system.md` § Image Display Conventions
   - Test: Carousel shows images, dots reflect current page
-- [ ] 2.7.3: Build `ProductDetailsView` for brand/model/condition/category grid
+- [x] 2.7.3: Build `ProductDetailsView` for brand/model/condition/category grid
   - Files: Views/Detail/ProductDetailsView.swift
   - Implement: Card-like container with 2-column grid. Each cell: label (caption, muted, uppercase) + value (body, medium weight). Fields: Brand, Model, Condition, Category.
   - Ref: `docs/screens.md` § Screen 7: Product Details
   - Test: Renders all 4 detail fields
-- [ ] 2.7.4: Build `ComparablesView` for market comparable listings
+- [x] 2.7.4: Build `ComparablesView` for market comparable listings
   - Files: Views/Detail/ComparablesView.swift
   - Implement: "Market Comparables" heading. List of comparable cards — each shows title (truncated), source text (muted), price (semibold), external link button (opens URL in Safari via `Link`).
   - Ref: `docs/screens.md` § Screen 7: Comparable Listings
   - Test: Renders comparables with title, price, source
-- [ ] 2.7.5: Build `ListingDetailView` (ready state) assembling all sections
+- [x] 2.7.5: Build `ListingDetailView` (ready state) assembling all sections
   - Files: Views/Detail/ListingDetailView.swift
   - Implement: ScrollView with sections: ImageCarouselView, status badge + category row, title + CopyButton, price card (suggested price large + market range), description + CopyButton, ProductDetailsView, ComparablesView, market notes (researchNotes text). Bottom bar with "Copy Full Listing" button (doc.on.doc icon). `.task` loads listing on appear.
   - Ref: `docs/screens.md` § Screen 7: Listing Detail — Ready
   - Test: All sections render with sample listing data
-- [ ] 2.7.6: Add dropdown menu actions to ListingDetailView
+- [x] 2.7.6: Add dropdown menu actions to ListingDetailView
   - Files: Views/Detail/ListingDetailView.swift
   - Implement: Navigation bar trailing `Menu` with items: "Mark as Listed" (if READY), "Mark as Sold" (if LISTED), "Archive", "Delete Listing" (destructive). Status changes call `viewModel.updateStatus()`. Delete shows `.confirmationDialog`.
   - Ref: `docs/screens.md` § Screen 7: DropdownMenu
   - Test: Menu items show for correct statuses, delete shows confirmation
-- [ ] 2.7.7: Implement "Copy Full Listing" action with ListingFormatter
+- [x] 2.7.7: Implement "Copy Full Listing" action with ListingFormatter
   - Files: Views/Detail/ListingDetailView.swift
   - Implement: Bottom bar button calls `ListingFormatter.formatForClipboard(listing)`, copies to `UIPasteboard.general.string`, triggers haptic feedback, shows brief "Copied!" feedback
   - Test: Copy puts formatted text on pasteboard
-- [ ] 2.7.8: Write tests for ListingDetailView and all detail sub-components
+- [x] 2.7.8: Write tests for ListingDetailView and all detail sub-components
   - Files: ListwellTests/Views/ListingDetailViewTests.swift, ListwellTests/ViewModels/ListingDetailViewModelTests.swift
   - Test: Tests pass with ≥80% coverage
 
 **Phase 2 Checkpoint:**
 
-- [ ] Listings feed displays user's listings with status badges and thumbnails
-- [ ] Empty state shows when no listings exist
-- [ ] User can capture photos via camera and photo library (1-5 photos)
-- [ ] User can describe item via text editor
-- [ ] Submission compresses, uploads images, and creates listing
-- [ ] Listing detail shows all sections (images, title, price, description, details, comparables, notes)
-- [ ] Copy full listing and individual section copy work with haptic feedback
-- [ ] Status can be changed (Listed, Sold, Archive) and listings can be deleted
-- [ ] Pull-to-refresh works on feed
-- [ ] All tests pass with ≥80% code coverage on Phase 2 code
-- [ ] Commit: "feat(ios): complete core listing screens (Phase 2)"
+- [x] Listings feed displays user's listings with status badges and thumbnails
+- [x] Empty state shows when no listings exist
+- [x] User can capture photos via camera and photo library (1-5 photos)
+- [x] User can describe item via text editor
+- [x] Submission compresses, uploads images, and creates listing
+- [x] Listing detail shows all sections (images, title, price, description, details, comparables, notes)
+- [x] Copy full listing and individual section copy work with haptic feedback
+- [x] Status can be changed (Listed, Sold, Archive) and listings can be deleted
+- [x] Pull-to-refresh works on feed
+- [x] All tests pass with ≥80% code coverage on Phase 2 code
+- [x] Commit: "feat(ios): complete core listing screens (Phase 2)"
 
 ---
 
@@ -788,18 +788,18 @@
 | 2.5.2 | 2026-02-22 | (batch) | PhotoGridView 3-col grid + dashed add slot |
 | 2.5.3 | 2026-02-22 | (batch) | CaptureView w/ camera/gallery + PhotosPicker |
 | 2.5.4 | 2026-02-22 | (batch) | 13 tests (12 ViewModel + 1 Grid) |
-| 2.6.1 |           |        |       |
-| 2.6.2 |           |        |       |
-| 2.6.3 |           |        |       |
-| 2.6.4 |           |        |       |
-| 2.7.1 |           |        |       |
-| 2.7.2 |           |        |       |
-| 2.7.3 |           |        |       |
-| 2.7.4 |           |        |       |
-| 2.7.5 |           |        |       |
-| 2.7.6 |           |        |       |
-| 2.7.7 |           |        |       |
-| 2.7.8 |           |        |       |
+| 2.6.1 | 2026-02-22 |        |       |
+| 2.6.2 | 2026-02-22 |        |       |
+| 2.6.3 | 2026-02-22 |        |       |
+| 2.6.4 | 2026-02-22 |        |       |
+| 2.7.1 | 2026-02-22 |        |       |
+| 2.7.2 | 2026-02-22 |        |       |
+| 2.7.3 | 2026-02-22 |        |       |
+| 2.7.4 | 2026-02-22 |        |       |
+| 2.7.5 | 2026-02-22 |        |       |
+| 2.7.6 | 2026-02-22 |        |       |
+| 2.7.7 | 2026-02-22 |        |       |
+| 2.7.8 | 2026-02-22 |        |       |
 | 3.1.1 |           |        |       |
 | 3.1.2 |           |        |       |
 | 3.2.1 |           |        |       |

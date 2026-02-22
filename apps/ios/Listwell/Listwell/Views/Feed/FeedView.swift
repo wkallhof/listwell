@@ -15,7 +15,7 @@ struct FeedView: View {
                     .padding(.bottom, Spacing.xxl)
             }
             .navigationDestination(for: String.self) { listingId in
-                Text("Listing \(listingId)") // Placeholder until ListingDetailView is built
+                ListingDetailView(listingId: listingId)
             }
             .background(Color.appBackground)
         }
