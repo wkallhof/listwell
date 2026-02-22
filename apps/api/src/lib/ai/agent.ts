@@ -179,6 +179,8 @@ async function uploadTranscript(
 
 const SANDBOX_DIR = "/home/user";
 const OUTPUT_FILENAME = "listing-output.json";
+const COMMAND_TIMEOUT_MS = 270_000;
+const SANDBOX_TIMEOUT_MS = 330_000;
 
 export async function runListingAgent(
   input: RunAgentInput,
@@ -208,12 +210,37 @@ export async function runListingAgent(
 
   const sandbox = await Sandbox.create("claude", {
     envs: { ANTHROPIC_API_KEY: apiKey },
-    timeoutMs: 300_000,
+    timeoutMs: SANDBOX_TIMEOUT_MS,
   });
 
   const rawTranscript: string[] = [];
 
   try {
+    // --- Pre-flight checks ---
+    const versionResult = await sandbox.commands.run("claude --version 2>&1", {
+      timeoutMs: 30_000,
+    });
+    const cliVersion = (versionResult.stdout || versionResult.stderr).trim();
+    agentLog.push({
+      ts: Date.now(),
+      type: "status",
+      content: `CLI version: ${cliVersion} (exit ${versionResult.exitCode})`,
+    });
+    await flushAgentLog(listingId, agentLog);
+
+    if (versionResult.exitCode !== 0) {
+      throw new Error(`Claude CLI unavailable in sandbox: ${cliVersion}`);
+    }
+
+    const envResult = await sandbox.commands.run(
+      'test -n "$ANTHROPIC_API_KEY" && echo "ok" || echo "missing"',
+      { timeoutMs: 10_000 },
+    );
+    if (envResult.stdout.trim() !== "ok") {
+      throw new Error("ANTHROPIC_API_KEY not set in sandbox environment");
+    }
+
+    // --- Write files to sandbox ---
     const systemPrompt = buildListingAgentPrompt(SANDBOX_DIR);
     const localImagePaths = downloadedImages.map(
       (img) => `${SANDBOX_DIR}/${img.localPath}`,
@@ -230,16 +257,38 @@ export async function runListingAgent(
       );
     }
 
-    const cliCommand = [
-      "claude",
-      `-p "$(cat ${SANDBOX_DIR}/user-prompt.txt)"`,
-      "--dangerously-skip-permissions",
-      "--output-format stream-json",
-      "--model claude-sonnet-4-5-20250929",
-      "--max-turns 15",
-      "--verbose",
-    ].join(" ");
+    // Verify files landed correctly
+    const fileCheck = await sandbox.commands.run(
+      `ls -la ${SANDBOX_DIR}/CLAUDE.md ${SANDBOX_DIR}/user-prompt.txt ${SANDBOX_DIR}/images/ 2>&1`,
+      { timeoutMs: 10_000 },
+    );
+    agentLog.push({
+      ts: Date.now(),
+      type: "status",
+      content: `Sandbox files: ${fileCheck.stdout.trim().slice(0, 300)}`,
+    });
+    await flushAgentLog(listingId, agentLog);
 
+    // --- Build runner script ---
+    // Shell script avoids all quoting/expansion issues with $(cat ...)
+    const runnerScript = [
+      "#!/bin/bash",
+      "set -euo pipefail",
+      `PROMPT=$(cat ${SANDBOX_DIR}/user-prompt.txt)`,
+      `exec claude -p "$PROMPT" \\`,
+      "  --dangerously-skip-permissions \\",
+      "  --output-format stream-json \\",
+      "  --model sonnet \\",
+      "  --max-turns 15 \\",
+      "  --verbose",
+    ].join("\n");
+
+    await sandbox.files.write(`${SANDBOX_DIR}/run-agent.sh`, runnerScript);
+    await sandbox.commands.run(`chmod +x ${SANDBOX_DIR}/run-agent.sh`, {
+      timeoutMs: 5_000,
+    });
+
+    // --- Execute Claude CLI ---
     let hasError = false;
     let errorMessage = "";
     let stdoutBuffer = "";
@@ -287,7 +336,15 @@ export async function runListingAgent(
           }
         }
       } catch {
-        // Not valid JSON, skip
+        // Not valid JSON — log non-JSON stderr-like output for debugging
+        if (!trimmed.startsWith("{")) {
+          agentLog.push({
+            ts: Date.now(),
+            type: "status",
+            content: `[stdout] ${trimmed.slice(0, 200)}`,
+          });
+          flushAgentLog(listingId, agentLog).catch(() => {});
+        }
       }
     }
 
@@ -298,29 +355,36 @@ export async function runListingAgent(
     });
     await flushAgentLog(listingId, agentLog);
 
-    const proc = await sandbox.commands.run(cliCommand, {
-      cwd: SANDBOX_DIR,
-      onStdout: (data) => {
-        onStdoutCallCount++;
-        stdoutBuffer += data;
-        const lines = stdoutBuffer.split("\n");
-        stdoutBuffer = lines.pop() ?? "";
-        for (const line of lines) {
-          processLine(line);
-        }
+    const proc = await sandbox.commands.run(
+      `bash ${SANDBOX_DIR}/run-agent.sh`,
+      {
+        cwd: SANDBOX_DIR,
+        onStdout: (data) => {
+          onStdoutCallCount++;
+          stdoutBuffer += data;
+          const lines = stdoutBuffer.split("\n");
+          stdoutBuffer = lines.pop() ?? "";
+          for (const line of lines) {
+            processLine(line);
+          }
+        },
+        onStderr: (data) => {
+          stderrChunks.push(data);
+          agentLog.push({
+            ts: Date.now(),
+            type: "status",
+            content: `[stderr] ${data.trim().slice(0, 300)}`,
+          });
+          flushAgentLog(listingId, agentLog).catch(() => {});
+        },
+        timeoutMs: COMMAND_TIMEOUT_MS,
       },
-      onStderr: (data) => {
-        stderrChunks.push(data);
-      },
-      timeoutMs: 300_000,
-    });
+    );
 
-    // Process any remaining data in the buffer
     if (stdoutBuffer.trim()) {
       processLine(stdoutBuffer);
     }
 
-    // Diagnostic: log what we received
     const stderr = stderrChunks.join("");
     agentLog.push({
       ts: Date.now(),
@@ -331,12 +395,11 @@ export async function runListingAgent(
         `transcript lines=${rawTranscript.length}`,
         `proc.stdout length=${proc.stdout.length}`,
         `stderr length=${stderr.length}`,
-        stderr.length > 0 ? `stderr preview: ${stderr.slice(0, 200)}` : "",
+        stderr.length > 0 ? `stderr tail: ${stderr.slice(-300)}` : "",
       ].filter(Boolean).join(", "),
     });
     await flushAgentLog(listingId, agentLog);
 
-    // If onStdout never fired but proc.stdout has data, process it now
     if (onStdoutCallCount === 0 && proc.stdout.length > 0) {
       for (const line of proc.stdout.split("\n")) {
         processLine(line);
