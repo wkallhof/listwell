@@ -45,7 +45,7 @@
 ## Progress Summary
 
 - Phase 0: [x] Complete
-- Phase 1: [ ] Not Started
+- Phase 1: [x] Complete
 - Phase 2: [ ] Not Started
 - Phase 3: [ ] Not Started
 - Phase 4: [ ] Not Started
@@ -192,35 +192,35 @@
 
 ### 1.1 Auth Service
 
-- [ ] 1.1.1: Create `AuthService` with sign-in method using BetterAuth bearer plugin
+- [x] 1.1.1: Create `AuthService` with sign-in method using BetterAuth bearer plugin
   - Files: Services/AuthService.swift
   - Implement: `func signIn(email:password:) async throws -> AuthResponse` — POST `/api/auth/sign-in/email`
   - Parse bearer token from response and return alongside user data
   - Test: Successful sign-in returns token and user (mock URLProtocol)
-- [ ] 1.1.2: Add sign-up method to AuthService
+- [x] 1.1.2: Add sign-up method to AuthService
   - Files: Services/AuthService.swift
   - Implement: `func signUp(email:password:name:) async throws -> AuthResponse` — POST `/api/auth/sign-up/email`
   - Test: Successful sign-up returns token and user
-- [ ] 1.1.3: Add sign-out and session check methods to AuthService
+- [x] 1.1.3: Add sign-out and session check methods to AuthService
   - Files: Services/AuthService.swift
   - Implement: `func signOut() async throws` — POST `/api/auth/sign-out`, `func getSession(token:) async throws -> User` — GET `/api/auth/get-session`
   - Test: Sign-out clears session, getSession validates token
-- [ ] 1.1.4: Write tests for AuthService (sign-in, sign-up, sign-out, error cases)
+- [x] 1.1.4: Write tests for AuthService (sign-in, sign-up, sign-out, error cases)
   - Files: ListwellTests/Services/AuthServiceTests.swift
   - Test: Tests pass with ≥80% coverage, including 401 handling and network errors
 
 ### 1.2 Auth State & View Model
 
-- [ ] 1.2.1: Create `AuthState` observable for app-wide auth tracking
+- [x] 1.2.1: Create `AuthState` observable for app-wide auth tracking
   - Files: ViewModels/AuthViewModel.swift
   - Implement: `@Observable @MainActor final class AuthState` with properties: `isLoggedIn`, `currentUser: User?`, `token: String?`, `isLoading`, `errorMessage: String?`
   - On init: check Keychain for existing token → validate with getSession → set isLoggedIn
   - Test: AuthState initializes correctly from Keychain state
-- [ ] 1.2.2: Add login, register, and logout actions to AuthState
+- [x] 1.2.2: Add login, register, and logout actions to AuthState
   - Files: ViewModels/AuthViewModel.swift
   - Implement: `func login(email:password:)` — calls AuthService, saves token to Keychain, sets user; `func register(email:password:name:)` — same flow; `func logout()` — clears Keychain, resets state
   - Test: Login saves token to Keychain, logout clears it
-- [ ] 1.2.3: Update `ContentView` to switch between LoginView and MainView based on AuthState
+- [x] 1.2.3: Update `ContentView` to switch between LoginView and MainView based on AuthState
   - Files: ContentView.swift, ListwellApp.swift
   - Implement: Inject `AuthState` via `.environment()` in App, ContentView checks `authState.isLoggedIn`
   - Show splash/loading while checking Keychain token on startup
@@ -228,36 +228,36 @@
 
 ### 1.3 Login UI
 
-- [ ] 1.3.1: Build `LoginView` with email and password fields and login/register tab picker
+- [x] 1.3.1: Build `LoginView` with email and password fields and login/register tab picker
   - Files: Views/Auth/LoginView.swift
   - Implement: `Picker` or segmented control for "Log in" / "Sign up" tabs, email `TextField`, password `SecureField`, confirm password (register only), submit `Button`
   - Ref: `docs/screens.md` § Screen 1: Login/Register — `docs/design-system.md`
   - Match: Centered vertically, card-like container, app name "Listwell" + tagline at top
   - Test: Both tabs render correct fields, tab switching works
-- [ ] 1.3.2: Add form validation to LoginView
+- [x] 1.3.2: Add form validation to LoginView
   - Files: Views/Auth/LoginView.swift
   - Implement: Email format validation, password minimum length (8 chars), confirm password match on register tab
   - Disable submit button until validation passes
   - Test: Submit disabled with invalid email, enabled with valid inputs
-- [ ] 1.3.3: Wire LoginView to AuthState actions with loading and error states
+- [x] 1.3.3: Wire LoginView to AuthState actions with loading and error states
   - Files: Views/Auth/LoginView.swift
   - Implement: Submit calls `authState.login()` or `authState.register()`, show `ProgressView` on button while loading, show error text below form on failure, clear error on tab switch
   - Test: Successful login transitions to MainView, error shows inline message
-- [ ] 1.3.4: Write tests for LoginView
+- [x] 1.3.4: Write tests for LoginView
   - Files: ListwellTests/Views/LoginViewTests.swift
   - Test: Tests pass with ≥80% coverage — form rendering, validation, error display
 
 **Phase 1 Checkpoint:**
 
-- [ ] User can register with email/password
-- [ ] User can log in with email/password
-- [ ] Bearer token persists in Keychain across app restarts
-- [ ] App shows login screen when no valid token, main screen when authenticated
-- [ ] Logout clears token and returns to login
-- [ ] Form validation works (email format, password length, confirm match)
-- [ ] Error messages display inline below form
-- [ ] All tests pass with ≥80% code coverage on Phase 1 code
-- [ ] Commit: "feat(ios): complete authentication (Phase 1)"
+- [x] User can register with email/password
+- [x] User can log in with email/password
+- [x] Bearer token persists in Keychain across app restarts
+- [x] App shows login screen when no valid token, main screen when authenticated
+- [x] Logout clears token and returns to login
+- [x] Form validation works (email format, password length, confirm match)
+- [x] Error messages display inline below form
+- [x] All tests pass with ≥80% code coverage on Phase 1 code
+- [x] Commit: "feat(ios): complete authentication (Phase 1)"
 
 ---
 
@@ -752,17 +752,17 @@
 | 0.5.7 | 2026-02-21 | 9d80519 | 25 model decoding tests |
 | 0.6.1 | 2026-02-21 | 9d80519 | ListingFormatter (6 tests) |
 | 0.6.2 | 2026-02-21 | 9d80519 | TimeAgo utility (5 tests) |
-| 1.1.1 |           |        |       |
-| 1.1.2 |           |        |       |
-| 1.1.3 |           |        |       |
-| 1.1.4 |           |        |       |
-| 1.2.1 |           |        |       |
-| 1.2.2 |           |        |       |
-| 1.2.3 |           |        |       |
-| 1.3.1 |           |        |       |
-| 1.3.2 |           |        |       |
-| 1.3.3 |           |        |       |
-| 1.3.4 |           |        |       |
+| 1.1.1 | 2026-02-21 | 06e3899 | AuthService sign-in |
+| 1.1.2 | 2026-02-21 | 06e3899 | AuthService sign-up |
+| 1.1.3 | 2026-02-21 | 06e3899 | AuthService sign-out + getSession |
+| 1.1.4 | 2026-02-21 | 06e3899 | 15 AuthService tests |
+| 1.2.1 | 2026-02-21 | 06e3899 | AuthState @Observable with session restore |
+| 1.2.2 | 2026-02-21 | 06e3899 | Login/register/logout actions |
+| 1.2.3 | 2026-02-21 | 06e3899 | ContentView auth routing + splash |
+| 1.3.1 | 2026-02-21 | 06e3899 | LoginView with tabs + form fields |
+| 1.3.2 | 2026-02-21 | 06e3899 | Email/password/confirm validation |
+| 1.3.3 | 2026-02-21 | 06e3899 | Wired to AuthState + loading/error |
+| 1.3.4 | 2026-02-21 | 06e3899 | LoginView + AuthState tests (17 tests) |
 | 2.1.1 |           |        |       |
 | 2.1.2 |           |        |       |
 | 2.1.3 |           |        |       |
