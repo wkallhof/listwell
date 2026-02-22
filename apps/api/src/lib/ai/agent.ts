@@ -221,31 +221,6 @@ export async function runListingAgent(
   const rawTranscript: string[] = [];
 
   try {
-    // --- Pre-flight checks ---
-    const versionResult = await sandbox.commands.run("claude --version 2>&1", {
-      timeoutMs: 30_000,
-    });
-    const cliVersion = (versionResult.stdout || versionResult.stderr).trim();
-    agentLog.push({
-      ts: Date.now(),
-      type: "status",
-      content: `CLI version: ${cliVersion} (exit ${versionResult.exitCode})`,
-    });
-    await flushAgentLog(listingId, agentLog);
-
-    if (versionResult.exitCode !== 0) {
-      throw new Error(`Claude CLI unavailable in sandbox: ${cliVersion}`);
-    }
-
-    const envResult = await sandbox.commands.run(
-      'test -n "$ANTHROPIC_API_KEY" && echo "ok" || echo "missing"',
-      { timeoutMs: 10_000 },
-    );
-    if (envResult.stdout.trim() !== "ok") {
-      throw new Error("ANTHROPIC_API_KEY not set in sandbox environment");
-    }
-
-    // --- Write files to sandbox ---
     const systemPrompt = buildListingAgentPrompt(SANDBOX_DIR);
     const localImagePaths = downloadedImages.map(
       (img) => `${SANDBOX_DIR}/${img.localPath}`,
@@ -262,80 +237,16 @@ export async function runListingAgent(
       );
     }
 
-    // Verify files landed correctly
-    const fileCheck = await sandbox.commands.run(
-      `ls -la ${SANDBOX_DIR}/CLAUDE.md ${SANDBOX_DIR}/user-prompt.txt ${SANDBOX_DIR}/images/ 2>&1`,
-      { timeoutMs: 10_000 },
-    );
-    agentLog.push({
-      ts: Date.now(),
-      type: "status",
-      content: `Sandbox files: ${fileCheck.stdout.trim().slice(0, 300)}`,
-    });
-    await flushAgentLog(listingId, agentLog);
-
-    // --- Network connectivity check ---
-    const netCheck = await sandbox.commands.run(
-      'curl -s -m 10 -o /dev/null -w "%{http_code}" https://api.anthropic.com/v1/messages 2>&1',
-      { timeoutMs: 15_000 },
-    );
-    agentLog.push({
-      ts: Date.now(),
-      type: "status",
-      content: `Anthropic API reachability: HTTP ${netCheck.stdout.trim()} (exit ${netCheck.exitCode})`,
-    });
-    await flushAgentLog(listingId, agentLog);
-
-    // --- Diagnose: what is Claude CLI blocked on? ---
-    agentLog.push({
-      ts: Date.now(),
-      type: "status",
-      content: "Inspecting Claude CLI process state (12s)...",
-    });
-    await flushAgentLog(listingId, agentLog);
-
-    const diagScript = [
-      "#!/bin/bash",
-      'claude -p "Say OK" --dangerously-skip-permissions --output-format json < /dev/null &',
-      "CPID=$!",
-      "sleep 8",
-      'echo "wchan: $(cat /proc/$CPID/wchan 2>&1)"',
-      'echo "state: $(grep State /proc/$CPID/status 2>&1)"',
-      'echo "threads: $(ls /proc/$CPID/task/ 2>&1 | wc -w)"',
-      'echo "fds: $(ls /proc/$CPID/fd/ 2>&1 | wc -w)"',
-      'echo "net: $(cat /proc/$CPID/net/tcp 2>&1 | tail -5)"',
-      'echo "cmdline: $(tr "\\0" " " < /proc/$CPID/cmdline 2>&1 | head -c 200)"',
-      "kill $CPID 2>/dev/null",
-      "wait $CPID 2>/dev/null",
-    ].join("\n");
-
-    await sandbox.files.write(`${SANDBOX_DIR}/diag.sh`, diagScript);
-    const diagResult = await sandbox.commands.run(
-      `bash ${SANDBOX_DIR}/diag.sh 2>&1`,
-      { timeoutMs: 20_000 },
-    );
-    agentLog.push({
-      ts: Date.now(),
-      type: "status",
-      content: `Process diag: ${diagResult.stdout.trim().slice(0, 600)}`,
-    });
-    await flushAgentLog(listingId, agentLog);
-
-    // --- Build runner script ---
+    // Runner script: reads prompt from file, pipes /dev/null to stdin
+    // to prevent Claude CLI from blocking on stdin during init.
     const runnerScript = [
       "#!/bin/bash",
-      'echo "[runner] Reading prompt..." >&2',
-      `PROMPT=$(cat ${SANDBOX_DIR}/user-prompt.txt) || { echo "[runner] FAILED to read prompt" >&2; exit 1; }`,
-      'echo "[runner] Prompt loaded (${#PROMPT} chars), starting claude..." >&2',
+      `PROMPT=$(cat ${SANDBOX_DIR}/user-prompt.txt)`,
       `claude -p "$PROMPT" \\`,
       "  --dangerously-skip-permissions \\",
       "  --output-format stream-json \\",
       "  --model sonnet \\",
-      "  --max-turns 15 \\",
-      "  --verbose < /dev/null",
-      "EXIT_CODE=$?",
-      'echo "[runner] claude exited with code $EXIT_CODE" >&2',
-      "exit $EXIT_CODE",
+      "  --max-turns 15 < /dev/null",
     ].join("\n");
 
     await sandbox.files.write(`${SANDBOX_DIR}/run-agent.sh`, runnerScript);
@@ -343,12 +254,10 @@ export async function runListingAgent(
       timeoutMs: 5_000,
     });
 
-    // --- Execute Claude CLI ---
     let hasError = false;
     let errorMessage = "";
     let stdoutBuffer = "";
     const stderrChunks: string[] = [];
-    let onStdoutCallCount = 0;
 
     function processLine(line: string): void {
       const trimmed = line.trim();
@@ -391,15 +300,7 @@ export async function runListingAgent(
           }
         }
       } catch {
-        // Not valid JSON — log non-JSON stderr-like output for debugging
-        if (!trimmed.startsWith("{")) {
-          agentLog.push({
-            ts: Date.now(),
-            type: "status",
-            content: `[stdout] ${trimmed.slice(0, 200)}`,
-          });
-          flushAgentLog(listingId, agentLog).catch(() => {});
-        }
+        // Not valid JSON — skip silently
       }
     }
 
@@ -415,7 +316,6 @@ export async function runListingAgent(
       {
         cwd: SANDBOX_DIR,
         onStdout: (data) => {
-          onStdoutCallCount++;
           stdoutBuffer += data;
           const lines = stdoutBuffer.split("\n");
           stdoutBuffer = lines.pop() ?? "";
@@ -425,12 +325,6 @@ export async function runListingAgent(
         },
         onStderr: (data) => {
           stderrChunks.push(data);
-          agentLog.push({
-            ts: Date.now(),
-            type: "status",
-            content: `[stderr] ${data.trim().slice(0, 300)}`,
-          });
-          flushAgentLog(listingId, agentLog).catch(() => {});
         },
         timeoutMs: COMMAND_TIMEOUT_MS,
       },
@@ -440,28 +334,8 @@ export async function runListingAgent(
       processLine(stdoutBuffer);
     }
 
-    const stderr = stderrChunks.join("");
-    agentLog.push({
-      ts: Date.now(),
-      type: "status",
-      content: [
-        `CLI exited code=${proc.exitCode}`,
-        `onStdout called ${onStdoutCallCount}x`,
-        `transcript lines=${rawTranscript.length}`,
-        `proc.stdout length=${proc.stdout.length}`,
-        `stderr length=${stderr.length}`,
-        stderr.length > 0 ? `stderr tail: ${stderr.slice(-300)}` : "",
-      ].filter(Boolean).join(", "),
-    });
-    await flushAgentLog(listingId, agentLog);
-
-    if (onStdoutCallCount === 0 && proc.stdout.length > 0) {
-      for (const line of proc.stdout.split("\n")) {
-        processLine(line);
-      }
-    }
-
     if (proc.exitCode !== 0 || hasError) {
+      const stderr = stderrChunks.join("");
       const detail = hasError ? errorMessage : stderr || `exit code ${proc.exitCode}`;
       throw new Error(`Claude CLI failed: ${detail}`);
     }
