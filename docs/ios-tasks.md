@@ -265,23 +265,23 @@
 
 ### 2.1 Listings Service
 
-- [ ] 2.1.1: Create `ListingsService` with fetch all listings method
+- [x] 2.1.1: Create `ListingsService` with fetch all listings method
   - Files: Services/ListingsService.swift
   - Implement: `func fetchListings(token:) async throws -> [Listing]` — GET `/api/listings`
   - Test: Returns decoded array of listings
-- [ ] 2.1.2: Add fetch single listing method to ListingsService
+- [x] 2.1.2: Add fetch single listing method to ListingsService
   - Files: Services/ListingsService.swift
   - Implement: `func fetchListing(id:token:) async throws -> Listing` — GET `/api/listings/:id`
   - Test: Returns listing with images array populated
-- [ ] 2.1.3: Add create listing method to ListingsService
+- [x] 2.1.3: Add create listing method to ListingsService
   - Files: Services/ListingsService.swift
   - Implement: `func createListing(description:images:token:) async throws -> Listing` — POST `/api/listings`
   - Test: Creates listing with image refs, returns listing with status PROCESSING
-- [ ] 2.1.4: Add update and delete listing methods to ListingsService
+- [x] 2.1.4: Add update and delete listing methods to ListingsService
   - Files: Services/ListingsService.swift
   - Implement: `func updateListing(id:updates:token:) async throws -> Listing` — PATCH `/api/listings/:id`, `func deleteListing(id:token:) async throws` — DELETE `/api/listings/:id`
   - Test: Update changes status, delete returns success
-- [ ] 2.1.5: Write tests for ListingsService
+- [x] 2.1.5: Write tests for ListingsService
   - Files: ListwellTests/Services/ListingsServiceTests.swift
   - Test: Tests pass with ≥80% coverage
 
@@ -763,11 +763,11 @@
 | 1.3.2 | 2026-02-21 | 06e3899 | Email/password/confirm validation |
 | 1.3.3 | 2026-02-21 | 06e3899 | Wired to AuthState + loading/error |
 | 1.3.4 | 2026-02-21 | 06e3899 | LoginView + AuthState tests (17 tests) |
-| 2.1.1 |           |        |       |
-| 2.1.2 |           |        |       |
-| 2.1.3 |           |        |       |
-| 2.1.4 |           |        |       |
-| 2.1.5 |           |        |       |
+| 2.1.1 | 2026-02-22 | (batch) | fetchListings GET /listings |
+| 2.1.2 | 2026-02-22 | (batch) | fetchListing GET /listings/:id |
+| 2.1.3 | 2026-02-22 | (batch) | createListing POST /listings |
+| 2.1.4 | 2026-02-22 | (batch) | updateListing + deleteListing |
+| 2.1.5 | 2026-02-22 | (batch) | 12 ListingsService tests |
 | 2.2.1 |           |        |       |
 | 2.2.2 |           |        |       |
 | 2.2.3 |           |        |       |
