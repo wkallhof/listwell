@@ -47,7 +47,7 @@
 - Phase 0: [x] Complete
 - Phase 1: [x] Complete
 - Phase 2: [x] Complete
-- Phase 3: [ ] Not Started
+- Phase 3: [x] Complete
 - Phase 4: [ ] Not Started
 - Phase 5: [ ] Not Started
 - Phase 6: [ ] Not Started
@@ -464,57 +464,57 @@
 
 ### 3.1 Pipeline UI Components
 
-- [ ] 3.1.1: Build `PipelineStepsView` with step indicators matching web processing screen
+- [x] 3.1.1: Build `PipelineStepsView` with step indicators matching web processing screen
   - Files: Views/Detail/PipelineStepsView.swift
   - Implement: VStack of step rows. Each row: HStack with icon + label + optional duration. Icon states: completed = `checkmark.circle.fill` (green), active = `ProgressView()` (accent), pending = `circle` (muted/30%). Labels: "Analyzing photos", "Researching prices", "Writing listing", "Finishing up". Active step has bold text, completed has muted text, pending has muted/50%.
   - Ref: `docs/screens.md` § Screen 6: Pipeline Steps, `docs/design-system.md` § Pipeline Step Indicators
   - Test: Renders correct icons/styles for each step state based on current pipelineStep
-- [ ] 3.1.2: Build agent log view for real-time activity display
+- [x] 3.1.2: Build agent log view for real-time activity display
   - Files: Views/Detail/AgentLogView.swift
   - Implement: ScrollView with VStack of log entries. Each entry: HStack with type icon (status = info, search = magnifyingglass, fetch = arrow.down, text = text.bubble, write = pencil, complete = checkmark, error = exclamationmark.triangle) + content text (caption size) + relative time. Auto-scrolls to bottom on new entries.
   - Test: Renders log entries with correct icons
 
 ### 3.2 Processing State
 
-- [ ] 3.2.1: Add processing state branch to ListingDetailView
+- [x] 3.2.1: Add processing state branch to ListingDetailView
   - Files: Views/Detail/ListingDetailView.swift
   - Implement: When `listing.status == .processing`, show: photo preview (first image, 4:3 aspect ratio), PipelineStepsView, AgentLogView (if agentLog not empty), helper text "This usually takes 30-90 seconds". Switch to ready layout when status becomes .ready.
   - Ref: `docs/screens.md` § Screen 6: Listing Detail — Processing
   - Test: Processing status shows pipeline view, ready status shows full detail
-- [ ] 3.2.2: Implement polling in ListingDetailViewModel
+- [x] 3.2.2: Implement polling in ListingDetailViewModel
   - Files: ViewModels/ListingDetailViewModel.swift
   - Implement: When listing status is `.processing`, start Timer/Task that calls `loadListing()` every 4 seconds. Cancel polling when status is no longer `.processing` or view disappears. Use `Task` with `try await Task.sleep` in a while loop, checking for cancellation.
   - Test: Polling triggers repeated fetches, stops when status changes to READY
-- [ ] 3.2.3: Add auto-transition from processing to ready view
+- [x] 3.2.3: Add auto-transition from processing to ready view
   - Files: ViewModels/ListingDetailViewModel.swift
   - Implement: When polled listing shows `pipelineStep == .complete` and `status == .ready`, stop polling and update view to ready state (already handled by SwiftUI reactivity)
   - Test: View transitions from processing to ready when API returns READY status
 
 ### 3.3 Error State
 
-- [ ] 3.3.1: Build error state card in ListingDetailView
+- [x] 3.3.1: Build error state card in ListingDetailView
   - Files: Views/Detail/ListingDetailView.swift
   - Implement: When `listing.pipelineStep == .error`, show card with destructive border, `exclamationmark.circle.fill` icon (red), "Generation failed" title, `pipelineError` message, two buttons: "Retry" (primary) and "Delete" (ghost/destructive).
   - Ref: `docs/screens.md` § Screen 9: Error Recovery
   - Test: Error card renders with error message and both buttons
-- [ ] 3.3.2: Implement retry action
+- [x] 3.3.2: Implement retry action
   - Files: ViewModels/ListingDetailViewModel.swift
   - Implement: `func retryGeneration()` — PATCH `/api/listings/:id` with `{ pipelineStep: "PENDING", pipelineError: null, status: "PROCESSING", retry: true }`. Resume polling after retry.
   - Test: Retry resets pipeline state and restarts polling
-- [ ] 3.3.3: Write tests for pipeline views and polling logic
+- [x] 3.3.3: Write tests for pipeline views and polling logic
   - Files: ListwellTests/Views/PipelineStepsViewTests.swift, ListwellTests/ViewModels/ListingDetailViewModelPollingTests.swift
   - Test: Tests pass with ≥80% coverage
 
 **Phase 3 Checkpoint:**
 
-- [ ] Processing state shows live pipeline step indicators
-- [ ] Polling fetches updated listing every 4 seconds during processing
-- [ ] View auto-transitions from processing to ready when pipeline completes
-- [ ] Agent log entries display in scrollable view
-- [ ] Error state shows with error message, retry button, and delete button
-- [ ] Retry resets pipeline and restarts polling
-- [ ] All tests pass with ≥80% code coverage on Phase 3 code
-- [ ] Commit: "feat(ios): complete pipeline & real-time updates (Phase 3)"
+- [x] Processing state shows live pipeline step indicators
+- [x] Polling fetches updated listing every 4 seconds during processing
+- [x] View auto-transitions from processing to ready when pipeline completes
+- [x] Agent log entries display in scrollable view
+- [x] Error state shows with error message, retry button, and delete button
+- [x] Retry resets pipeline and restarts polling
+- [x] All tests pass with ≥80% code coverage on Phase 3 code
+- [x] Commit: "feat(ios): add pipeline & real-time updates (Phase 3)" — d4aa081
 
 ---
 
@@ -800,14 +800,14 @@
 | 2.7.6 | 2026-02-22 |        |       |
 | 2.7.7 | 2026-02-22 |        |       |
 | 2.7.8 | 2026-02-22 |        |       |
-| 3.1.1 |           |        |       |
-| 3.1.2 |           |        |       |
-| 3.2.1 |           |        |       |
-| 3.2.2 |           |        |       |
-| 3.2.3 |           |        |       |
-| 3.3.1 |           |        |       |
-| 3.3.2 |           |        |       |
-| 3.3.3 |           |        |       |
+| 3.1.1 | 2026-02-22 | (batch) | PipelineStepsView w/ 4 steps + 3 states |
+| 3.1.2 | 2026-02-22 | (batch) | AgentLogView w/ auto-scroll + icons |
+| 3.2.1 | 2026-02-22 | (batch) | Processing state branch in detail view |
+| 3.2.2 | 2026-02-22 | (batch) | Polling every 4s via Task.sleep loop |
+| 3.2.3 | 2026-02-22 | (batch) | Auto-transition via SwiftUI reactivity |
+| 3.3.1 | 2026-02-22 | (batch) | Error card w/ destructive border + retry/delete |
+| 3.3.2 | 2026-02-22 | (batch) | retryGeneration PATCH w/ retry flag |
+| 3.3.3 | 2026-02-22 | (batch) | 29 pipeline/polling tests (2 new test files) |
 | 4.1.1 |           |        |       |
 | 4.2.1 |           |        |       |
 | 4.2.2 |           |        |       |

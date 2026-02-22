@@ -14,6 +14,18 @@ struct FeedViewModelTests {
             try result.get()
         }
 
+        static func fetchListing(id: String, token: String, client: APIClient) async throws -> Listing {
+            fatalError("Not used in FeedViewModel tests")
+        }
+
+        static func updateListing(id: String, updates: PatchListingRequest, token: String, client: APIClient) async throws -> Listing {
+            fatalError("Not used in FeedViewModel tests")
+        }
+
+        static func deleteListing(id: String, token: String, client: APIClient) async throws {
+            fatalError("Not used in FeedViewModel tests")
+        }
+
         static func reset() {
             result = .success([])
         }

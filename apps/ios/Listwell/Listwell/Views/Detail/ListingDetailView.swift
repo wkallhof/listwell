@@ -1,4 +1,5 @@
 import SwiftUI
+import Kingfisher
 
 struct ListingDetailView: View {
     let listingId: String
@@ -15,9 +16,13 @@ struct ListingDetailView: View {
                 ProgressView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if let listing = viewModel.listing {
-                listingContent(listing)
+                if listing.isProcessing || listing.pipelineStep == .error {
+                    processingContent(listing)
+                } else {
+                    readyContent(listing)
+                }
             } else if let error = viewModel.errorMessage {
-                errorView(error)
+                loadErrorView(error)
             }
         }
         .background(Color.appBackground)
@@ -31,7 +36,7 @@ struct ListingDetailView: View {
                         .foregroundStyle(Color.appForeground)
                 }
             }
-            if let listing = viewModel.listing {
+            if let listing = viewModel.listing, !listing.isProcessing, listing.pipelineStep != .error {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     menuButton(for: listing)
                 }
@@ -55,11 +60,137 @@ struct ListingDetailView: View {
         .task {
             await viewModel.loadListing(id: listingId, token: authState.token)
         }
+        .onDisappear {
+            viewModel.cancelPolling()
+        }
     }
 
-    // MARK: - Listing Content
+    // MARK: - Processing Content
 
-    private func listingContent(_ listing: Listing) -> some View {
+    private func processingContent(_ listing: Listing) -> some View {
+        ScrollView {
+            VStack(spacing: Spacing.xl) {
+                processingHeader()
+                photoPreview(listing)
+
+                VStack(spacing: Spacing.xl) {
+                    if listing.pipelineStep == .error {
+                        errorCard(listing)
+                    } else {
+                        PipelineStepsView(currentStep: listing.pipelineStep)
+                    }
+
+                    if let agentLog = listing.agentLog, !agentLog.isEmpty {
+                        VStack(alignment: .leading, spacing: Spacing.sm) {
+                            Text("Activity")
+                                .font(.system(size: Typography.caption, weight: .medium))
+                                .foregroundStyle(Color.mutedForeground)
+                            AgentLogView(entries: agentLog)
+                        }
+                    }
+
+                    Text("This usually takes 30-90 seconds")
+                        .font(.system(size: Typography.caption))
+                        .foregroundStyle(Color.mutedForeground)
+                }
+                .padding(.horizontal, Sizing.pagePadding)
+            }
+        }
+    }
+
+    private func processingHeader() -> some View {
+        HStack {
+            Text("Generating...")
+                .font(.system(size: Typography.sectionHeading, weight: .semibold))
+                .foregroundStyle(Color.appForeground)
+            Spacer()
+        }
+        .padding(.horizontal, Sizing.pagePadding)
+    }
+
+    @ViewBuilder
+    private func photoPreview(_ listing: Listing) -> some View {
+        Group {
+            if let url = listing.primaryImageURL {
+                KFImage(url)
+                    .resizable()
+                    .aspectRatio(4/3, contentMode: .fill)
+                    .clipped()
+            } else {
+                Rectangle()
+                    .fill(Color.mutedBackground)
+                    .aspectRatio(4/3, contentMode: .fill)
+            }
+        }
+        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.image))
+        .padding(.horizontal, Sizing.pagePadding)
+    }
+
+    // MARK: - Error Card
+
+    private func errorCard(_ listing: Listing) -> some View {
+        VStack(alignment: .leading, spacing: Spacing.md) {
+            HStack(alignment: .top, spacing: Spacing.md) {
+                Image(systemName: "exclamationmark.circle.fill")
+                    .font(.system(size: 20))
+                    .foregroundStyle(Color.destructive)
+
+                VStack(alignment: .leading, spacing: Spacing.xs) {
+                    Text("Generation failed")
+                        .font(.system(size: Typography.body, weight: .medium))
+                        .foregroundStyle(Color.appForeground)
+
+                    if let error = listing.pipelineError {
+                        Text(error)
+                            .font(.system(size: Typography.body))
+                            .foregroundStyle(Color.mutedForeground)
+                    }
+                }
+            }
+
+            HStack(spacing: Spacing.sm) {
+                Button {
+                    Task {
+                        await viewModel.retryGeneration(token: authState.token)
+                    }
+                } label: {
+                    Text("Retry")
+                        .font(.system(size: Typography.body, weight: .medium))
+                        .frame(maxWidth: .infinity)
+                        .frame(height: Sizing.minTapTarget)
+                        .background(Color.accentColor)
+                        .foregroundStyle(.white)
+                        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.default))
+                }
+
+                Button {
+                    showDeleteConfirmation = true
+                } label: {
+                    Text("Delete")
+                        .font(.system(size: Typography.body, weight: .medium))
+                        .frame(maxWidth: .infinity)
+                        .frame(height: Sizing.minTapTarget)
+                        .foregroundStyle(Color.destructive)
+                        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.default))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: CornerRadius.default)
+                                .stroke(Color.borderColor, lineWidth: 1)
+                        )
+                }
+            }
+        }
+        .padding(Spacing.lg)
+        .background(Color.cardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.default))
+        .overlay(
+            RoundedRectangle(cornerRadius: CornerRadius.default)
+                .stroke(Color.destructive.opacity(0.5), lineWidth: 1)
+        )
+    }
+
+    // MARK: - Ready Content
+
+    private func readyContent(_ listing: Listing) -> some View {
         ZStack(alignment: .bottom) {
             ScrollView {
                 VStack(spacing: Spacing.xl) {
@@ -262,9 +393,9 @@ struct ListingDetailView: View {
         }
     }
 
-    // MARK: - Error View
+    // MARK: - Load Error View
 
-    private func errorView(_ message: String) -> some View {
+    private func loadErrorView(_ message: String) -> some View {
         VStack(spacing: Spacing.lg) {
             Image(systemName: "exclamationmark.triangle")
                 .font(.system(size: 48))
