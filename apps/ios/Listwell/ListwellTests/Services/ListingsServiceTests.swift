@@ -414,4 +414,108 @@ struct ListingsServiceTests {
             )
         }
     }
+
+    // MARK: - Enhance Image
+
+    @Test("enhanceImage sends POST with imageId in body")
+    func enhanceImageSuccess() async throws {
+        let client = makeTestClient()
+
+        MockURLProtocol.requestHandler = { request in
+            #expect(request.httpMethod == "POST")
+            #expect(request.url?.path.hasSuffix("/listings/listing-1/enhance") == true)
+            #expect(request.value(forHTTPHeaderField: "Authorization") == "Bearer test-token")
+
+            // Verify body contains imageId
+            if let body = request.httpBody,
+               let json = try? JSONSerialization.jsonObject(with: body) as? [String: Any] {
+                #expect(json["imageId"] as? String == "img-1")
+            }
+
+            let response = HTTPURLResponse(
+                url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil
+            )!
+            return (response, #"{"status":"processing"}"#.data(using: .utf8)!)
+        }
+
+        try await ListingsService.enhanceImage(
+            listingId: "listing-1", imageId: "img-1", token: "test-token", client: client
+        )
+    }
+
+    @Test("enhanceImage throws on 404")
+    func enhanceImageNotFound() async throws {
+        let client = makeTestClient()
+
+        MockURLProtocol.requestHandler = { request in
+            let response = HTTPURLResponse(
+                url: request.url!, statusCode: 404, httpVersion: nil, headerFields: nil
+            )!
+            return (response, #"{"error":"Listing not found"}"#.data(using: .utf8)!)
+        }
+
+        await #expect(throws: APIError.self) {
+            try await ListingsService.enhanceImage(
+                listingId: "nonexistent", imageId: "img-1", token: "test-token", client: client
+            )
+        }
+    }
+
+    @Test("enhanceImage throws on 401 unauthorized")
+    func enhanceImageUnauthorized() async throws {
+        let client = makeTestClient()
+
+        MockURLProtocol.requestHandler = { request in
+            let response = HTTPURLResponse(
+                url: request.url!, statusCode: 401, httpVersion: nil, headerFields: nil
+            )!
+            return (response, Data())
+        }
+
+        await #expect(throws: APIError.self) {
+            try await ListingsService.enhanceImage(
+                listingId: "listing-1", imageId: "img-1", token: "bad-token", client: client
+            )
+        }
+    }
+
+    // MARK: - Delete Image
+
+    @Test("deleteImage sends DELETE with imageId in query string")
+    func deleteImageSuccess() async throws {
+        let client = makeTestClient()
+
+        MockURLProtocol.requestHandler = { request in
+            #expect(request.httpMethod == "DELETE")
+            #expect(request.url?.absoluteString.contains("/listings/listing-1/images?imageId=img-2") == true)
+            #expect(request.value(forHTTPHeaderField: "Authorization") == "Bearer test-token")
+
+            let response = HTTPURLResponse(
+                url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil
+            )!
+            return (response, #"{"success":true}"#.data(using: .utf8)!)
+        }
+
+        try await ListingsService.deleteImage(
+            listingId: "listing-1", imageId: "img-2", token: "test-token", client: client
+        )
+    }
+
+    @Test("deleteImage throws on 404")
+    func deleteImageNotFound() async throws {
+        let client = makeTestClient()
+
+        MockURLProtocol.requestHandler = { request in
+            let response = HTTPURLResponse(
+                url: request.url!, statusCode: 404, httpVersion: nil, headerFields: nil
+            )!
+            return (response, #"{"error":"Image not found"}"#.data(using: .utf8)!)
+        }
+
+        await #expect(throws: APIError.self) {
+            try await ListingsService.deleteImage(
+                listingId: "listing-1", imageId: "nonexistent", token: "test-token", client: client
+            )
+        }
+    }
 }

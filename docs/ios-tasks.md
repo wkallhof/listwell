@@ -48,7 +48,7 @@
 - Phase 1: [x] Complete
 - Phase 2: [x] Complete
 - Phase 3: [x] Complete
-- Phase 4: [ ] Not Started
+- Phase 4: [x] Complete
 - Phase 5: [ ] Not Started
 - Phase 6: [ ] Not Started
 - **MVP Status:** Not Started
@@ -522,47 +522,47 @@
 
 ### 4.1 Enhancement Service
 
-- [ ] 4.1.1: Add enhancement methods to ListingsService
+- [x] 4.1.1: Add enhancement methods to ListingsService
   - Files: Services/ListingsService.swift
   - Implement: `func enhanceImage(listingId:imageId:token:) async throws` — POST `/api/listings/:id/enhance`, `func deleteImage(listingId:imageId:token:) async throws` — DELETE `/api/listings/:id/images?imageId=X`
   - Test: Enhance returns success, delete returns success
 
 ### 4.2 Enhancement UI
 
-- [ ] 4.2.1: Create `EnhancementViewModel` observable for enhancement sheet state
+- [x] 4.2.1: Create `EnhancementViewModel` observable for enhancement sheet state
   - Files: ViewModels/EnhancementViewModel.swift
   - Implement: `@Observable @MainActor final class EnhancementViewModel` — properties: `originalImage: ListingImage`, `enhancedVariants: [ListingImage]`, `isEnhancing`, `errorMessage`. Methods: `func requestEnhancement(listingId:token:)`, `func deleteVariant(_:listingId:token:)`, `func pollForNewVariant(listingId:token:)`
   - Polling: After requesting enhancement, poll GET /listings/:id every 3s until a new enhanced image appears for this original
   - Test: Enhancement request triggers API call, polling detects new variant
-- [ ] 4.2.2: Build `EnhancementSheet` view with original image and variants grid
+- [x] 4.2.2: Build `EnhancementSheet` view with original image and variants grid
   - Files: Views/Enhancement/EnhancementSheet.swift
   - Implement: Presented as `.sheet`. Header: "Enhance Photo" + "AI will clean up lighting and background". Original image with "Original" label overlay (top-left, dark semi-transparent pill). Enhanced variants section: "Enhanced versions" label + 2-column LazyVGrid of variant thumbnails. Each variant has trash button overlay (top-right). "Generate Enhanced Version" button with `wand.and.stars` icon. Loading state: `ProgressView` + "Enhancing..." while processing. "Done" button at bottom.
   - Ref: `docs/screens.md` § Screen 8: Image Enhancement
   - Test: Sheet renders original, shows variants grid, enhance button triggers request
-- [ ] 4.2.3: Add "Enhance" button overlay to original images in ImageCarouselView
+- [x] 4.2.3: Add "Enhance" button overlay to original images in ImageCarouselView
   - Files: Views/Detail/ImageCarouselView.swift
   - Implement: On images where `type == .original`, overlay a "Enhance" button (secondary style, small, `wand.and.stars` icon) at bottom-right with padding. Tap opens `EnhancementSheet` as `.sheet`, passing the original image.
   - Ref: `docs/screens.md` § Screen 7: Enhance button on carousel
   - Test: Enhance button visible only on ORIGINAL images, tapping opens sheet
-- [ ] 4.2.4: Implement variant deletion with confirmation
+- [x] 4.2.4: Implement variant deletion with confirmation
   - Files: Views/Enhancement/EnhancementSheet.swift
   - Implement: Trash button on variant calls `viewModel.deleteVariant()`. Show brief undo-style alert/toast. On confirm, delete via API and remove from local array.
   - Test: Delete removes variant from UI and calls API
-- [ ] 4.2.5: Write tests for EnhancementSheet, EnhancementViewModel
+- [x] 4.2.5: Write tests for EnhancementSheet, EnhancementViewModel
   - Files: ListwellTests/Views/EnhancementSheetTests.swift, ListwellTests/ViewModels/EnhancementViewModelTests.swift
   - Test: Tests pass with ≥80% coverage
 
 **Phase 4 Checkpoint:**
 
-- [ ] "Enhance" button appears on original images in carousel
-- [ ] Enhancement sheet opens showing original image
-- [ ] "Generate Enhanced Version" triggers API and shows loading
-- [ ] Enhanced variants appear in grid after processing
-- [ ] Variants can be deleted with confirmation
-- [ ] Multiple variants can be generated per original
-- [ ] Original images are never modified
-- [ ] All tests pass with ≥80% code coverage on Phase 4 code
-- [ ] Commit: "feat(ios): complete image enhancement (Phase 4)"
+- [x] "Enhance" button appears on original images in carousel
+- [x] Enhancement sheet opens showing original image
+- [x] "Generate Enhanced Version" triggers API and shows loading
+- [x] Enhanced variants appear in grid after processing
+- [x] Variants can be deleted with confirmation
+- [x] Multiple variants can be generated per original
+- [x] Original images are never modified
+- [x] All tests pass with ≥80% code coverage on Phase 4 code
+- [x] Commit: "feat(ios): complete image enhancement (Phase 4)"
 
 ---
 
@@ -808,12 +808,12 @@
 | 3.3.1 | 2026-02-22 | (batch) | Error card w/ destructive border + retry/delete |
 | 3.3.2 | 2026-02-22 | (batch) | retryGeneration PATCH w/ retry flag |
 | 3.3.3 | 2026-02-22 | (batch) | 29 pipeline/polling tests (2 new test files) |
-| 4.1.1 |           |        |       |
-| 4.2.1 |           |        |       |
-| 4.2.2 |           |        |       |
-| 4.2.3 |           |        |       |
-| 4.2.4 |           |        |       |
-| 4.2.5 |           |        |       |
+| 4.1.1 | 2026-02-22 | (batch) | enhanceImage + deleteImage on ListingsService |
+| 4.2.1 | 2026-02-22 | (batch) | EnhancementViewModel w/ polling + variant mgmt |
+| 4.2.2 | 2026-02-22 | (batch) | EnhancementSheet w/ original + variants grid |
+| 4.2.3 | 2026-02-22 | (batch) | Enhance button overlay on original images |
+| 4.2.4 | 2026-02-22 | (batch) | Variant deletion w/ confirmation alert |
+| 4.2.5 | 2026-02-22 | (batch) | 22 tests (10 ViewModel + 7 Sheet + 5 Service) |
 | 5.1.1 |           |        |       |
 | 5.1.2 |           |        |       |
 | 5.1.3 |           |        |       |
