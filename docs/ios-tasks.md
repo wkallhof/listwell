@@ -49,7 +49,7 @@
 - Phase 2: [x] Complete
 - Phase 3: [ ] Not Started
 - Phase 4: [ ] Not Started
-- Phase 5: [ ] Not Started
+- Phase 5: [x] Complete
 - Phase 6: [ ] Not Started
 - **MVP Status:** Not Started
 
@@ -570,81 +570,81 @@
 
 ### 5.1 Voice Input (iOS-side)
 
-- [ ] 5.1.1: Build `SpeechRecognizer` service with SFSpeechRecognizer
+- [x] 5.1.1: Build `SpeechRecognizer` service with SFSpeechRecognizer
   - Files: Services/SpeechRecognizer.swift
   - Implement: `@Observable @MainActor final class SpeechRecognizer` — properties: `transcript`, `isRecording`, `errorMessage`. Methods: `func requestPermissions() async -> Bool` (speech + microphone), `func startRecording() throws` (install audio tap, create recognition task with partial results), `func stopRecording()` (stop audio engine, cancel task)
   - Use `SFSpeechAudioBufferRecognitionRequest` with `shouldReportPartialResults = true`
   - Test: SpeechRecognizer initializes, permission methods callable
-- [ ] 5.1.2: Add Info.plist entries for speech and microphone permissions
+- [x] 5.1.2: Add Info.plist entries for speech and microphone permissions
   - Files: Info.plist
   - Keys: `NSSpeechRecognitionUsageDescription` = "Listwell uses speech recognition to describe your items by voice", `NSMicrophoneUsageDescription` = "Listwell needs microphone access for voice descriptions"
   - Test: Permission prompts show correct description text
-- [ ] 5.1.3: Add mic button and recording indicator to DescribeView
+- [x] 5.1.3: Add mic button and recording indicator to DescribeView
   - Files: Views/NewListing/DescribeView.swift
   - Implement: Mic button inside or adjacent to TextEditor (bottom-right overlay). When recording: pulsing red dot indicator + "Listening..." text below TextEditor. Tap toggles `speechRecognizer.startRecording()` / `stopRecording()`. Transcribed text appends to description TextEditor in real-time.
   - Ref: `docs/screens.md` § Screen 4: Mic Button, Recording Indicator
   - Test: Mic button toggles recording state, UI shows recording indicator
-- [ ] 5.1.4: Write tests for SpeechRecognizer and voice input integration
+- [x] 5.1.4: Write tests for SpeechRecognizer and voice input integration
   - Files: ListwellTests/Services/SpeechRecognizerTests.swift
   - Test: Tests pass with ≥80% coverage on SpeechRecognizer
 
 ### 5.2 Push Notifications (iOS-side)
 
-- [ ] 5.2.1: Add Push Notifications capability and entitlement to Xcode project
+- [x] 5.2.1: Add Push Notifications capability and entitlement to Xcode project
   - Files: Listwell.entitlements, Xcode project settings
   - Enable: Push Notifications capability, Background Modes → Remote notifications
   - Test: Entitlement file exists with aps-environment key
-- [ ] 5.2.2: Build `PushNotificationManager` for APNs registration and handling
+- [x] 5.2.2: Build `PushNotificationManager` for APNs registration and handling
   - Files: Services/PushNotificationManager.swift
   - Implement: `func requestPermission() async -> Bool` (requestAuthorization for alert, badge, sound), `func registerForRemoteNotifications()` (calls `UIApplication.shared.registerForRemoteNotifications()`), store device token on successful registration
   - Test: Permission request method callable
-- [ ] 5.2.3: Create `AppDelegate` for push notification delegate methods
+- [x] 5.2.3: Create `AppDelegate` for push notification delegate methods
   - Files: ListwellApp.swift (add @UIApplicationDelegateAdaptor)
   - Implement: `didRegisterForRemoteNotificationsWithDeviceToken` — convert token to hex string, send to API via POST /push/subscribe with `{ type: "apns", deviceToken }`. `didFailToRegisterForRemoteNotificationsWithError` — log error. `userNotificationCenter(_:willPresent:)` — show banner in foreground. `userNotificationCenter(_:didReceive:)` — extract listingId from payload, post notification to navigate to detail.
   - Test: Token conversion produces correct hex string
-- [ ] 5.2.4: Add deep linking from push notification tap to listing detail
+- [x] 5.2.4: Add deep linking from push notification tap to listing detail
   - Files: Views/Feed/FeedView.swift or ContentView.swift
   - Implement: Listen for `NotificationCenter` post from AppDelegate. When received, push `ListingDetailView(listingId:)` onto NavigationPath.
   - Test: Notification with listingId triggers navigation
-- [ ] 5.2.5: Add push permission prompt after first listing submission
+- [x] 5.2.5: Add push permission prompt after first listing submission
   - Files: Views/NewListing/DescribeView.swift or Views/Detail/ListingDetailView.swift
   - Implement: After first successful listing submission (check UserDefaults flag), show `.alert` asking to enable notifications. If accepted, call `PushNotificationManager.requestPermission()` and register.
   - Test: Prompt shows on first submission, not on subsequent ones
 
 ### 5.3 API Changes for APNs (Server-side)
 
-- [ ] 5.3.1: Update push_subscriptions schema to support APNs tokens
+- [x] 5.3.1: Update push_subscriptions schema to support APNs tokens
   - Files: packages/db/src/schema.ts
   - Add: `type` column (text, default "web"), `deviceToken` column (text, nullable)
   - Run: `pnpm --filter @listwell/db exec drizzle-kit generate` and `drizzle-kit push`
   - Test: Migration succeeds, new columns exist
-- [ ] 5.3.2: Update push subscribe/unsubscribe routes to accept APNs device tokens
+- [x] 5.3.2: Update push subscribe/unsubscribe routes to accept APNs device tokens
   - Files: apps/api/src/routes/push.ts
   - POST /push/subscribe: Accept either `{ endpoint, p256dh, auth }` (web) or `{ type: "apns", deviceToken }` (iOS). Store with appropriate type.
   - DELETE /push/subscribe: Accept either `{ endpoint }` (web) or `{ deviceToken }` (iOS). Delete matching subscription.
   - Test: Both web push and APNs subscriptions can be created/deleted
-- [ ] 5.3.3: Install `apn` package and add APNs notification sending
+- [x] 5.3.3: Install `apn` package and add APNs notification sending
   - Files: apps/api/src/lib/notifications.ts, apps/api/package.json
   - Install: `apn` or `@parse/node-apn` package
   - Implement: `sendAPNsNotification(deviceToken, payload)` alongside existing `sendPushNotification`. In the notify function, query push_subscriptions for userId, send to both web push and APNs subscribers.
   - Configure: APNs auth key (`.p8` file path, key ID, team ID) from env vars
   - Add env vars: `APNS_KEY_PATH`, `APNS_KEY_ID`, `APNS_TEAM_ID`, `APNS_BUNDLE_ID`
   - Test: APNs notification helper sends without error (mock)
-- [ ] 5.3.4: Write tests for updated push routes and APNs integration
+- [x] 5.3.4: Write tests for updated push routes and APNs integration
   - Files: apps/api/src/routes/__tests__/push.test.ts, apps/api/src/lib/__tests__/notifications.test.ts
   - Test: Tests pass with ≥80% coverage on modified files
 
 **Phase 5 Checkpoint:**
 
-- [ ] Voice input works: tap mic → speak → transcript appears in real-time
-- [ ] Speech recognition permissions requested with proper descriptions
-- [ ] APNs device token registered with API after permission granted
-- [ ] Push notification received when listing generation completes
-- [ ] Tapping notification navigates to listing detail screen
-- [ ] Push permission prompt appears after first listing submission
-- [ ] API supports both web push and APNs subscriptions
-- [ ] All tests pass with ≥80% code coverage on Phase 5 code
-- [ ] Commit: "feat(ios): complete voice input and push notifications (Phase 5)"
+- [x] Voice input works: tap mic → speak → transcript appears in real-time
+- [x] Speech recognition permissions requested with proper descriptions
+- [x] APNs device token registered with API after permission granted
+- [x] Push notification received when listing generation completes
+- [x] Tapping notification navigates to listing detail screen
+- [x] Push permission prompt appears after first listing submission
+- [x] API supports both web push and APNs subscriptions
+- [x] All tests pass with ≥80% code coverage on Phase 5 code
+- [x] Commit: "feat(ios): complete voice input and push notifications (Phase 5)"
 
 ---
 
@@ -814,19 +814,19 @@
 | 4.2.3 |           |        |       |
 | 4.2.4 |           |        |       |
 | 4.2.5 |           |        |       |
-| 5.1.1 |           |        |       |
-| 5.1.2 |           |        |       |
-| 5.1.3 |           |        |       |
-| 5.1.4 |           |        |       |
-| 5.2.1 |           |        |       |
-| 5.2.2 |           |        |       |
-| 5.2.3 |           |        |       |
-| 5.2.4 |           |        |       |
-| 5.2.5 |           |        |       |
-| 5.3.1 |           |        |       |
-| 5.3.2 |           |        |       |
-| 5.3.3 |           |        |       |
-| 5.3.4 |           |        |       |
+| 5.1.1 | 2026-02-22 | (batch) | SpeechRecognizer @Observable + SFSpeechRecognizer |
+| 5.1.2 | 2026-02-22 | (batch) | Info.plist speech + mic permission strings |
+| 5.1.3 | 2026-02-22 | (batch) | Mic button + recording indicator in DescribeView |
+| 5.1.4 | 2026-02-22 | (batch) | 5 SpeechRecognizer tests |
+| 5.2.1 | 2026-02-22 | (batch) | Entitlements + background modes |
+| 5.2.2 | 2026-02-22 | (batch) | PushNotificationManager + API subscribe |
+| 5.2.3 | 2026-02-22 | (batch) | AppDelegate + UNUserNotificationCenter |
+| 5.2.4 | 2026-02-22 | (batch) | Deep link via NotificationCenter |
+| 5.2.5 | 2026-02-22 | (batch) | Push prompt on first submission |
+| 5.3.1 | 2026-02-22 | (batch) | type + deviceToken columns on push_subscriptions |
+| 5.3.2 | 2026-02-22 | (batch) | Push route accepts APNs + web push |
+| 5.3.3 | 2026-02-22 | (batch) | @parse/node-apn + dual notification sending |
+| 5.3.4 | 2026-02-22 | (batch) | 15 API tests (9 push route + 6 notifications) |
 | 6.1.1 |           |        |       |
 | 6.1.2 |           |        |       |
 | 6.1.3 |           |        |       |

@@ -4,6 +4,9 @@ struct DescribeView: View {
     @Bindable var viewModel: NewListingViewModel
     @Environment(AuthState.self) private var authState
     @Environment(\.dismiss) private var dismiss
+    @State private var speechRecognizer = SpeechRecognizer()
+    @State private var showPushPrompt = false
+    @Environment(PushNotificationManager.self) private var pushManager
 
     var onSubmitted: (String) -> Void
 
@@ -39,8 +42,19 @@ struct DescribeView: View {
         }
         .onChange(of: viewModel.submittedListingId) { _, listingId in
             if let listingId {
+                promptForPushIfFirstSubmission()
                 onSubmitted(listingId)
             }
+        }
+        .alert("Enable Notifications?", isPresented: $showPushPrompt) {
+            Button("Enable") {
+                Task {
+                    _ = await pushManager.requestPermission()
+                }
+            }
+            Button("Not Now", role: .cancel) {}
+        } message: {
+            Text("Get notified when your listing is ready. We'll send a push notification when the AI finishes generating your listing.")
         }
     }
 
@@ -63,26 +77,88 @@ struct DescribeView: View {
     // MARK: - Text Editor
 
     private var textEditor: some View {
-        ZStack(alignment: .topLeading) {
-            TextEditor(text: Bindable(viewModel).description)
-                .font(.system(size: Typography.body))
-                .frame(minHeight: 160)
-                .scrollContentBackground(.hidden)
-                .padding(Spacing.sm)
-                .background(Color.secondaryBackground)
-                .clipShape(RoundedRectangle(cornerRadius: CornerRadius.default))
-                .overlay(
-                    RoundedRectangle(cornerRadius: CornerRadius.default)
-                        .stroke(Color.borderColor, lineWidth: 1)
-                )
-
-            if viewModel.description.isEmpty {
-                Text("Tell us about this item — brand, condition, why you're selling... (optional)")
+        VStack(spacing: Spacing.sm) {
+            ZStack(alignment: .topLeading) {
+                TextEditor(text: Bindable(viewModel).description)
                     .font(.system(size: Typography.body))
-                    .foregroundStyle(Color.mutedForeground)
-                    .padding(.horizontal, Spacing.md)
-                    .padding(.vertical, Spacing.md)
-                    .allowsHitTesting(false)
+                    .frame(minHeight: 160)
+                    .scrollContentBackground(.hidden)
+                    .padding(Spacing.sm)
+                    .background(Color.secondaryBackground)
+                    .clipShape(RoundedRectangle(cornerRadius: CornerRadius.default))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: CornerRadius.default)
+                            .stroke(Color.borderColor, lineWidth: 1)
+                    )
+                    .overlay(alignment: .bottomTrailing) {
+                        micButton
+                            .padding(Spacing.sm)
+                    }
+
+                if viewModel.description.isEmpty && !speechRecognizer.isRecording {
+                    Text("Tell us about this item — brand, condition, why you're selling... (optional)")
+                        .font(.system(size: Typography.body))
+                        .foregroundStyle(Color.mutedForeground)
+                        .padding(.horizontal, Spacing.md)
+                        .padding(.vertical, Spacing.md)
+                        .allowsHitTesting(false)
+                }
+            }
+
+            if speechRecognizer.isRecording {
+                recordingIndicator
+            }
+        }
+        .onChange(of: speechRecognizer.transcript) { _, newValue in
+            if !newValue.isEmpty {
+                viewModel.description = newValue
+            }
+        }
+    }
+
+    // MARK: - Mic Button
+
+    private var micButton: some View {
+        Button {
+            Task { await toggleRecording() }
+        } label: {
+            Image(systemName: speechRecognizer.isRecording ? "mic.slash" : "mic")
+                .font(.system(size: 18))
+                .foregroundStyle(speechRecognizer.isRecording ? Color.destructive : Color.accentColor)
+                .frame(width: Sizing.minTapTarget, height: Sizing.minTapTarget)
+                .background(
+                    Circle()
+                        .fill(speechRecognizer.isRecording ? Color.destructive.opacity(0.1) : Color.accentColor.opacity(0.1))
+                )
+        }
+        .accessibilityLabel(speechRecognizer.isRecording ? "Stop recording" : "Start voice input")
+    }
+
+    // MARK: - Recording Indicator
+
+    private var recordingIndicator: some View {
+        HStack(spacing: Spacing.sm) {
+            Circle()
+                .fill(Color.destructive)
+                .frame(width: 8, height: 8)
+
+            Text("Listening...")
+                .font(.system(size: Typography.caption))
+                .foregroundStyle(Color.mutedForeground)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func toggleRecording() async {
+        if speechRecognizer.isRecording {
+            speechRecognizer.stopRecording()
+        } else {
+            let granted = await speechRecognizer.requestPermissions()
+            guard granted else { return }
+            do {
+                try speechRecognizer.startRecording()
+            } catch {
+                speechRecognizer.errorMessage = "Failed to start recording."
             }
         }
     }
@@ -150,5 +226,13 @@ struct DescribeView: View {
 
     private func submit() async {
         await viewModel.submitListing(token: authState.token)
+    }
+
+    private func promptForPushIfFirstSubmission() {
+        let key = "hasPromptedForPush"
+        guard !UserDefaults.standard.bool(forKey: key) else { return }
+        guard !pushManager.isRegistered else { return }
+        UserDefaults.standard.set(true, forKey: key)
+        showPushPrompt = true
     }
 }
