@@ -301,10 +301,10 @@ struct ListingImageTests {
     }
 }
 
-// MARK: - Comparable Tests
+// MARK: - MarketComparable Tests
 
-@Suite("Comparable")
-struct ComparableTests {
+@Suite("MarketComparable")
+struct MarketComparableTests {
     @Test("decodes from JSON")
     func decodeFull() throws {
         let json = """
@@ -318,7 +318,7 @@ struct ComparableTests {
         }
         """.data(using: .utf8)!
 
-        let comparable = try JSONDecoder().decode(Comparable.self, from: json)
+        let comparable = try JSONDecoder().decode(MarketComparable.self, from: json)
         #expect(comparable.title == "West Elm Harmony Sofa")
         #expect(comparable.price == 500)
         #expect(comparable.source == "eBay Sold")
@@ -338,7 +338,7 @@ struct ComparableTests {
         }
         """.data(using: .utf8)!
 
-        let comparable = try JSONDecoder().decode(Comparable.self, from: json)
+        let comparable = try JSONDecoder().decode(MarketComparable.self, from: json)
         #expect(comparable.url == nil)
         #expect(comparable.condition == nil)
         #expect(comparable.soldDate == nil)

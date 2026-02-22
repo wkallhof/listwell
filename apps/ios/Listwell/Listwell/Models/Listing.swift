@@ -14,7 +14,7 @@ struct Listing: Codable, Identifiable, Sendable {
     let brand: String?
     let model: String?
     let researchNotes: String?
-    let comparables: [Comparable]?
+    let comparables: [MarketComparable]?
     let status: ListingStatus
     let pipelineStep: PipelineStep
     let pipelineError: String?
@@ -32,9 +32,10 @@ struct Listing: Codable, Identifiable, Sendable {
         return status
     }
 
-    /// Whether this listing is still being processed
+    /// Whether this listing is still being processed (includes freshly submitted drafts)
     var isProcessing: Bool {
-        status == .processing && pipelineStep != .complete && pipelineStep != .error
+        let inPipeline = pipelineStep != .complete && pipelineStep != .error
+        return (status == .processing || (status == .draft && pipelineStep == .pending)) && inPipeline
     }
 
     /// Whether this listing has completed generation

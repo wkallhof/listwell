@@ -7,9 +7,8 @@ struct AgentLogView: View {
         ScrollViewReader { proxy in
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: Spacing.sm) {
-                    ForEach(Array(entries.enumerated()), id: \.offset) { index, entry in
+                    ForEach(entries) { entry in
                         logEntryRow(entry)
-                            .id(index)
                     }
                 }
                 .padding(Spacing.lg)
@@ -21,10 +20,10 @@ struct AgentLogView: View {
                 RoundedRectangle(cornerRadius: CornerRadius.default)
                     .stroke(Color.borderColor, lineWidth: 1)
             )
-            .onChange(of: entries.count) { _, newCount in
-                if newCount > 0 {
+            .onChange(of: entries.count) {
+                if let lastEntry = entries.last {
                     withAnimation {
-                        proxy.scrollTo(newCount - 1, anchor: .bottom)
+                        proxy.scrollTo(lastEntry.id, anchor: .bottom)
                     }
                 }
             }

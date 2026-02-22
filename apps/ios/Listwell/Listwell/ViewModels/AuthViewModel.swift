@@ -100,12 +100,3 @@ final class AuthState {
         errorMessage = nil
     }
 }
-
-protocol AuthServiceProtocol {
-    static func signIn(email: String, password: String, client: APIClient) async throws -> AuthResponse
-    static func signUp(email: String, password: String, name: String, client: APIClient) async throws -> AuthResponse
-    static func signOut(token: String, client: APIClient) async throws
-    static func getSession(token: String, client: APIClient) async throws -> User
-}
-
-extension AuthService: AuthServiceProtocol {}

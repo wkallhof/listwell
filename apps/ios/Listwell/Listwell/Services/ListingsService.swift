@@ -1,6 +1,13 @@
 import Foundation
 
-enum ListingsService {
+protocol ListingsServiceProtocol {
+    static func fetchListings(token: String, client: APIClient) async throws -> [Listing]
+    static func fetchListing(id: String, token: String, client: APIClient) async throws -> Listing
+    static func updateListing(id: String, updates: PatchListingRequest, token: String, client: APIClient) async throws -> Listing
+    static func deleteListing(id: String, token: String, client: APIClient) async throws
+}
+
+enum ListingsService: ListingsServiceProtocol {
 
     static func fetchListings(
         token: String,

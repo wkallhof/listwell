@@ -41,15 +41,18 @@ struct PhotoGridView: View {
     }
 
     private var addSlot: some View {
-        RoundedRectangle(cornerRadius: CornerRadius.image)
-            .strokeBorder(Color.borderColor, style: StrokeStyle(lineWidth: 2, dash: [8, 4]))
-            .aspectRatio(1, contentMode: .fill)
-            .overlay {
-                Image(systemName: "photo.badge.plus")
-                    .font(.system(size: 24))
-                    .foregroundStyle(Color.mutedForeground)
-            }
-            .contentShape(Rectangle())
-            .onTapGesture { onAddTapped() }
+        Button {
+            onAddTapped()
+        } label: {
+            RoundedRectangle(cornerRadius: CornerRadius.image)
+                .strokeBorder(Color.borderColor, style: StrokeStyle(lineWidth: 2, dash: [8, 4]))
+                .aspectRatio(1, contentMode: .fill)
+                .overlay {
+                    Image(systemName: "photo.badge.plus")
+                        .font(.system(size: 24))
+                        .foregroundStyle(Color.mutedForeground)
+                }
+        }
+        .accessibilityLabel("Add photo")
     }
 }

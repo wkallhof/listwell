@@ -5,6 +5,12 @@ struct FeedView: View {
     @State private var viewModel = FeedViewModel()
     @State private var showNewListing = false
     @State private var navigationPath = NavigationPath()
+    @State private var newListingViewModel = NewListingViewModel()
+    @State private var newListingStep = NewListingStep.capture
+
+    private enum NewListingStep {
+        case capture, describe
+    }
 
     var body: some View {
         NavigationStack(path: $navigationPath) {
@@ -19,8 +25,36 @@ struct FeedView: View {
             }
             .background(Color.appBackground)
         }
+        .sheet(isPresented: $showNewListing) {
+            newListingViewModel.reset()
+            newListingStep = .capture
+        } content: {
+            NavigationStack {
+                switch newListingStep {
+                case .capture:
+                    CaptureView(viewModel: newListingViewModel) {
+                        newListingStep = .describe
+                    }
+                case .describe:
+                    DescribeView(viewModel: newListingViewModel) { listingId in
+                        showNewListing = false
+                        navigationPath.append(listingId)
+                    }
+                }
+            }
+        }
         .task {
             await viewModel.loadListings(token: authState.token)
+        }
+        .onChange(of: navigationPath) {
+            if navigationPath.isEmpty {
+                Task { await viewModel.refresh(token: authState.token) }
+            }
+        }
+        .onChange(of: showNewListing) {
+            if !showNewListing {
+                Task { await viewModel.refresh(token: authState.token) }
+            }
         }
         .onReceive(NotificationCenter.default.publisher(for: .navigateToListing)) { notification in
             if let listingId = notification.userInfo?["listingId"] as? String {
@@ -110,6 +144,7 @@ struct FeedView: View {
                     .foregroundStyle(Color.mutedForeground)
                     .frame(width: Sizing.minTapTarget, height: Sizing.minTapTarget)
             }
+            .accessibilityLabel("More options")
         }
         .padding(.horizontal, Sizing.pagePadding)
         .padding(.top, Spacing.sm)

@@ -15,28 +15,38 @@ struct ImageCarouselView: View {
             if images.isEmpty {
                 placeholderView
             } else {
-                TabView(selection: $currentIndex) {
-                    ForEach(Array(images.enumerated()), id: \.element.id) { index, image in
-                        ZStack(alignment: .bottomTrailing) {
-                            KFImage(image.imageURL)
-                                .placeholder {
-                                    Color.mutedBackground
-                                }
-                                .fade(duration: 0.2)
-                                .resizable()
-                                .scaledToFill()
-                                .frame(maxWidth: .infinity)
-                                .aspectRatio(4/3, contentMode: .fit)
-                                .clipped()
+                ScrollView(.horizontal) {
+                    LazyHStack(spacing: 0) {
+                        ForEach(Array(images.enumerated()), id: \.element.id) { index, image in
+                            ZStack(alignment: .bottomTrailing) {
+                                KFImage(image.imageURL)
+                                    .placeholder {
+                                        Color.mutedBackground
+                                    }
+                                    .fade(duration: 0.2)
+                                    .resizable()
+                                    .scaledToFill()
+                                    .containerRelativeFrame(.horizontal)
+                                    .aspectRatio(4/3, contentMode: .fit)
+                                    .clipped()
 
-                            if image.isOriginal {
-                                enhanceButton(for: image)
+                                if image.isOriginal {
+                                    enhanceButton(for: image)
+                                }
                             }
+                            .containerRelativeFrame(.horizontal)
+                            .id(index)
+                            .accessibilityLabel("Photo \(index + 1) of \(images.count)")
                         }
-                        .tag(index)
                     }
+                    .scrollTargetLayout()
                 }
-                .tabViewStyle(.page(indexDisplayMode: .never))
+                .scrollTargetBehavior(.paging)
+                .scrollIndicators(.hidden)
+                .scrollPosition(id: Binding(
+                    get: { currentIndex },
+                    set: { if let newValue = $0 { currentIndex = newValue } }
+                ))
                 .aspectRatio(4/3, contentMode: .fit)
                 .clipShape(RoundedRectangle(cornerRadius: CornerRadius.default))
 

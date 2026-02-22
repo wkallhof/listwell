@@ -14,7 +14,7 @@ private func makeListing(
     brand: String? = "Nike",
     model: String? = "Air Max 90",
     researchNotes: String? = "Popular model with strong resale value",
-    comparables: [Comparable]? = nil,
+    comparables: [MarketComparable]? = nil,
     status: ListingStatus = .ready,
     pipelineStep: PipelineStep = .complete,
     images: [ListingImage]? = nil
@@ -125,8 +125,8 @@ struct ComparablesViewTests {
     @Test("renders comparables with title price and source")
     func renderComparables() {
         let comps = [
-            Comparable(title: "Nike Air Max 90 Used", price: 75, source: "eBay", url: "https://ebay.com/item/1", condition: "Good", soldDate: nil),
-            Comparable(title: "Air Max 90 White", price: 90, source: "Mercari", url: nil, condition: "Like New", soldDate: nil)
+            MarketComparable(title: "Nike Air Max 90 Used", price: 75, source: "eBay", url: "https://ebay.com/item/1", condition: "Good", soldDate: nil),
+            MarketComparable(title: "Air Max 90 White", price: 90, source: "Mercari", url: nil, condition: "Like New", soldDate: nil)
         ]
         #expect(comps.count == 2)
         #expect(comps[0].title == "Nike Air Max 90 Used")
@@ -137,7 +137,7 @@ struct ComparablesViewTests {
 
     @Test("handles empty comparables")
     func emptyComparables() {
-        let comps: [Comparable] = []
+        let comps: [MarketComparable] = []
         #expect(comps.isEmpty)
     }
 }
@@ -150,7 +150,7 @@ struct ListingDetailViewTests {
     @Test("listing with all sections has complete data")
     func allSections() {
         let comps = [
-            Comparable(title: "Similar Item", price: 80, source: "eBay", url: nil, condition: nil, soldDate: nil)
+            MarketComparable(title: "Similar Item", price: 80, source: "eBay", url: nil, condition: nil, soldDate: nil)
         ]
         let listing = makeListing(comparables: comps)
         #expect(listing.title != nil)

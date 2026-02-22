@@ -6,6 +6,7 @@ struct DescribeView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var speechRecognizer = SpeechRecognizer()
     @State private var showPushPrompt = false
+    @State private var pendingListingId: String?
     @Environment(PushNotificationManager.self) private var pushManager
 
     var onSubmitted: (String) -> Void
@@ -43,8 +44,12 @@ struct DescribeView: View {
         .sensoryFeedback(.success, trigger: viewModel.submittedListingId)
         .onChange(of: viewModel.submittedListingId) { _, listingId in
             if let listingId {
-                promptForPushIfFirstSubmission()
-                onSubmitted(listingId)
+                if shouldPromptForPush() {
+                    pendingListingId = listingId
+                    showPushPrompt = true
+                } else {
+                    onSubmitted(listingId)
+                }
             }
         }
         .alert("Enable Notifications?", isPresented: $showPushPrompt) {
@@ -52,8 +57,11 @@ struct DescribeView: View {
                 Task {
                     _ = await pushManager.requestPermission()
                 }
+                if let id = pendingListingId { onSubmitted(id) }
             }
-            Button("Not Now", role: .cancel) {}
+            Button("Not Now", role: .cancel) {
+                if let id = pendingListingId { onSubmitted(id) }
+            }
         } message: {
             Text("Get notified when your listing is ready. We'll send a push notification when the AI finishes generating your listing.")
         }
@@ -62,7 +70,7 @@ struct DescribeView: View {
     // MARK: - Thumbnail Strip
 
     private var thumbnailStrip: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
+        ScrollView(.horizontal) {
             HStack(spacing: Spacing.sm) {
                 ForEach(viewModel.selectedImages.indices, id: \.self) { index in
                     Image(uiImage: viewModel.selectedImages[index])
@@ -73,6 +81,7 @@ struct DescribeView: View {
                 }
             }
         }
+        .scrollIndicators(.hidden)
     }
 
     // MARK: - Text Editor
@@ -229,11 +238,11 @@ struct DescribeView: View {
         await viewModel.submitListing(token: authState.token)
     }
 
-    private func promptForPushIfFirstSubmission() {
+    private func shouldPromptForPush() -> Bool {
         let key = "hasPromptedForPush"
-        guard !UserDefaults.standard.bool(forKey: key) else { return }
-        guard !pushManager.isRegistered else { return }
+        guard !UserDefaults.standard.bool(forKey: key) else { return false }
+        guard !pushManager.isRegistered else { return false }
         UserDefaults.standard.set(true, forKey: key)
-        showPushPrompt = true
+        return true
     }
 }

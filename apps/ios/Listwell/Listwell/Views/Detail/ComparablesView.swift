@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ComparablesView: View {
-    let comparables: [Comparable]
+    let comparables: [MarketComparable]
 
     var body: some View {
         if !comparables.isEmpty {
@@ -11,7 +11,7 @@ struct ComparablesView: View {
                     .foregroundStyle(Color.appForeground)
 
                 VStack(spacing: Spacing.sm) {
-                    ForEach(Array(comparables.enumerated()), id: \.offset) { _, comparable in
+                    ForEach(comparables) { comparable in
                         comparableCard(comparable)
                     }
                 }
@@ -19,7 +19,7 @@ struct ComparablesView: View {
         }
     }
 
-    private func comparableCard(_ comparable: Comparable) -> some View {
+    private func comparableCard(_ comparable: MarketComparable) -> some View {
         HStack(spacing: Spacing.md) {
             VStack(alignment: .leading, spacing: Spacing.xs) {
                 Text(comparable.title)
@@ -44,6 +44,7 @@ struct ComparablesView: View {
                         .frame(width: Sizing.minTapTarget, height: Sizing.minTapTarget)
                         .contentShape(Rectangle())
                 }
+                .accessibilityLabel("View on \(comparable.source)")
             }
         }
         .padding(.horizontal, Spacing.lg)

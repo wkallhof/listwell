@@ -45,6 +45,7 @@ struct ListingDetailView: View {
                     Image(systemName: "chevron.left")
                         .foregroundStyle(Color.appForeground)
                 }
+                .accessibilityLabel("Back")
             }
             if let listing = viewModel.listing, !listing.isProcessing, listing.pipelineStep != .error {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -221,9 +222,44 @@ struct ListingDetailView: View {
 
                     VStack(spacing: Spacing.xl) {
                         statusRow(listing)
-                        titleSection(listing)
-                        priceCard(listing)
-                        descriptionSection(listing)
+
+                        if let title = listing.title {
+                            ListingDetailTitleSection(
+                                title: title,
+                                isEditing: $editingTitle,
+                                editText: $editTitleText,
+                                onSave: {
+                                    await viewModel.updateField(title: editTitleText, token: authState.token)
+                                }
+                            )
+                        }
+
+                        if let price = listing.suggestedPrice {
+                            ListingDetailPriceCard(
+                                price: price,
+                                priceRangeLow: listing.priceRangeLow,
+                                priceRangeHigh: listing.priceRangeHigh,
+                                isEditing: $editingPrice,
+                                editText: $editPriceText,
+                                onSave: {
+                                    if let newPrice = Double(editPriceText) {
+                                        await viewModel.updateField(suggestedPrice: newPrice, token: authState.token)
+                                    }
+                                }
+                            )
+                        }
+
+                        if let description = listing.description {
+                            ListingDetailDescriptionSection(
+                                description: description,
+                                isEditing: $editingDescription,
+                                editText: $editDescriptionText,
+                                onSave: {
+                                    await viewModel.updateField(description: editDescriptionText, token: authState.token)
+                                }
+                            )
+                        }
+
                         ProductDetailsView(
                             brand: listing.brand,
                             model: listing.model,
@@ -238,7 +274,10 @@ struct ListingDetailView: View {
                 .padding(.bottom, 80)
             }
 
-            bottomBar(listing)
+            ListingDetailBottomBar(
+                onCopy: { viewModel.copyFullListing() },
+                isCopied: $isCopied
+            )
         }
     }
 
@@ -253,142 +292,6 @@ struct ListingDetailView: View {
                     .foregroundStyle(Color.mutedForeground)
             }
             Spacer()
-        }
-    }
-
-    // MARK: - Title Section
-
-    @ViewBuilder
-    private func titleSection(_ listing: Listing) -> some View {
-        if let title = listing.title {
-            if editingTitle {
-                VStack(alignment: .leading, spacing: Spacing.sm) {
-                    TextField("Title", text: $editTitleText)
-                        .font(.system(size: Typography.pageTitle, weight: .bold))
-                        .textFieldStyle(.plain)
-                        .editFieldStyle()
-                    editActions {
-                        await viewModel.updateField(title: editTitleText, token: authState.token)
-                        editingTitle = false
-                    } onCancel: {
-                        editingTitle = false
-                    }
-                }
-            } else {
-                HStack(alignment: .top, spacing: Spacing.sm) {
-                    Text(title)
-                        .font(.system(size: Typography.pageTitle, weight: .bold))
-                        .foregroundStyle(Color.appForeground)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .onTapGesture {
-                            editTitleText = title
-                            editingTitle = true
-                        }
-                    CopyButton(text: title, label: "title")
-                }
-            }
-        }
-    }
-
-    // MARK: - Price Card
-
-    @ViewBuilder
-    private func priceCard(_ listing: Listing) -> some View {
-        if let price = listing.suggestedPrice {
-            VStack(spacing: Spacing.sm) {
-                if editingPrice {
-                    VStack(alignment: .leading, spacing: Spacing.sm) {
-                        HStack(spacing: Spacing.xs) {
-                            Text("$")
-                                .font(.system(size: Typography.priceLarge, weight: .bold))
-                                .foregroundStyle(Color.appForeground)
-                            TextField("Price", text: $editPriceText)
-                                .font(.system(size: Typography.priceLarge, weight: .bold))
-                                .keyboardType(.decimalPad)
-                                .textFieldStyle(.plain)
-                                .editFieldStyle()
-                        }
-                        editActions {
-                            if let newPrice = Double(editPriceText) {
-                                await viewModel.updateField(suggestedPrice: newPrice, token: authState.token)
-                            }
-                            editingPrice = false
-                        } onCancel: {
-                            editingPrice = false
-                        }
-                    }
-                } else {
-                    HStack(alignment: .firstTextBaseline) {
-                        Text("$\(Int(price))")
-                            .font(.system(size: Typography.priceLarge, weight: .bold))
-                            .foregroundStyle(Color.appForeground)
-                            .onTapGesture {
-                                editPriceText = "\(Int(price))"
-                                editingPrice = true
-                            }
-                        Spacer()
-                        Text("suggested price")
-                            .font(.system(size: Typography.caption))
-                            .foregroundStyle(Color.mutedForeground)
-                    }
-                }
-
-                if let low = listing.priceRangeLow, let high = listing.priceRangeHigh {
-                    Text("Market range: $\(Int(low)) – $\(Int(high))")
-                        .font(.system(size: Typography.body))
-                        .foregroundStyle(Color.mutedForeground)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                }
-            }
-            .padding(Spacing.lg)
-            .background(Color.cardBackground)
-            .clipShape(RoundedRectangle(cornerRadius: CornerRadius.default))
-            .overlay(
-                RoundedRectangle(cornerRadius: CornerRadius.default)
-                    .stroke(Color.borderColor, lineWidth: 1)
-            )
-        }
-    }
-
-    // MARK: - Description Section
-
-    @ViewBuilder
-    private func descriptionSection(_ listing: Listing) -> some View {
-        if let description = listing.description {
-            VStack(alignment: .leading, spacing: Spacing.sm) {
-                HStack {
-                    Text("Description")
-                        .font(.system(size: Typography.sectionHeading, weight: .semibold))
-                        .foregroundStyle(Color.appForeground)
-                    Spacer()
-                    CopyButton(text: description, label: "description")
-                }
-
-                if editingDescription {
-                    VStack(alignment: .leading, spacing: Spacing.sm) {
-                        TextEditor(text: $editDescriptionText)
-                            .font(.system(size: Typography.body))
-                            .frame(minHeight: 120)
-                            .scrollContentBackground(.hidden)
-                            .editFieldStyle()
-                        editActions {
-                            await viewModel.updateField(description: editDescriptionText, token: authState.token)
-                            editingDescription = false
-                        } onCancel: {
-                            editingDescription = false
-                        }
-                    }
-                } else {
-                    Text(description)
-                        .font(.system(size: Typography.body))
-                        .foregroundStyle(Color.appForeground)
-                        .lineSpacing(4)
-                        .onTapGesture {
-                            editDescriptionText = description
-                            editingDescription = true
-                        }
-                }
-            }
         }
     }
 
@@ -407,37 +310,6 @@ struct ListingDetailView: View {
                     .lineSpacing(4)
             }
         }
-    }
-
-    // MARK: - Bottom Bar
-
-    private func bottomBar(_ listing: Listing) -> some View {
-        VStack(spacing: 0) {
-            Divider()
-            Button {
-                viewModel.copyFullListing()
-                isCopied = true
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                    isCopied = false
-                }
-            } label: {
-                HStack(spacing: Spacing.sm) {
-                    Image(systemName: isCopied ? "checkmark" : "doc.on.doc")
-                        .font(.system(size: 16))
-                    Text(isCopied ? "Copied!" : "Copy Full Listing")
-                        .font(.system(size: Typography.body, weight: .semibold))
-                }
-                .frame(maxWidth: .infinity)
-                .frame(height: Sizing.minTapTarget)
-                .background(Color.accentColor)
-                .foregroundStyle(.white)
-                .clipShape(RoundedRectangle(cornerRadius: CornerRadius.default))
-            }
-            .sensoryFeedback(.success, trigger: isCopied)
-            .padding(.horizontal, Sizing.pagePadding)
-            .padding(.vertical, Spacing.md)
-        }
-        .background(Color.appBackground.opacity(0.8))
     }
 
     // MARK: - Menu Button
@@ -484,6 +356,7 @@ struct ListingDetailView: View {
                 .foregroundStyle(Color.mutedForeground)
                 .frame(width: Sizing.minTapTarget, height: Sizing.minTapTarget)
         }
+        .accessibilityLabel("Listing actions")
     }
 
     // MARK: - Skeleton Loading
@@ -515,22 +388,6 @@ struct ListingDetailView: View {
             }
         }
         .redacted(reason: .placeholder)
-    }
-
-    // MARK: - Edit Actions Helper
-
-    private func editActions(onSave: @escaping () async -> Void, onCancel: @escaping () -> Void) -> some View {
-        HStack(spacing: Spacing.sm) {
-            Button("Save") {
-                Task { await onSave() }
-            }
-            .font(.system(size: Typography.body, weight: .medium))
-            .foregroundStyle(Color.accentColor)
-
-            Button("Cancel", action: onCancel)
-                .font(.system(size: Typography.body))
-                .foregroundStyle(Color.mutedForeground)
-        }
     }
 
     // MARK: - Load Error View

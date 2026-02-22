@@ -1,9 +1,11 @@
 import Foundation
 
-struct AgentLogEntry: Codable, Sendable {
+struct AgentLogEntry: Codable, Sendable, Identifiable {
     let ts: TimeInterval
     let type: String
     let content: String
+
+    var id: String { "\(ts)-\(type)" }
 
     var iconName: String {
         switch type {
