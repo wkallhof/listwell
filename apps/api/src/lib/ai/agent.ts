@@ -209,7 +209,12 @@ export async function runListingAgent(
   }
 
   const sandbox = await Sandbox.create("claude", {
-    envs: { ANTHROPIC_API_KEY: apiKey },
+    envs: {
+      ANTHROPIC_API_KEY: apiKey,
+      DISABLE_AUTOUPDATE: "1",
+      DO_NOT_TRACK: "1",
+      CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: "1",
+    },
     timeoutMs: SANDBOX_TIMEOUT_MS,
   });
 
@@ -281,35 +286,43 @@ export async function runListingAgent(
     });
     await flushAgentLog(listingId, agentLog);
 
-    // --- Diagnose: Claude CLI debug output ---
+    // --- Diagnose: what network calls does Claude CLI make? ---
     agentLog.push({
       ts: Date.now(),
       type: "status",
-      content: "Running Claude CLI with --debug (20s timeout)...",
+      content: "Tracing Claude CLI network calls (15s)...",
     });
     await flushAgentLog(listingId, agentLog);
 
-    const debugChunks: string[] = [];
-    const debugTest = await sandbox.commands.run(
-      'timeout 20 claude -p "Say OK" --dangerously-skip-permissions --output-format json --debug 2>&1; echo "EXIT:$?"',
-      {
-        timeoutMs: 25_000,
-        onStdout: (data) => {
-          debugChunks.push(data);
-          agentLog.push({
-            ts: Date.now(),
-            type: "status",
-            content: `[debug] ${data.trim().slice(0, 300)}`,
-          });
-          flushAgentLog(listingId, agentLog).catch(() => {});
-        },
-      },
+    await sandbox.commands.run(
+      "apt-get install -y strace >/dev/null 2>&1 || true",
+      { timeoutMs: 30_000 },
     );
-    const debugOutput = debugChunks.join("") || debugTest.stdout;
+
+    const traceResult = await sandbox.commands.run(
+      [
+        'timeout 15 strace -f -e trace=connect -o /tmp/strace.txt',
+        'claude -p "Say OK" --dangerously-skip-permissions --output-format json 2>/dev/null;',
+        'grep -a "connect(" /tmp/strace.txt | grep -v "ENOENT\\|EINPROGRESS.*unix" | tail -20',
+      ].join(" "),
+      { timeoutMs: 50_000 },
+    );
     agentLog.push({
       ts: Date.now(),
       type: "status",
-      content: `Debug test done (exit ${debugTest.exitCode}): ${debugOutput.trim().slice(-500)}`,
+      content: `Network trace: ${traceResult.stdout.trim().slice(0, 500) || "no connect calls found"}`,
+    });
+    await flushAgentLog(listingId, agentLog);
+
+    // Also check ~/.claude/ state
+    const configCheck = await sandbox.commands.run(
+      "ls -la ~/.claude/ 2>&1; echo '---'; cat ~/.claude/statsig_metadata.json 2>&1 || true",
+      { timeoutMs: 5_000 },
+    );
+    agentLog.push({
+      ts: Date.now(),
+      type: "status",
+      content: `Claude config: ${configCheck.stdout.trim().slice(0, 400)}`,
     });
     await flushAgentLog(listingId, agentLog);
 
