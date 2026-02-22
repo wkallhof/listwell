@@ -281,30 +281,37 @@ export async function runListingAgent(
     });
     await flushAgentLog(listingId, agentLog);
 
-    // --- Smoke test: can Claude CLI make any API call? ---
-    agentLog.push({
-      ts: Date.now(),
-      type: "status",
-      content: "Smoke test: verifying Claude CLI can reach Anthropic API...",
-    });
-    await flushAgentLog(listingId, agentLog);
+    // --- Diagnose: can Node.js reach the API from E2B? ---
+    const nodeTestScript = `
+const res = await fetch('https://api.anthropic.com/v1/messages', {
+  method: 'POST',
+  headers: {
+    'x-api-key': process.env.ANTHROPIC_API_KEY,
+    'anthropic-version': '2023-06-01',
+    'content-type': 'application/json',
+  },
+  body: JSON.stringify({
+    model: 'claude-sonnet-4-20250514',
+    max_tokens: 16,
+    messages: [{ role: 'user', content: 'Say OK' }],
+  }),
+});
+console.log('status:' + res.status);
+const t = await res.text();
+console.log(t.slice(0, 300));
+`;
+    await sandbox.files.write(`${SANDBOX_DIR}/api-test.mjs`, nodeTestScript);
 
-    const smokeTest = await sandbox.commands.run(
-      'claude -p "Reply with only the word OK" --dangerously-skip-permissions --output-format json --max-turns 1 2>&1',
-      { timeoutMs: 60_000 },
+    const nodeCheck = await sandbox.commands.run(
+      `node ${SANDBOX_DIR}/api-test.mjs 2>&1`,
+      { timeoutMs: 30_000 },
     );
     agentLog.push({
       ts: Date.now(),
       type: "status",
-      content: `Smoke test: exit=${smokeTest.exitCode}, stdout=${smokeTest.stdout.trim().slice(0, 300)}`,
+      content: `Node.js API test: ${nodeCheck.stdout.trim().slice(0, 400)}`,
     });
     await flushAgentLog(listingId, agentLog);
-
-    if (smokeTest.exitCode !== 0) {
-      throw new Error(
-        `Claude CLI smoke test failed (exit ${smokeTest.exitCode}): ${(smokeTest.stdout + smokeTest.stderr).slice(0, 500)}`,
-      );
-    }
 
     // --- Build runner script ---
     const runnerScript = [
