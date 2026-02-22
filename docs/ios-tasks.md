@@ -44,7 +44,7 @@
 
 ## Progress Summary
 
-- Phase 0: [ ] Not Started
+- Phase 0: [x] Complete
 - Phase 1: [ ] Not Started
 - Phase 2: [ ] Not Started
 - Phase 3: [ ] Not Started
@@ -59,132 +59,132 @@
 
 ### 0.0 Pre-flight
 
-- [ ] 0.0.1: Read CLAUDE.md and ios-plan.md, confirm understanding of project conventions and iOS architecture
-- [ ] 0.0.2: Verify no uncommitted changes in working directory
+- [x] 0.0.1: Read CLAUDE.md and ios-plan.md, confirm understanding of project conventions and iOS architecture
+- [x] 0.0.2: Verify no uncommitted changes in working directory
 
 ### 0.1 Xcode Project Setup
 
-- [ ] 0.1.1: Create Xcode project with SwiftUI lifecycle at `apps/ios/Listwell/`
+- [x] 0.1.1: Create Xcode project with SwiftUI lifecycle at `apps/ios/Listwell/`
   - Files: Listwell.xcodeproj, ListwellApp.swift, ContentView.swift
   - Configure: iOS 17+ deployment target, Swift 5.9+, bundle identifier `com.listwell.app`
   - Test: Project builds and runs in simulator
-- [ ] 0.1.2: Add Kingfisher via Swift Package Manager
+- [x] 0.1.2: Add Kingfisher via Swift Package Manager
   - Files: Listwell.xcodeproj (package dependency)
   - Package URL: `https://github.com/onevcat/Kingfisher.git`, version ~> 7.0
   - Test: `import KingfisherSwiftUI` compiles without errors
-- [ ] 0.1.3: Create folder structure per ios-plan.md project structure
+- [x] 0.1.3: Create folder structure per ios-plan.md project structure
   - Folders: Models/, Services/, ViewModels/, Views/Auth/, Views/Feed/, Views/NewListing/, Views/Detail/, Views/Enhancement/, Views/Shared/, Utilities/, Resources/
   - Test: Folders exist in Xcode project navigator
-- [ ] 0.1.4: Create unit test target `ListwellTests`
+- [x] 0.1.4: Create unit test target `ListwellTests`
   - Files: ListwellTests/ target in Xcode project
   - Test: Empty test suite runs successfully
 
 ### 0.2 Design System
 
-- [ ] 0.2.1: Create Asset Catalog color sets for all design system tokens (light + dark)
+- [x] 0.2.1: Create Asset Catalog color sets for all design system tokens (light + dark)
   - Files: Resources/Assets.xcassets/ — color sets: AccentColor, AppBackground, AppForeground, CardBackground, MutedBackground, MutedForeground, Destructive, BorderColor, SecondaryBackground, SecondaryForeground
   - Ref: `docs/ios-plan.md` § Design System Mapping, `docs/design-system.md` § Color Tokens
   - Test: All color sets defined with Both Appearances (Any + Dark)
-- [ ] 0.2.2: Create Asset Catalog color sets for status badge colors
+- [x] 0.2.2: Create Asset Catalog color sets for status badge colors
   - Files: Resources/Assets.xcassets/ — color set pairs (bg + fg): StatusProcessingBg/Fg, StatusReadyBg/Fg, StatusListedBg/Fg, StatusSoldBg/Fg, StatusErrorBg/Fg, StatusDraftBg/Fg, StatusArchivedBg/Fg
   - Ref: `docs/design-system.md` § Status Colors
   - Test: All status color sets defined with light + dark variants
-- [ ] 0.2.3: Create `Constants.swift` with typography scale, spacing, and sizing constants
+- [x] 0.2.3: Create `Constants.swift` with typography scale, spacing, and sizing constants
   - Files: Utilities/Constants.swift
   - Define: Font sizes matching web type scale (pageTitle: 24, sectionHeading: 18, cardTitle: 16, body: 14, caption: 12, priceLarge: 30), corner radii (default: 10, small: 6, image: 8), minimum tap target (44pt)
   - Ref: `docs/design-system.md` § Typography, § Spacing, § Border Radius
   - Test: Constants compile and are accessible from any view
-- [ ] 0.2.4: Create `Color` extension for convenient access to custom color tokens
+- [x] 0.2.4: Create `Color` extension for convenient access to custom color tokens
   - Files: Utilities/Constants.swift (extend)
   - Define: `Color.appBackground`, `Color.appForeground`, `Color.cardBackground`, `Color.mutedBackground`, `Color.mutedForeground`, `Color.destructive`, `Color.borderColor`
   - Test: `Color.appBackground` resolves correctly in SwiftUI preview
 
 ### 0.3 Networking Foundation
 
-- [ ] 0.3.1: Create `APIClient` actor with URLSession, base URL configuration, and JSON encoding/decoding
+- [x] 0.3.1: Create `APIClient` actor with URLSession, base URL configuration, and JSON encoding/decoding
   - Files: Services/APIClient.swift
   - Implement: `actor APIClient` with shared singleton, configurable base URL, JSONEncoder/JSONDecoder with iso8601 date strategy
   - Test: APIClient initializes without errors
-- [ ] 0.3.2: Add generic request method to APIClient with bearer token injection
+- [x] 0.3.2: Add generic request method to APIClient with bearer token injection
   - Files: Services/APIClient.swift
   - Implement: `func request<T: Decodable>(_ method: HTTPMethod, path: String, body: Encodable?, token: String?) async throws -> T`
   - Define: `HTTPMethod` enum (get, post, patch, delete), `APIError` enum (invalidResponse, httpError, decodingError, unauthorized)
   - Test: Request builds correct URLRequest with method, headers, body, and Authorization header
-- [ ] 0.3.3: Add empty-response request method and raw data request method to APIClient
+- [x] 0.3.3: Add empty-response request method and raw data request method to APIClient
   - Files: Services/APIClient.swift
   - Implement: `func requestVoid(...)` for DELETE endpoints returning `{ success: true }`, `func requestData(...)` for raw data responses
   - Test: Void request handles 200 response without decoding body
-- [ ] 0.3.4: Write tests for APIClient (request building, error handling, token injection)
+- [x] 0.3.4: Write tests for APIClient (request building, error handling, token injection)
   - Files: ListwellTests/Services/APIClientTests.swift
   - Test: Tests pass with ≥80% coverage using URLProtocol mock
 
 ### 0.4 Secure Storage
 
-- [ ] 0.4.1: Create `KeychainManager` enum with save, retrieve, and delete operations
+- [x] 0.4.1: Create `KeychainManager` enum with save, retrieve, and delete operations
   - Files: Services/KeychainManager.swift
   - Implement: `save(token:forKey:)`, `retrieve(forKey:) -> String?`, `delete(forKey:)` using Security framework
   - Use `kSecAttrAccessibleWhenUnlocked` for token accessibility
   - Define: `KeychainError` enum (duplicateItem, itemNotFound, unexpectedStatus)
   - Test: Can save, retrieve, and delete a test token
-- [ ] 0.4.2: Write tests for KeychainManager
+- [x] 0.4.2: Write tests for KeychainManager
   - Files: ListwellTests/Services/KeychainManagerTests.swift
   - Test: Save + retrieve returns same value, delete removes item, retrieve on missing key returns nil
 
 ### 0.5 Data Models
 
-- [ ] 0.5.1: Create `ListingStatus` and `PipelineStep` enums with Codable conformance
+- [x] 0.5.1: Create `ListingStatus` and `PipelineStep` enums with Codable conformance
   - Files: Models/Enums.swift
   - ListingStatus cases: draft, processing, ready, listed, sold, archived
   - PipelineStep cases: pending, analyzing, researching, generating, complete, error
   - ImageType cases: original, enhanced
   - Use `String` raw values matching API uppercase format (e.g., "DRAFT", "PROCESSING")
   - Test: Decoding from JSON string "PROCESSING" produces `.processing`
-- [ ] 0.5.2: Create `Listing` Codable model matching API response shape
+- [x] 0.5.2: Create `Listing` Codable model matching API response shape
   - Files: Models/Listing.swift
   - Fields: id, userId, rawDescription?, title?, description?, suggestedPrice?, priceRangeLow?, priceRangeHigh?, category?, condition?, brand?, model?, researchNotes?, comparables?, status, pipelineStep, pipelineError?, agentLog?, inngestRunId?, createdAt, updatedAt, images?
   - Test: Decodes from sample JSON matching GET /listings/:id response
-- [ ] 0.5.3: Create `ListingImage` Codable model
+- [x] 0.5.3: Create `ListingImage` Codable model
   - Files: Models/ListingImage.swift
   - Fields: id, listingId, type (ImageType), blobUrl, blobKey, parentImageId?, sortOrder, isPrimary, geminiPrompt?, createdAt
   - Test: Decodes from sample JSON
-- [ ] 0.5.4: Create `Comparable` and `AgentLogEntry` Codable models
+- [x] 0.5.4: Create `Comparable` and `AgentLogEntry` Codable models
   - Files: Models/Comparable.swift, Models/AgentLogEntry.swift
   - Comparable fields: title, price, source, url?, condition?, soldDate?
   - AgentLogEntry fields: ts (TimeInterval), type (String), content (String)
   - Test: Both decode from sample JSON
-- [ ] 0.5.5: Create `User` Codable model for auth responses
+- [x] 0.5.5: Create `User` Codable model for auth responses
   - Files: Models/User.swift
   - Fields: id, name, email, createdAt, updatedAt
   - Test: Decodes from BetterAuth session response JSON
-- [ ] 0.5.6: Create request/response DTOs for API interactions
+- [x] 0.5.6: Create request/response DTOs for API interactions
   - Files: Models/APIModels.swift
   - Define: `CreateListingRequest` (description?, images: [ImageRef]), `ImageRef` (key, url, filename), `PresignRequest` (files: [FileInfo]), `FileInfo` (filename, contentType), `PresignResponse` (uploads: [PresignedUpload]), `PresignedUpload` (presignedUrl, key, publicUrl), `PatchListingRequest` (title?, description?, suggestedPrice?, status?, retry?), `EnhanceRequest` (imageId), `AuthRequest` (email, password, name?), `AuthResponse` (session, token, user)
   - Test: All DTOs encode/decode correctly
-- [ ] 0.5.7: Write comprehensive tests for all data models
+- [x] 0.5.7: Write comprehensive tests for all data models
   - Files: ListwellTests/Models/ModelDecodingTests.swift
   - Test: Tests pass with ≥80% coverage, including edge cases (null optionals, empty arrays, unknown enum values)
 
 ### 0.6 Utilities
 
-- [ ] 0.6.1: Create `ListingFormatter` with `formatForClipboard` function
+- [x] 0.6.1: Create `ListingFormatter` with `formatForClipboard` function
   - Files: Utilities/ListingFormatter.swift
   - Implement: Matches web `formatListingForClipboard` output — "Title - $Price\n\nDescription\n\nCondition: X | Brand: Y | Model: Z"
   - Test: Formatted output matches expected string for sample listing
-- [ ] 0.6.2: Create `TimeAgo` utility for relative date formatting
+- [x] 0.6.2: Create `TimeAgo` utility for relative date formatting
   - Files: Utilities/TimeAgo.swift
   - Implement: Uses `RelativeDateTimeFormatter` for "2 hours ago", "3 days ago" etc.
   - Test: Produces expected relative strings for various date offsets
 
 **Phase 0 Checkpoint:**
 
-- [ ] Xcode project builds and runs in simulator (iOS 17+)
-- [ ] All design system color tokens mapped to Asset Catalog (light + dark)
-- [ ] APIClient actor compiles with URLSession + bearer token injection
-- [ ] KeychainManager saves/retrieves/deletes tokens
-- [ ] All Codable models decode from sample API JSON
-- [ ] ListingFormatter produces correct clipboard output
-- [ ] Test target runs successfully with ≥80% coverage on Phase 0 code
-- [ ] Commit: "chore(ios): complete project foundation (Phase 0)"
+- [x] Xcode project builds and runs in simulator (iOS 17+)
+- [x] All design system color tokens mapped to Asset Catalog (light + dark)
+- [x] APIClient actor compiles with URLSession + bearer token injection
+- [x] KeychainManager saves/retrieves/deletes tokens
+- [x] All Codable models decode from sample API JSON
+- [x] ListingFormatter produces correct clipboard output
+- [x] Test target runs successfully with ≥80% coverage on Phase 0 code
+- [x] Commit: "chore(ios): complete project foundation (Phase 0)"
 
 ---
 
@@ -727,31 +727,31 @@
 
 | Task  | Completed | Commit | Notes |
 | ----- | --------- | ------ | ----- |
-| 0.0.1 |           |        |       |
-| 0.0.2 |           |        |       |
-| 0.1.1 |           |        |       |
-| 0.1.2 |           |        |       |
-| 0.1.3 |           |        |       |
-| 0.1.4 |           |        |       |
-| 0.2.1 |           |        |       |
-| 0.2.2 |           |        |       |
-| 0.2.3 |           |        |       |
-| 0.2.4 |           |        |       |
-| 0.3.1 |           |        |       |
-| 0.3.2 |           |        |       |
-| 0.3.3 |           |        |       |
-| 0.3.4 |           |        |       |
-| 0.4.1 |           |        |       |
-| 0.4.2 |           |        |       |
-| 0.5.1 |           |        |       |
-| 0.5.2 |           |        |       |
-| 0.5.3 |           |        |       |
-| 0.5.4 |           |        |       |
-| 0.5.5 |           |        |       |
-| 0.5.6 |           |        |       |
-| 0.5.7 |           |        |       |
-| 0.6.1 |           |        |       |
-| 0.6.2 |           |        |       |
+| 0.0.1 | 2026-02-21 | 9d80519 | Pre-flight check |
+| 0.0.2 | 2026-02-21 | 9d80519 | Clean working directory |
+| 0.1.1 | 2026-02-21 | 9d80519 | Xcode project via XcodeGen |
+| 0.1.2 | 2026-02-21 | 9d80519 | Kingfisher ~> 7.0 |
+| 0.1.3 | 2026-02-21 | 9d80519 | Full folder structure |
+| 0.1.4 | 2026-02-21 | 9d80519 | ListwellTests target |
+| 0.2.1 | 2026-02-21 | 9d80519 | 10 base color sets (light+dark) |
+| 0.2.2 | 2026-02-21 | 9d80519 | 14 status color sets (7 bg+fg pairs) |
+| 0.2.3 | 2026-02-21 | 9d80519 | Typography, spacing, sizing constants |
+| 0.2.4 | 2026-02-21 | 9d80519 | Color extension with status helpers |
+| 0.3.1 | 2026-02-21 | 9d80519 | APIClient actor with URLSession |
+| 0.3.2 | 2026-02-21 | 9d80519 | Generic request + bearer token |
+| 0.3.3 | 2026-02-21 | 9d80519 | requestVoid + requestData methods |
+| 0.3.4 | 2026-02-21 | 9d80519 | 10 APIClient tests with MockURLProtocol |
+| 0.4.1 | 2026-02-21 | 9d80519 | KeychainManager with Security framework |
+| 0.4.2 | 2026-02-21 | 9d80519 | 5 KeychainManager tests |
+| 0.5.1 | 2026-02-21 | 9d80519 | ListingStatus, PipelineStep, ImageType enums |
+| 0.5.2 | 2026-02-21 | 9d80519 | Listing Codable model |
+| 0.5.3 | 2026-02-21 | 9d80519 | ListingImage Codable model |
+| 0.5.4 | 2026-02-21 | 9d80519 | Comparable + AgentLogEntry models |
+| 0.5.5 | 2026-02-21 | 9d80519 | User Codable model |
+| 0.5.6 | 2026-02-21 | 9d80519 | All request/response DTOs |
+| 0.5.7 | 2026-02-21 | 9d80519 | 25 model decoding tests |
+| 0.6.1 | 2026-02-21 | 9d80519 | ListingFormatter (6 tests) |
+| 0.6.2 | 2026-02-21 | 9d80519 | TimeAgo utility (5 tests) |
 | 1.1.1 |           |        |       |
 | 1.1.2 |           |        |       |
 | 1.1.3 |           |        |       |
