@@ -306,31 +306,31 @@
 
 ### 2.3 Shared Components
 
-- [ ] 2.3.1: Build `ListingStatusBadge` view with status-specific colors and optional icon
+- [x] 2.3.1: Build `ListingStatusBadge` view with status-specific colors and optional icon
   - Files: Views/Shared/ListingStatusBadge.swift
   - Implement: Takes `ListingStatus`, renders rounded capsule with status color bg/fg from Asset Catalog. PROCESSING shows `ProgressView` inline, ERROR shows `exclamationmark.circle.fill`
   - Ref: `docs/screens.md` § ListingStatusBadge, `docs/design-system.md` § Status Colors
   - Test: Renders correct colors for each of 7 statuses
-- [ ] 2.3.2: Build `CopyButton` view with clipboard, haptic, and visual feedback
+- [x] 2.3.2: Build `CopyButton` view with clipboard, haptic, and visual feedback
   - Files: Views/Shared/CopyButton.swift
   - Implement: Button with `doc.on.doc` icon, on tap: copy text to `UIPasteboard.general.string`, swap icon to `checkmark` for 2s, trigger `.sensoryFeedback(.success)`
   - Ref: `docs/screens.md` § CopyButton
   - Test: Tap copies text to pasteboard, icon toggles
-- [ ] 2.3.3: Build `EmptyStateView` with icon, title, and description
+- [x] 2.3.3: Build `EmptyStateView` with icon, title, and description
   - Files: Views/Shared/EmptyStateView.swift
   - Implement: Centered VStack with SF Symbol icon (48pt, muted), title text, description text
   - Ref: `docs/screens.md` § EmptyState
   - Test: Renders icon, title, and description
-- [ ] 2.3.4: Build `FABButton` (Floating Action Button) view
+- [x] 2.3.4: Build `FABButton` (Floating Action Button) view
   - Files: Views/Shared/FABButton.swift
   - Implement: Circle button (56pt), accent color, `plus` SF Symbol (24pt), positioned bottom-trailing with padding. Scale-down animation on press.
   - Ref: `docs/screens.md` § FAB, `docs/design-system.md` § Floating Action Button
   - Test: Renders at bottom-right, tap triggers action
-- [ ] 2.3.5: Build `CameraView` UIViewControllerRepresentable for camera capture
+- [x] 2.3.5: Build `CameraView` UIViewControllerRepresentable for camera capture
   - Files: Views/Shared/CameraView.swift
   - Implement: Wraps `UIImagePickerController` with `.camera` source type, returns captured `UIImage` via binding, handles cancel
   - Test: Representable creates UIImagePickerController with camera source
-- [ ] 2.3.6: Write tests for all shared components
+- [x] 2.3.6: Write tests for all shared components
   - Files: ListwellTests/Views/SharedComponentTests.swift
   - Test: Tests pass with ≥80% coverage
 
@@ -772,12 +772,12 @@
 | 2.2.2 | 2026-02-22 | (batch) | uploadImage PUT to presigned URL |
 | 2.2.3 | 2026-02-22 | (batch) | uploadImages full flow + compression |
 | 2.2.4 | 2026-02-22 | (batch) | 9 ImageUploadService tests |
-| 2.3.1 |           |        |       |
-| 2.3.2 |           |        |       |
-| 2.3.3 |           |        |       |
-| 2.3.4 |           |        |       |
-| 2.3.5 |           |        |       |
-| 2.3.6 |           |        |       |
+| 2.3.1 | 2026-02-22 | (batch) | ListingStatusBadge w/ 7 statuses |
+| 2.3.2 | 2026-02-22 | (batch) | CopyButton w/ clipboard + haptic |
+| 2.3.3 | 2026-02-22 | (batch) | EmptyStateView centered placeholder |
+| 2.3.4 | 2026-02-22 | (batch) | FABButton 56pt circle + scale anim |
+| 2.3.5 | 2026-02-22 | (batch) | CameraView UIImagePickerController |
+| 2.3.6 | 2026-02-22 | (batch) | 13 shared component tests |
 | 2.4.1 |           |        |       |
 | 2.4.2 |           |        |       |
 | 2.4.3 |           |        |       |
