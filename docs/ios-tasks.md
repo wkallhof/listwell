@@ -336,31 +336,31 @@
 
 ### 2.4 Feed Screen
 
-- [ ] 2.4.1: Create `FeedViewModel` observable for feed data management
+- [x] 2.4.1: Create `FeedViewModel` observable for feed data management
   - Files: ViewModels/FeedViewModel.swift
   - Implement: `@Observable @MainActor final class FeedViewModel` — properties: `listings: [Listing]`, `isLoading`, `errorMessage`, methods: `func loadListings()`, `func refresh()`
   - Uses AuthState token for API calls
   - Test: loadListings fetches and stores listings
-- [ ] 2.4.2: Build `ListingCardView` for feed display
+- [x] 2.4.2: Build `ListingCardView` for feed display
   - Files: Views/Feed/ListingCardView.swift
   - Implement: HStack with thumbnail (80x80, rounded, Kingfisher for async loading), VStack with title (or "Processing..." italic when processing), status badge, price (if ready+), pipeline step text + spinner (if processing), relative time
   - Ref: `docs/screens.md` § ListingCard Component
   - Test: Renders all states — processing with spinner, ready with price, sold with badge
-- [ ] 2.4.3: Build `FeedView` with listings list, empty state, and FAB
+- [x] 2.4.3: Build `FeedView` with listings list, empty state, and FAB
   - Files: Views/Feed/FeedView.swift
   - Implement: NavigationStack root, ScrollView with LazyVStack of ListingCardViews, EmptyStateView when no listings ("No listings yet" + "Tap + to create your first one"), FAB overlay, `.refreshable` for pull-to-refresh, `.task` for initial load
   - Ref: `docs/screens.md` § Screen 2: Listings Feed
   - Test: Shows listings, shows empty state, FAB visible
-- [ ] 2.4.4: Add header with title and overflow menu to FeedView
+- [x] 2.4.4: Add header with title and overflow menu to FeedView
   - Files: Views/Feed/FeedView.swift
   - Implement: HStack with "Your Listings" title (text-2xl bold), Menu with "Log out" item (calls authState.logout())
   - Ref: `docs/screens.md` § Screen 2: header
   - Test: Title renders, logout menu item works
-- [ ] 2.4.5: Add navigation from feed cards to listing detail
+- [x] 2.4.5: Add navigation from feed cards to listing detail
   - Files: Views/Feed/FeedView.swift
   - Implement: `NavigationLink` or `.navigationDestination` — tap card navigates to `ListingDetailView(listingId:)`
   - Test: Tap card pushes detail view
-- [ ] 2.4.6: Write tests for FeedView and FeedViewModel
+- [x] 2.4.6: Write tests for FeedView and FeedViewModel
   - Files: ListwellTests/Views/FeedViewTests.swift, ListwellTests/ViewModels/FeedViewModelTests.swift
   - Test: Tests pass with ≥80% coverage
 
@@ -778,12 +778,12 @@
 | 2.3.4 | 2026-02-22 | (batch) | FABButton 56pt circle + scale anim |
 | 2.3.5 | 2026-02-22 | (batch) | CameraView UIImagePickerController |
 | 2.3.6 | 2026-02-22 | (batch) | 13 shared component tests |
-| 2.4.1 |           |        |       |
-| 2.4.2 |           |        |       |
-| 2.4.3 |           |        |       |
-| 2.4.4 |           |        |       |
-| 2.4.5 |           |        |       |
-| 2.4.6 |           |        |       |
+| 2.4.1 | 2026-02-22 | (batch) | FeedViewModel w/ protocol mock |
+| 2.4.2 | 2026-02-22 | (batch) | ListingCardView w/ Kingfisher + states |
+| 2.4.3 | 2026-02-22 | (batch) | FeedView w/ empty state + FAB + pull-to-refresh |
+| 2.4.4 | 2026-02-22 | (batch) | Header + overflow menu + logout |
+| 2.4.5 | 2026-02-22 | (batch) | NavigationPath + navigationDestination |
+| 2.4.6 | 2026-02-22 | (batch) | 12 feed tests (6 ViewModel + 6 View) |
 | 2.5.1 |           |        |       |
 | 2.5.2 |           |        |       |
 | 2.5.3 |           |        |       |

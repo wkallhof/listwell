@@ -30,28 +30,11 @@ struct ContentView: View {
     }
 }
 
-// MARK: - Placeholder MainView (will be replaced in Phase 2)
+// MARK: - Main View (Authenticated)
 
 struct MainView: View {
-    @Environment(AuthState.self) private var authState
-
     var body: some View {
-        VStack(spacing: Spacing.lg) {
-            Text("Your Listings")
-                .font(.system(size: Typography.pageTitle, weight: .bold))
-
-            Text("Welcome, \(authState.currentUser?.name ?? "User")")
-                .foregroundStyle(Color.mutedForeground)
-
-            Button("Log out") {
-                Task {
-                    await authState.logout()
-                }
-            }
-            .foregroundStyle(Color.destructive)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.appBackground)
+        FeedView()
     }
 }
 
