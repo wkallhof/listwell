@@ -244,6 +244,7 @@ export async function runListingAgent(
     let errorMessage = "";
     let stdoutBuffer = "";
     const stderrChunks: string[] = [];
+    let onStdoutCallCount = 0;
 
     function processLine(line: string): void {
       const trimmed = line.trim();
@@ -254,6 +255,7 @@ export async function runListingAgent(
       try {
         const parsed = JSON.parse(trimmed) as {
           type?: string;
+          subtype?: string;
           message?: { content?: ContentBlock[] };
           is_error?: boolean;
           errors?: string[];
@@ -289,9 +291,17 @@ export async function runListingAgent(
       }
     }
 
+    agentLog.push({
+      ts: Date.now(),
+      type: "status",
+      content: "Running Claude agent in sandbox...",
+    });
+    await flushAgentLog(listingId, agentLog);
+
     const proc = await sandbox.commands.run(cliCommand, {
       cwd: SANDBOX_DIR,
       onStdout: (data) => {
+        onStdoutCallCount++;
         stdoutBuffer += data;
         const lines = stdoutBuffer.split("\n");
         stdoutBuffer = lines.pop() ?? "";
@@ -310,8 +320,30 @@ export async function runListingAgent(
       processLine(stdoutBuffer);
     }
 
+    // Diagnostic: log what we received
+    const stderr = stderrChunks.join("");
+    agentLog.push({
+      ts: Date.now(),
+      type: "status",
+      content: [
+        `CLI exited code=${proc.exitCode}`,
+        `onStdout called ${onStdoutCallCount}x`,
+        `transcript lines=${rawTranscript.length}`,
+        `proc.stdout length=${proc.stdout.length}`,
+        `stderr length=${stderr.length}`,
+        stderr.length > 0 ? `stderr preview: ${stderr.slice(0, 200)}` : "",
+      ].filter(Boolean).join(", "),
+    });
+    await flushAgentLog(listingId, agentLog);
+
+    // If onStdout never fired but proc.stdout has data, process it now
+    if (onStdoutCallCount === 0 && proc.stdout.length > 0) {
+      for (const line of proc.stdout.split("\n")) {
+        processLine(line);
+      }
+    }
+
     if (proc.exitCode !== 0 || hasError) {
-      const stderr = stderrChunks.join("");
       const detail = hasError ? errorMessage : stderr || `exit code ${proc.exitCode}`;
       throw new Error(`Claude CLI failed: ${detail}`);
     }
