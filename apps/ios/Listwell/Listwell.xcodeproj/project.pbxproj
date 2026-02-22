@@ -1,0 +1,652 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		08F41DFF8D39584C5B1B4AD0 /* APIModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54612F11132171C09C05608D /* APIModels.swift */; };
+		174BFF9F1A81A4B009899048 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 448BB569502FA7F5E363C5A8 /* Kingfisher */; };
+		24E8066DFF620B79A9BAF21F /* ListingFormatterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 122843332F2933508D6AAF68 /* ListingFormatterTests.swift */; };
+		27AB61AC3DDE04436DEFCE5F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 396CBA4552671D80BD8381D6 /* Assets.xcassets */; };
+		2BA9E45AF87C377076D082DD /* APIClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5FB0633F3FFF8C30AB3992 /* APIClientTests.swift */; };
+		30FA2E2D1A96487BFE2F81B7 /* TimeAgo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 074A374C42874E4BCBAFC080 /* TimeAgo.swift */; };
+		42F86AF78F6EBF54E2CBFF7F /* KeychainManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83FA06B45AF55FFDAE8EEB45 /* KeychainManagerTests.swift */; };
+		50D5280832FE6B94FC9DA21E /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFE6936882B2EAA70F62EDE9 /* Constants.swift */; };
+		5E20FAD9B65430C50C8D12D5 /* Comparable.swift in Sources */ = {isa = PBXBuildFile; fileRef = F17CCF7A328A3E452B6E177E /* Comparable.swift */; };
+		64BD2D49BB83B57A5EF445EF /* TimeAgoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6A0C6315C6951DDE7E574CF /* TimeAgoTests.swift */; };
+		705D19EC5E46DE54CF4A262F /* ListwellApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BBED54F4A289C69B75B494C /* ListwellApp.swift */; };
+		89C08CF98EDFF106B7435421 /* AgentLogEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B4B056BB0BF49854AB2EB2A /* AgentLogEntry.swift */; };
+		8BA9CFB948F1CAAE0B554796 /* ListingImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AC6EAF81A6CF9A984377A6D /* ListingImage.swift */; };
+		AF7731589EE66F0460BFBAFA /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B3C846BBF90DD6B98F13364 /* APIClient.swift */; };
+		BFF264AFC30DFB8BBC84B1B6 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2BEE564EC271DD9F196C2BD /* ContentView.swift */; };
+		C0140D811ED340007C81AE0A /* Enums.swift in Sources */ = {isa = PBXBuildFile; fileRef = 051E5B357100E32357ED4AC2 /* Enums.swift */; };
+		C4EC2E37482BD32773B9F9C1 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1F7FF75DFAA1D5E9C503DC5 /* User.swift */; };
+		CCC648FB6D3B0A8E461F38B6 /* KeychainManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 173182EE1F48FEBA7C2BE055 /* KeychainManager.swift */; };
+		DDF46B04C937DDCADCCEE648 /* ListingFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DCB3C9A8F92A36F256EA3C5 /* ListingFormatter.swift */; };
+		F519C4C75C55212823D2AE2A /* Listing.swift in Sources */ = {isa = PBXBuildFile; fileRef = E47391DD4597DB29F9F9B55F /* Listing.swift */; };
+		F70B9BAF77FF53084A45E19D /* ModelDecodingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D07080CB631239BB306A8903 /* ModelDecodingTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		ACF38E615A74216A3A741516 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1AFA296E33A81293081C2C4D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DF70CD2D22E82CC202D42B63;
+			remoteInfo = Listwell;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		051E5B357100E32357ED4AC2 /* Enums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enums.swift; sourceTree = "<group>"; };
+		074A374C42874E4BCBAFC080 /* TimeAgo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeAgo.swift; sourceTree = "<group>"; };
+		0BBED54F4A289C69B75B494C /* ListwellApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListwellApp.swift; sourceTree = "<group>"; };
+		0C0D667152928041E16BE35A /* ListwellTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = ListwellTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		122843332F2933508D6AAF68 /* ListingFormatterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListingFormatterTests.swift; sourceTree = "<group>"; };
+		173182EE1F48FEBA7C2BE055 /* KeychainManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainManager.swift; sourceTree = "<group>"; };
+		1AC6EAF81A6CF9A984377A6D /* ListingImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListingImage.swift; sourceTree = "<group>"; };
+		2486EBB83BB928B1C6F866AA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		2DCB3C9A8F92A36F256EA3C5 /* ListingFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListingFormatter.swift; sourceTree = "<group>"; };
+		396CBA4552671D80BD8381D6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		3B4B056BB0BF49854AB2EB2A /* AgentLogEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentLogEntry.swift; sourceTree = "<group>"; };
+		54612F11132171C09C05608D /* APIModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIModels.swift; sourceTree = "<group>"; };
+		6D5FB0633F3FFF8C30AB3992 /* APIClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClientTests.swift; sourceTree = "<group>"; };
+		83FA06B45AF55FFDAE8EEB45 /* KeychainManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainManagerTests.swift; sourceTree = "<group>"; };
+		9B3C846BBF90DD6B98F13364 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		9EAB2817E001FB0D7DDF3951 /* Listwell.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Listwell.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A2BEE564EC271DD9F196C2BD /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		A6A0C6315C6951DDE7E574CF /* TimeAgoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeAgoTests.swift; sourceTree = "<group>"; };
+		D07080CB631239BB306A8903 /* ModelDecodingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelDecodingTests.swift; sourceTree = "<group>"; };
+		E47391DD4597DB29F9F9B55F /* Listing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Listing.swift; sourceTree = "<group>"; };
+		EFE6936882B2EAA70F62EDE9 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		F17CCF7A328A3E452B6E177E /* Comparable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Comparable.swift; sourceTree = "<group>"; };
+		F1F7FF75DFAA1D5E9C503DC5 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		391D63B874913E12220D5B87 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				174BFF9F1A81A4B009899048 /* Kingfisher in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0962084090ECF89F62D0BB74 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				D07080CB631239BB306A8903 /* ModelDecodingTests.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		158A876C35FB53B24268AF9E /* Detail */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Detail;
+			sourceTree = "<group>";
+		};
+		26E578D0F728ADD0484BA15F /* Feed */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Feed;
+			sourceTree = "<group>";
+		};
+		35FADB861DAEC5415B3D1959 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				3B4B056BB0BF49854AB2EB2A /* AgentLogEntry.swift */,
+				54612F11132171C09C05608D /* APIModels.swift */,
+				F17CCF7A328A3E452B6E177E /* Comparable.swift */,
+				051E5B357100E32357ED4AC2 /* Enums.swift */,
+				E47391DD4597DB29F9F9B55F /* Listing.swift */,
+				1AC6EAF81A6CF9A984377A6D /* ListingImage.swift */,
+				F1F7FF75DFAA1D5E9C503DC5 /* User.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		3C1E6E0F3A29B917E3B15D9F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				9EAB2817E001FB0D7DDF3951 /* Listwell.app */,
+				0C0D667152928041E16BE35A /* ListwellTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		44F822219BFDC94E15DA85A6 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				122843332F2933508D6AAF68 /* ListingFormatterTests.swift */,
+				A6A0C6315C6951DDE7E574CF /* TimeAgoTests.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		6462BEB45D3C342AA6403127 /* ListwellTests */ = {
+			isa = PBXGroup;
+			children = (
+				0962084090ECF89F62D0BB74 /* Models */,
+				9CE012DFAF186F25E6E76F99 /* Services */,
+				44F822219BFDC94E15DA85A6 /* Utilities */,
+				ACD62A7AB633A3AE35C2512B /* ViewModels */,
+			);
+			path = ListwellTests;
+			sourceTree = "<group>";
+		};
+		83434BE10A6D31AC51C56513 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				9B3C846BBF90DD6B98F13364 /* APIClient.swift */,
+				173182EE1F48FEBA7C2BE055 /* KeychainManager.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		8BCD3701206059E13320D109 /* NewListing */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = NewListing;
+			sourceTree = "<group>";
+		};
+		8EE49D49C6BDACD87704FE06 = {
+			isa = PBXGroup;
+			children = (
+				C3F85CBF790ED060C3AA6850 /* Listwell */,
+				6462BEB45D3C342AA6403127 /* ListwellTests */,
+				3C1E6E0F3A29B917E3B15D9F /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		91C1618AF4C7B4B793F9A001 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				396CBA4552671D80BD8381D6 /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		95F3844220ACCAE606753C32 /* Enhancement */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Enhancement;
+			sourceTree = "<group>";
+		};
+		9CE012DFAF186F25E6E76F99 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				6D5FB0633F3FFF8C30AB3992 /* APIClientTests.swift */,
+				83FA06B45AF55FFDAE8EEB45 /* KeychainManagerTests.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		ACD62A7AB633A3AE35C2512B /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		AF6CC6933951F8D0B104E2DE /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				EFE6936882B2EAA70F62EDE9 /* Constants.swift */,
+				2DCB3C9A8F92A36F256EA3C5 /* ListingFormatter.swift */,
+				074A374C42874E4BCBAFC080 /* TimeAgo.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		C3F85CBF790ED060C3AA6850 /* Listwell */ = {
+			isa = PBXGroup;
+			children = (
+				A2BEE564EC271DD9F196C2BD /* ContentView.swift */,
+				2486EBB83BB928B1C6F866AA /* Info.plist */,
+				0BBED54F4A289C69B75B494C /* ListwellApp.swift */,
+				35FADB861DAEC5415B3D1959 /* Models */,
+				91C1618AF4C7B4B793F9A001 /* Resources */,
+				83434BE10A6D31AC51C56513 /* Services */,
+				AF6CC6933951F8D0B104E2DE /* Utilities */,
+				F14E12944911D40E3EA49274 /* ViewModels */,
+				D420D4A8C966435D2FA570FB /* Views */,
+			);
+			path = Listwell;
+			sourceTree = "<group>";
+		};
+		C443DE590D569F5FD6B6D0F7 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		C795ABD0F5EC2584C922D482 /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Auth;
+			sourceTree = "<group>";
+		};
+		D420D4A8C966435D2FA570FB /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				C795ABD0F5EC2584C922D482 /* Auth */,
+				158A876C35FB53B24268AF9E /* Detail */,
+				95F3844220ACCAE606753C32 /* Enhancement */,
+				26E578D0F728ADD0484BA15F /* Feed */,
+				8BCD3701206059E13320D109 /* NewListing */,
+				C443DE590D569F5FD6B6D0F7 /* Shared */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		F14E12944911D40E3EA49274 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		29B54617D0D829C487F6EF98 /* ListwellTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8B5ABB31CC49C5DFCF0D9408 /* Build configuration list for PBXNativeTarget "ListwellTests" */;
+			buildPhases = (
+				A07137094ECB442C52731F8A /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3BF0849F8894B5BD7B585F51 /* PBXTargetDependency */,
+			);
+			name = ListwellTests;
+			packageProductDependencies = (
+			);
+			productName = ListwellTests;
+			productReference = 0C0D667152928041E16BE35A /* ListwellTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		DF70CD2D22E82CC202D42B63 /* Listwell */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EC714742C8EF9761C3FB6926 /* Build configuration list for PBXNativeTarget "Listwell" */;
+			buildPhases = (
+				BCC420C8E1D1687DC1244734 /* Sources */,
+				3DFB4680491F256B7902B305 /* Resources */,
+				391D63B874913E12220D5B87 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Listwell;
+			packageProductDependencies = (
+				448BB569502FA7F5E363C5A8 /* Kingfisher */,
+			);
+			productName = Listwell;
+			productReference = 9EAB2817E001FB0D7DDF3951 /* Listwell.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		1AFA296E33A81293081C2C4D /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					DF70CD2D22E82CC202D42B63 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 195D5D8592B9E23610C2301E /* Build configuration list for PBXProject "Listwell" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 8EE49D49C6BDACD87704FE06;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				BE914173099417541AA10FF9 /* XCRemoteSwiftPackageReference "Kingfisher" */,
+			);
+			preferredProjectObjectVersion = 77;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				DF70CD2D22E82CC202D42B63 /* Listwell */,
+				29B54617D0D829C487F6EF98 /* ListwellTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		3DFB4680491F256B7902B305 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				27AB61AC3DDE04436DEFCE5F /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A07137094ECB442C52731F8A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2BA9E45AF87C377076D082DD /* APIClientTests.swift in Sources */,
+				42F86AF78F6EBF54E2CBFF7F /* KeychainManagerTests.swift in Sources */,
+				24E8066DFF620B79A9BAF21F /* ListingFormatterTests.swift in Sources */,
+				F70B9BAF77FF53084A45E19D /* ModelDecodingTests.swift in Sources */,
+				64BD2D49BB83B57A5EF445EF /* TimeAgoTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BCC420C8E1D1687DC1244734 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AF7731589EE66F0460BFBAFA /* APIClient.swift in Sources */,
+				08F41DFF8D39584C5B1B4AD0 /* APIModels.swift in Sources */,
+				89C08CF98EDFF106B7435421 /* AgentLogEntry.swift in Sources */,
+				5E20FAD9B65430C50C8D12D5 /* Comparable.swift in Sources */,
+				50D5280832FE6B94FC9DA21E /* Constants.swift in Sources */,
+				BFF264AFC30DFB8BBC84B1B6 /* ContentView.swift in Sources */,
+				C0140D811ED340007C81AE0A /* Enums.swift in Sources */,
+				CCC648FB6D3B0A8E461F38B6 /* KeychainManager.swift in Sources */,
+				F519C4C75C55212823D2AE2A /* Listing.swift in Sources */,
+				DDF46B04C937DDCADCCEE648 /* ListingFormatter.swift in Sources */,
+				8BA9CFB948F1CAAE0B554796 /* ListingImage.swift in Sources */,
+				705D19EC5E46DE54CF4A262F /* ListwellApp.swift in Sources */,
+				30FA2E2D1A96487BFE2F81B7 /* TimeAgo.swift in Sources */,
+				C4EC2E37482BD32773B9F9C1 /* User.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		3BF0849F8894B5BD7B585F51 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DF70CD2D22E82CC202D42B63 /* Listwell */;
+			targetProxy = ACF38E615A74216A3A741516 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		093A89B27F8543350E3A8FA0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				INFOPLIST_FILE = Listwell/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.listwell.app;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		1613AF6830FDFE67984945C8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.listwell.ListwellTests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Listwell.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Listwell";
+			};
+			name = Debug;
+		};
+		2387363BF606481BAB5056A6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		57A3E36DCBA4E12BEA24FB5C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.listwell.ListwellTests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Listwell.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Listwell";
+			};
+			name = Release;
+		};
+		59D9FE938E690A2ACEE0DDA3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				INFOPLIST_FILE = Listwell/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.listwell.app;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		FAB81161765B89EC90C4392C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		195D5D8592B9E23610C2301E /* Build configuration list for PBXProject "Listwell" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2387363BF606481BAB5056A6 /* Debug */,
+				FAB81161765B89EC90C4392C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		8B5ABB31CC49C5DFCF0D9408 /* Build configuration list for PBXNativeTarget "ListwellTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1613AF6830FDFE67984945C8 /* Debug */,
+				57A3E36DCBA4E12BEA24FB5C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		EC714742C8EF9761C3FB6926 /* Build configuration list for PBXNativeTarget "Listwell" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				59D9FE938E690A2ACEE0DDA3 /* Debug */,
+				093A89B27F8543350E3A8FA0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		BE914173099417541AA10FF9 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 7.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		448BB569502FA7F5E363C5A8 /* Kingfisher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BE914173099417541AA10FF9 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 1AFA296E33A81293081C2C4D /* Project object */;
+}
