@@ -281,35 +281,35 @@ export async function runListingAgent(
     });
     await flushAgentLog(listingId, agentLog);
 
-    // --- Diagnose: can Node.js reach the API from E2B? ---
-    const nodeTestScript = `
-const res = await fetch('https://api.anthropic.com/v1/messages', {
-  method: 'POST',
-  headers: {
-    'x-api-key': process.env.ANTHROPIC_API_KEY,
-    'anthropic-version': '2023-06-01',
-    'content-type': 'application/json',
-  },
-  body: JSON.stringify({
-    model: 'claude-sonnet-4-20250514',
-    max_tokens: 16,
-    messages: [{ role: 'user', content: 'Say OK' }],
-  }),
-});
-console.log('status:' + res.status);
-const t = await res.text();
-console.log(t.slice(0, 300));
-`;
-    await sandbox.files.write(`${SANDBOX_DIR}/api-test.mjs`, nodeTestScript);
-
-    const nodeCheck = await sandbox.commands.run(
-      `node ${SANDBOX_DIR}/api-test.mjs 2>&1`,
-      { timeoutMs: 30_000 },
-    );
+    // --- Diagnose: Claude CLI debug output ---
     agentLog.push({
       ts: Date.now(),
       type: "status",
-      content: `Node.js API test: ${nodeCheck.stdout.trim().slice(0, 400)}`,
+      content: "Running Claude CLI with --debug (20s timeout)...",
+    });
+    await flushAgentLog(listingId, agentLog);
+
+    const debugChunks: string[] = [];
+    const debugTest = await sandbox.commands.run(
+      'timeout 20 claude -p "Say OK" --dangerously-skip-permissions --output-format json --debug 2>&1; echo "EXIT:$?"',
+      {
+        timeoutMs: 25_000,
+        onStdout: (data) => {
+          debugChunks.push(data);
+          agentLog.push({
+            ts: Date.now(),
+            type: "status",
+            content: `[debug] ${data.trim().slice(0, 300)}`,
+          });
+          flushAgentLog(listingId, agentLog).catch(() => {});
+        },
+      },
+    );
+    const debugOutput = debugChunks.join("") || debugTest.stdout;
+    agentLog.push({
+      ts: Date.now(),
+      type: "status",
+      content: `Debug test done (exit ${debugTest.exitCode}): ${debugOutput.trim().slice(-500)}`,
     });
     await flushAgentLog(listingId, agentLog);
 
