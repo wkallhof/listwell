@@ -28,6 +28,7 @@ struct EnhancementSheet: View {
                     Button("Done") { onDismiss() }
                 }
             }
+            .sensoryFeedback(.success, trigger: viewModel.enhancedVariants.count)
             .alert(
                 "Delete enhanced version?",
                 isPresented: Binding(

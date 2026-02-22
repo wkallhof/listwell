@@ -296,8 +296,6 @@ struct ListingDetailViewModelPollingTests {
         let viewModel = ListingDetailViewModel(listingsService: MockDetailService.self)
         await viewModel.loadListing(id: "test-1", token: "test-token")
 
-        var listedListing = readyListing
-        // Can't mutate a let, so create a new one
         let listed = Listing(
             id: "test-1", userId: "user-1", rawDescription: "Test item",
             title: "Nike Air Max 90", description: "Classic sneakers",
@@ -312,5 +310,134 @@ struct ListingDetailViewModelPollingTests {
 
         await viewModel.updateStatus("LISTED", token: "test-token")
         #expect(viewModel.listing?.status == .listed)
+    }
+
+    @Test("updateField updates title")
+    @MainActor
+    func updateFieldTitle() async {
+        MockDetailService.fetchListingResult = .success(makeReadyListing())
+
+        let viewModel = ListingDetailViewModel(listingsService: MockDetailService.self)
+        await viewModel.loadListing(id: "test-1", token: "test-token")
+
+        let updated = Listing(
+            id: "test-1", userId: "user-1", rawDescription: "Test item",
+            title: "Updated Title", description: "Classic sneakers",
+            suggestedPrice: 85, priceRangeLow: 60, priceRangeHigh: 110,
+            category: "Shoes", condition: "Good", brand: "Nike", model: "Air Max 90",
+            researchNotes: "Popular model", comparables: [],
+            status: .ready, pipelineStep: .complete, pipelineError: nil,
+            agentLog: nil, inngestRunId: "run-1",
+            createdAt: Date(), updatedAt: Date(), images: []
+        )
+        MockDetailService.updateListingResult = .success(updated)
+
+        await viewModel.updateField(title: "Updated Title", token: "test-token")
+        #expect(viewModel.listing?.title == "Updated Title")
+        #expect(MockDetailService.lastUpdateBody?.title == "Updated Title")
+    }
+
+    @Test("updateField updates description")
+    @MainActor
+    func updateFieldDescription() async {
+        MockDetailService.fetchListingResult = .success(makeReadyListing())
+
+        let viewModel = ListingDetailViewModel(listingsService: MockDetailService.self)
+        await viewModel.loadListing(id: "test-1", token: "test-token")
+
+        let updated = Listing(
+            id: "test-1", userId: "user-1", rawDescription: "Test item",
+            title: "Nike Air Max 90", description: "New description",
+            suggestedPrice: 85, priceRangeLow: 60, priceRangeHigh: 110,
+            category: "Shoes", condition: "Good", brand: "Nike", model: "Air Max 90",
+            researchNotes: "Popular model", comparables: [],
+            status: .ready, pipelineStep: .complete, pipelineError: nil,
+            agentLog: nil, inngestRunId: "run-1",
+            createdAt: Date(), updatedAt: Date(), images: []
+        )
+        MockDetailService.updateListingResult = .success(updated)
+
+        await viewModel.updateField(description: "New description", token: "test-token")
+        #expect(viewModel.listing?.description == "New description")
+        #expect(MockDetailService.lastUpdateBody?.description == "New description")
+    }
+
+    @Test("updateField updates suggestedPrice")
+    @MainActor
+    func updateFieldPrice() async {
+        MockDetailService.fetchListingResult = .success(makeReadyListing())
+
+        let viewModel = ListingDetailViewModel(listingsService: MockDetailService.self)
+        await viewModel.loadListing(id: "test-1", token: "test-token")
+
+        let updated = Listing(
+            id: "test-1", userId: "user-1", rawDescription: "Test item",
+            title: "Nike Air Max 90", description: "Classic sneakers",
+            suggestedPrice: 120, priceRangeLow: 60, priceRangeHigh: 110,
+            category: "Shoes", condition: "Good", brand: "Nike", model: "Air Max 90",
+            researchNotes: "Popular model", comparables: [],
+            status: .ready, pipelineStep: .complete, pipelineError: nil,
+            agentLog: nil, inngestRunId: "run-1",
+            createdAt: Date(), updatedAt: Date(), images: []
+        )
+        MockDetailService.updateListingResult = .success(updated)
+
+        await viewModel.updateField(suggestedPrice: 120, token: "test-token")
+        #expect(viewModel.listing?.suggestedPrice == 120)
+        #expect(MockDetailService.lastUpdateBody?.suggestedPrice == 120)
+    }
+
+    @Test("updateField sets error on API failure")
+    @MainActor
+    func updateFieldError() async {
+        MockDetailService.fetchListingResult = .success(makeReadyListing())
+
+        let viewModel = ListingDetailViewModel(listingsService: MockDetailService.self)
+        await viewModel.loadListing(id: "test-1", token: "test-token")
+
+        MockDetailService.updateListingResult = nil // will throw
+
+        await viewModel.updateField(title: "Fail", token: "test-token")
+        #expect(viewModel.errorMessage != nil)
+    }
+
+    @Test("updateStatus sets error on failure")
+    @MainActor
+    func updateStatusError() async {
+        MockDetailService.fetchListingResult = .success(makeReadyListing())
+
+        let viewModel = ListingDetailViewModel(listingsService: MockDetailService.self)
+        await viewModel.loadListing(id: "test-1", token: "test-token")
+
+        MockDetailService.updateListingResult = nil // will throw
+
+        await viewModel.updateStatus("LISTED", token: "test-token")
+        #expect(viewModel.errorMessage != nil)
+    }
+
+    @Test("deleteListing returns false on failure")
+    @MainActor
+    func deleteListingFailure() async {
+        MockDetailService.fetchListingResult = .success(makeReadyListing())
+        MockDetailService.deleteListingResult = .failure(APIError.httpError(statusCode: 500, body: "Error"))
+
+        let viewModel = ListingDetailViewModel(listingsService: MockDetailService.self)
+        await viewModel.loadListing(id: "test-1", token: "test-token")
+
+        let result = await viewModel.deleteListing(token: "test-token")
+        #expect(!result)
+        #expect(viewModel.errorMessage != nil)
+    }
+
+    @Test("copyFullListing copies formatted text to pasteboard")
+    @MainActor
+    func copyFullListingSuccess() {
+        let viewModel = ListingDetailViewModel(listingsService: MockDetailService.self)
+        viewModel.listing = makeReadyListing()
+        viewModel.copyFullListing()
+        // The pasteboard should contain formatted text
+        let text = UIPasteboard.general.string ?? ""
+        #expect(text.contains("Nike Air Max 90"))
+        #expect(text.contains("$85"))
     }
 }

@@ -42,6 +42,7 @@ targets:
     scheme:
       testTargets:
         - ListwellTests
+        - ListwellUITests
 
   ListwellTests:
     type: bundle.unit-test
@@ -54,5 +55,18 @@ targets:
         GENERATE_INFOPLIST_FILE: true
         BUNDLE_LOADER: "$(TEST_HOST)"
         TEST_HOST: "$(BUILT_PRODUCTS_DIR)/Listwell.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Listwell"
+    dependencies:
+      - target: Listwell
+
+  ListwellUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: ListwellUITests
+    settings:
+      base:
+        SWIFT_VERSION: "5.9"
+        GENERATE_INFOPLIST_FILE: true
+        TEST_TARGET_NAME: Listwell
     dependencies:
       - target: Listwell

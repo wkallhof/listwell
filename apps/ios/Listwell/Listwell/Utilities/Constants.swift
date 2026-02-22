@@ -111,3 +111,18 @@ extension Color {
         }
     }
 }
+
+// MARK: - View Extensions
+
+extension View {
+    func editFieldStyle() -> some View {
+        self
+            .padding(Spacing.sm)
+            .background(Color.secondaryBackground)
+            .clipShape(RoundedRectangle(cornerRadius: CornerRadius.small))
+            .overlay(
+                RoundedRectangle(cornerRadius: CornerRadius.small)
+                    .stroke(Color.accentColor, lineWidth: 1)
+            )
+    }
+}

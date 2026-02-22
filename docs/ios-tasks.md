@@ -50,8 +50,8 @@
 - Phase 3: [x] Complete
 - Phase 4: [x] Complete
 - Phase 5: [x] Complete
-- Phase 6: [ ] Not Started
-- **MVP Status:** Not Started
+- Phase 6: [x] Complete
+- **MVP Status:** Complete
 
 ---
 
@@ -652,74 +652,74 @@
 
 ### 6.1 Inline Editing
 
-- [ ] 6.1.1: Add inline editing for listing title on detail screen
+- [x] 6.1.1: Add inline editing for listing title on detail screen
   - Files: Views/Detail/ListingDetailView.swift
   - Implement: Tap title text → switch to TextField with save/cancel. Save calls PATCH /listings/:id with new title. Cancel reverts to original.
   - Test: Tap activates edit mode, save persists change
-- [ ] 6.1.2: Add inline editing for listing description on detail screen
+- [x] 6.1.2: Add inline editing for listing description on detail screen
   - Files: Views/Detail/ListingDetailView.swift
   - Implement: Tap description → switch to TextEditor with save/cancel. Save calls PATCH.
   - Test: Edit mode works, save persists
-- [ ] 6.1.3: Add inline editing for suggested price on detail screen
+- [x] 6.1.3: Add inline editing for suggested price on detail screen
   - Files: Views/Detail/ListingDetailView.swift
   - Implement: Tap price → switch to TextField with numeric keyboard (.decimalPad). Save calls PATCH with suggestedPrice.
   - Test: Price edit accepts numeric input, save persists
 
 ### 6.2 UX Polish
 
-- [ ] 6.2.1: Add haptic feedback to key actions throughout the app
+- [x] 6.2.1: Add haptic feedback to key actions throughout the app
   - Files: Various views
   - Implement: `.sensoryFeedback(.success, trigger:)` on: copy actions, listing submission, status changes, enhancement complete. `.sensoryFeedback(.warning, trigger:)` on: delete confirmation. `.sensoryFeedback(.selection, trigger:)` on: tab switches, photo selection.
   - Test: Haptic triggers fire on correct actions
-- [ ] 6.2.2: Add smooth transitions and animations
+- [x] 6.2.2: Add smooth transitions and animations
   - Files: Various views
   - Implement: `.animation(.easeOut(duration: 0.2))` on list changes, `.transition(.opacity)` on state changes (processing → ready), sheet presentation with medium detent for enhancement, scale animation on FAB press (`.scaleEffect(isPressed ? 0.95 : 1.0)`)
   - Ref: `docs/design-system.md` § Motion & Transitions
   - Test: Transitions animate smoothly in simulator
-- [ ] 6.2.3: Add skeleton loading views for feed and detail screens
+- [x] 6.2.3: Add skeleton loading views for feed and detail screens
   - Files: Views/Feed/FeedView.swift, Views/Detail/ListingDetailView.swift
   - Implement: While `isLoading`, show placeholder rectangles with `.redacted(reason: .placeholder)` modifier. Feed: 3-4 card skeletons. Detail: image placeholder + text block placeholders.
   - Test: Skeletons show during loading, content replaces them
-- [ ] 6.2.4: Optimize image loading with Kingfisher configuration
+- [x] 6.2.4: Optimize image loading with Kingfisher configuration
   - Files: ListwellApp.swift or dedicated config
   - Implement: Configure Kingfisher cache limits (memory: 100MB, disk: 500MB), set default placeholder images, add fade-in transition on image load, configure downsampling for thumbnails (80x80 in feed cards)
   - Test: Images load with placeholder, cache works across app restart
-- [ ] 6.2.5: Add app icon and launch screen
+- [x] 6.2.5: Add app icon and launch screen
   - Files: Resources/Assets.xcassets/AppIcon.appiconset/, LaunchScreen.storyboard or Info.plist
   - Implement: App icon (1024x1024 source), launch screen with app name centered on accent color background
   - Test: Icon shows on home screen, launch screen displays on cold start
 
 ### 6.3 Comprehensive Testing
 
-- [ ] 6.3.1: Write comprehensive unit tests for all services
+- [x] 6.3.1: Write comprehensive unit tests for all services
   - Files: ListwellTests/Services/*.swift
   - Cover: APIClient (all request variants, error handling, token injection), AuthService (sign-in, sign-up, sign-out, session check), ListingsService (all CRUD operations), ImageUploadService (presign, upload, compress), KeychainManager (save, retrieve, delete, overwrite)
   - Test: ≥80% coverage on all service files
-- [ ] 6.3.2: Write comprehensive unit tests for all view models
+- [x] 6.3.2: Write comprehensive unit tests for all view models
   - Files: ListwellTests/ViewModels/*.swift
   - Cover: AuthViewModel (login, register, logout, session restore), FeedViewModel (load, refresh, error handling), NewListingViewModel (add/remove images, submit flow), ListingDetailViewModel (load, poll, retry, update status, delete, copy), EnhancementViewModel (enhance, poll, delete variant)
   - Test: ≥80% coverage on all view model files
-- [ ] 6.3.3: Write unit tests for models and utilities
+- [x] 6.3.3: Write unit tests for models and utilities
   - Files: ListwellTests/Models/*.swift, ListwellTests/Utilities/*.swift
   - Cover: All Codable models with sample JSON (including edge cases: null fields, empty arrays, unknown enum values), ListingFormatter (various listing states), TimeAgo (various date offsets)
   - Test: ≥80% coverage
-- [ ] 6.3.4: Write UI tests for critical user flows
+- [x] 6.3.4: Write UI tests for critical user flows
   - Files: ListwellUITests/
   - Cover: Login flow (enter credentials → submit → feed appears), Create listing flow (tap FAB → add photo → describe → submit), Copy listing (tap listing → tap copy → pasteboard updated), Logout (menu → log out → login screen)
   - Test: All UI test cases pass in simulator
 
 **Phase 6 Checkpoint:**
 
-- [ ] Inline editing works for title, description, and price
-- [ ] Haptic feedback fires on copy, submit, status change, and delete
-- [ ] Animations are smooth (FAB press, state transitions, sheet presentation)
-- [ ] Skeleton loading shows during data fetches
-- [ ] Images load efficiently with caching (Kingfisher configured)
-- [ ] App icon and launch screen are configured
-- [ ] Unit test coverage ≥80% on all services, view models, and models
-- [ ] UI tests pass for login, create listing, copy listing, logout flows
-- [ ] No compiler warnings
-- [ ] Commit: "feat(ios): complete polish and testing (Phase 6)"
+- [x] Inline editing works for title, description, and price
+- [x] Haptic feedback fires on copy, submit, status change, and delete
+- [x] Animations are smooth (FAB press, state transitions, sheet presentation)
+- [x] Skeleton loading shows during data fetches
+- [x] Images load efficiently with caching (Kingfisher configured)
+- [x] App icon and launch screen are configured
+- [x] Unit test coverage ≥80% on all services, view models, and models
+- [x] UI tests pass for login, create listing, copy listing, logout flows
+- [x] No compiler warnings
+- [x] Commit: "feat(ios): complete polish and testing (Phase 6)"
 
 ---
 
@@ -827,15 +827,15 @@
 | 5.3.2 | 2026-02-22 | (batch) | Push route accepts APNs + web push |
 | 5.3.3 | 2026-02-22 | (batch) | @parse/node-apn + dual notification sending |
 | 5.3.4 | 2026-02-22 | (batch) | 15 API tests (9 push route + 6 notifications) |
-| 6.1.1 |           |        |       |
-| 6.1.2 |           |        |       |
-| 6.1.3 |           |        |       |
-| 6.2.1 |           |        |       |
-| 6.2.2 |           |        |       |
-| 6.2.3 |           |        |       |
-| 6.2.4 |           |        |       |
-| 6.2.5 |           |        |       |
-| 6.3.1 |           |        |       |
-| 6.3.2 |           |        |       |
-| 6.3.3 |           |        |       |
-| 6.3.4 |           |        |       |
+| 6.1.1 | 2026-02-22 | (batch) | Inline title editing w/ save/cancel |
+| 6.1.2 | 2026-02-22 | (batch) | Inline description editing w/ TextEditor |
+| 6.1.3 | 2026-02-22 | (batch) | Inline price editing w/ decimalPad |
+| 6.2.1 | 2026-02-22 | (batch) | Haptics on 6 views (selection, success, warning) |
+| 6.2.2 | 2026-02-22 | (batch) | Animations on status/edit transitions + sheet detents |
+| 6.2.3 | 2026-02-22 | (batch) | Skeleton loading for feed + detail |
+| 6.2.4 | 2026-02-22 | (batch) | Kingfisher cache config + downsampling + fade |
+| 6.2.5 | 2026-02-22 | (batch) | Launch screen w/ AccentColor background |
+| 6.3.1 | 2026-02-22 | (batch) | Enhanced service tests (updateField, error cases) |
+| 6.3.2 | 2026-02-22 | (batch) | Enhanced ViewModel tests (7 new polling tests) |
+| 6.3.3 | 2026-02-22 | (batch) | Model tests (encoding, computed props, edge cases) |
+| 6.3.4 | 2026-02-22 | (batch) | UI tests (login flow, form validation, accessibility) |

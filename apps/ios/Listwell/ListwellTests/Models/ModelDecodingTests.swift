@@ -521,4 +521,124 @@ struct APIModelTests {
         let r2 = try JSONDecoder().decode(SuccessResponse.self, from: json2)
         #expect(r2.status == "ok")
     }
+
+    @Test("ImageRef encodes all fields")
+    func encodeImageRef() throws {
+        let ref = ImageRef(key: "uploads/img.jpg", url: "https://cdn.example.com/img.jpg", filename: "img.jpg")
+        let data = try JSONEncoder().encode(ref)
+        let json = try JSONSerialization.jsonObject(with: data) as! [String: Any]
+        #expect(json["key"] as? String == "uploads/img.jpg")
+        #expect(json["url"] as? String == "https://cdn.example.com/img.jpg")
+        #expect(json["filename"] as? String == "img.jpg")
+    }
+
+    @Test("FileInfo encodes correctly")
+    func encodeFileInfo() throws {
+        let info = FileInfo(filename: "photo.jpg", contentType: "image/jpeg")
+        let data = try JSONEncoder().encode(info)
+        let json = try JSONSerialization.jsonObject(with: data) as! [String: Any]
+        #expect(json["filename"] as? String == "photo.jpg")
+        #expect(json["contentType"] as? String == "image/jpeg")
+    }
+
+    @Test("PresignRequest encodes files array")
+    func encodePresignRequest() throws {
+        let request = PresignRequest(files: [
+            FileInfo(filename: "a.jpg", contentType: "image/jpeg"),
+            FileInfo(filename: "b.png", contentType: "image/png"),
+        ])
+        let data = try JSONEncoder().encode(request)
+        let json = try JSONSerialization.jsonObject(with: data) as! [String: Any]
+        let files = json["files"] as? [[String: Any]]
+        #expect(files?.count == 2)
+    }
+
+    @Test("PatchListingRequest encodes retry field")
+    func encodePatchWithRetry() throws {
+        let request = PatchListingRequest(
+            status: "PROCESSING",
+            pipelineStep: "PENDING",
+            retry: true
+        )
+        let data = try JSONEncoder().encode(request)
+        let json = try JSONSerialization.jsonObject(with: data) as! [String: Any]
+        #expect(json["retry"] as? Bool == true)
+        #expect(json["status"] as? String == "PROCESSING")
+        #expect(json["pipelineStep"] as? String == "PENDING")
+    }
+}
+
+// MARK: - Listing Computed Properties
+
+@Suite("Listing Computed Properties")
+struct ListingComputedPropertyTests {
+    @Test("primaryImageURL returns first primary image URL")
+    func primaryImageURL() {
+        let images = [
+            ListingImage(id: "1", listingId: "l1", type: .original, blobUrl: "https://example.com/1.jpg",
+                         blobKey: "1.jpg", parentImageId: nil, sortOrder: 0, isPrimary: false,
+                         geminiPrompt: nil, createdAt: Date()),
+            ListingImage(id: "2", listingId: "l1", type: .original, blobUrl: "https://example.com/2.jpg",
+                         blobKey: "2.jpg", parentImageId: nil, sortOrder: 1, isPrimary: true,
+                         geminiPrompt: nil, createdAt: Date()),
+        ]
+        let listing = Listing(id: "l1", userId: "u1", rawDescription: nil, title: nil, description: nil,
+                              suggestedPrice: nil, priceRangeLow: nil, priceRangeHigh: nil, category: nil,
+                              condition: nil, brand: nil, model: nil, researchNotes: nil, comparables: nil,
+                              status: .ready, pipelineStep: .complete, pipelineError: nil, agentLog: nil,
+                              inngestRunId: nil, createdAt: Date(), updatedAt: Date(), images: images)
+        #expect(listing.primaryImageURL?.absoluteString == "https://example.com/2.jpg")
+    }
+
+    @Test("primaryImageURL falls back to first image when no primary")
+    func primaryImageURLFallback() {
+        let images = [
+            ListingImage(id: "1", listingId: "l1", type: .original, blobUrl: "https://example.com/first.jpg",
+                         blobKey: "1.jpg", parentImageId: nil, sortOrder: 0, isPrimary: false,
+                         geminiPrompt: nil, createdAt: Date()),
+        ]
+        let listing = Listing(id: "l1", userId: "u1", rawDescription: nil, title: nil, description: nil,
+                              suggestedPrice: nil, priceRangeLow: nil, priceRangeHigh: nil, category: nil,
+                              condition: nil, brand: nil, model: nil, researchNotes: nil, comparables: nil,
+                              status: .ready, pipelineStep: .complete, pipelineError: nil, agentLog: nil,
+                              inngestRunId: nil, createdAt: Date(), updatedAt: Date(), images: images)
+        #expect(listing.primaryImageURL?.absoluteString == "https://example.com/first.jpg")
+    }
+
+    @Test("primaryImageURL returns nil for nil images")
+    func primaryImageURLNil() {
+        let listing = Listing(id: "l1", userId: "u1", rawDescription: nil, title: nil, description: nil,
+                              suggestedPrice: nil, priceRangeLow: nil, priceRangeHigh: nil, category: nil,
+                              condition: nil, brand: nil, model: nil, researchNotes: nil, comparables: nil,
+                              status: .ready, pipelineStep: .complete, pipelineError: nil, agentLog: nil,
+                              inngestRunId: nil, createdAt: Date(), updatedAt: Date(), images: nil)
+        #expect(listing.primaryImageURL == nil)
+    }
+
+    @Test("isProcessing is false when pipeline step is complete")
+    func isProcessingComplete() {
+        let listing = Listing(id: "l1", userId: "u1", rawDescription: nil, title: nil, description: nil,
+                              suggestedPrice: nil, priceRangeLow: nil, priceRangeHigh: nil, category: nil,
+                              condition: nil, brand: nil, model: nil, researchNotes: nil, comparables: nil,
+                              status: .processing, pipelineStep: .complete, pipelineError: nil, agentLog: nil,
+                              inngestRunId: nil, createdAt: Date(), updatedAt: Date(), images: nil)
+        #expect(!listing.isProcessing)
+    }
+
+    @Test("isReady requires both ready status and complete pipeline step")
+    func isReadyRequirements() {
+        let ready = Listing(id: "l1", userId: "u1", rawDescription: nil, title: nil, description: nil,
+                            suggestedPrice: nil, priceRangeLow: nil, priceRangeHigh: nil, category: nil,
+                            condition: nil, brand: nil, model: nil, researchNotes: nil, comparables: nil,
+                            status: .ready, pipelineStep: .complete, pipelineError: nil, agentLog: nil,
+                            inngestRunId: nil, createdAt: Date(), updatedAt: Date(), images: nil)
+        #expect(ready.isReady)
+
+        let notComplete = Listing(id: "l2", userId: "u1", rawDescription: nil, title: nil, description: nil,
+                                  suggestedPrice: nil, priceRangeLow: nil, priceRangeHigh: nil, category: nil,
+                                  condition: nil, brand: nil, model: nil, researchNotes: nil, comparables: nil,
+                                  status: .ready, pipelineStep: .analyzing, pipelineError: nil, agentLog: nil,
+                                  inngestRunId: nil, createdAt: Date(), updatedAt: Date(), images: nil)
+        #expect(!notComplete.isReady)
+    }
 }

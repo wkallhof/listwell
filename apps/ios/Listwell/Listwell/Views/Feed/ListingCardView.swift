@@ -25,6 +25,11 @@ struct ListingCardView: View {
         Group {
             if let url = listing.primaryImageURL {
                 KFImage(url)
+                    .placeholder {
+                        Color.mutedBackground
+                    }
+                    .fade(duration: 0.2)
+                    .downsampling(size: CGSize(width: Sizing.thumbnailSize * 2, height: Sizing.thumbnailSize * 2))
                     .resizable()
                     .scaledToFill()
             } else {
