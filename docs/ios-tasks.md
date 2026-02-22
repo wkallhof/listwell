@@ -46,7 +46,7 @@
 
 - Phase 0: [x] Complete
 - Phase 1: [x] Complete
-- Phase 2: [ ] Not Started
+- Phase 2: [x] Complete
 - Phase 3: [ ] Not Started
 - Phase 4: [ ] Not Started
 - Phase 5: [ ] Not Started
@@ -265,198 +265,198 @@
 
 ### 2.1 Listings Service
 
-- [ ] 2.1.1: Create `ListingsService` with fetch all listings method
+- [x] 2.1.1: Create `ListingsService` with fetch all listings method
   - Files: Services/ListingsService.swift
   - Implement: `func fetchListings(token:) async throws -> [Listing]` — GET `/api/listings`
   - Test: Returns decoded array of listings
-- [ ] 2.1.2: Add fetch single listing method to ListingsService
+- [x] 2.1.2: Add fetch single listing method to ListingsService
   - Files: Services/ListingsService.swift
   - Implement: `func fetchListing(id:token:) async throws -> Listing` — GET `/api/listings/:id`
   - Test: Returns listing with images array populated
-- [ ] 2.1.3: Add create listing method to ListingsService
+- [x] 2.1.3: Add create listing method to ListingsService
   - Files: Services/ListingsService.swift
   - Implement: `func createListing(description:images:token:) async throws -> Listing` — POST `/api/listings`
   - Test: Creates listing with image refs, returns listing with status PROCESSING
-- [ ] 2.1.4: Add update and delete listing methods to ListingsService
+- [x] 2.1.4: Add update and delete listing methods to ListingsService
   - Files: Services/ListingsService.swift
   - Implement: `func updateListing(id:updates:token:) async throws -> Listing` — PATCH `/api/listings/:id`, `func deleteListing(id:token:) async throws` — DELETE `/api/listings/:id`
   - Test: Update changes status, delete returns success
-- [ ] 2.1.5: Write tests for ListingsService
+- [x] 2.1.5: Write tests for ListingsService
   - Files: ListwellTests/Services/ListingsServiceTests.swift
   - Test: Tests pass with ≥80% coverage
 
 ### 2.2 Image Upload Service
 
-- [ ] 2.2.1: Create `ImageUploadService` with presigned URL request method
+- [x] 2.2.1: Create `ImageUploadService` with presigned URL request method
   - Files: Services/ImageUploadService.swift
   - Implement: `func requestPresignedURLs(files:token:) async throws -> [PresignedUpload]` — POST `/api/upload/presign`
   - Test: Returns presigned URLs for given file info
-- [ ] 2.2.2: Add direct upload to presigned URL method
+- [x] 2.2.2: Add direct upload to presigned URL method
   - Files: Services/ImageUploadService.swift
   - Implement: `func uploadImage(data:contentType:to presignedUrl:) async throws` — PUT to presigned URL with image data body and Content-Type header
   - Test: Upload completes without error (mock)
-- [ ] 2.2.3: Add full upload flow method combining presign + upload + image compression
+- [x] 2.2.3: Add full upload flow method combining presign + upload + image compression
   - Files: Services/ImageUploadService.swift
   - Implement: `func uploadImages(_ images: [UIImage], token:) async throws -> [ImageRef]` — compress to JPEG (0.8 quality, max 2048px), request presigned URLs, upload each in parallel with TaskGroup, return ImageRef array
   - Helper: `func compressImage(_ image: UIImage, maxDimension: CGFloat, quality: CGFloat) -> Data`
   - Test: Full flow returns ImageRef array with keys and URLs
-- [ ] 2.2.4: Write tests for ImageUploadService
+- [x] 2.2.4: Write tests for ImageUploadService
   - Files: ListwellTests/Services/ImageUploadServiceTests.swift
   - Test: Tests pass with ≥80% coverage, including compression and parallel upload
 
 ### 2.3 Shared Components
 
-- [ ] 2.3.1: Build `ListingStatusBadge` view with status-specific colors and optional icon
+- [x] 2.3.1: Build `ListingStatusBadge` view with status-specific colors and optional icon
   - Files: Views/Shared/ListingStatusBadge.swift
   - Implement: Takes `ListingStatus`, renders rounded capsule with status color bg/fg from Asset Catalog. PROCESSING shows `ProgressView` inline, ERROR shows `exclamationmark.circle.fill`
   - Ref: `docs/screens.md` § ListingStatusBadge, `docs/design-system.md` § Status Colors
   - Test: Renders correct colors for each of 7 statuses
-- [ ] 2.3.2: Build `CopyButton` view with clipboard, haptic, and visual feedback
+- [x] 2.3.2: Build `CopyButton` view with clipboard, haptic, and visual feedback
   - Files: Views/Shared/CopyButton.swift
   - Implement: Button with `doc.on.doc` icon, on tap: copy text to `UIPasteboard.general.string`, swap icon to `checkmark` for 2s, trigger `.sensoryFeedback(.success)`
   - Ref: `docs/screens.md` § CopyButton
   - Test: Tap copies text to pasteboard, icon toggles
-- [ ] 2.3.3: Build `EmptyStateView` with icon, title, and description
+- [x] 2.3.3: Build `EmptyStateView` with icon, title, and description
   - Files: Views/Shared/EmptyStateView.swift
   - Implement: Centered VStack with SF Symbol icon (48pt, muted), title text, description text
   - Ref: `docs/screens.md` § EmptyState
   - Test: Renders icon, title, and description
-- [ ] 2.3.4: Build `FABButton` (Floating Action Button) view
+- [x] 2.3.4: Build `FABButton` (Floating Action Button) view
   - Files: Views/Shared/FABButton.swift
   - Implement: Circle button (56pt), accent color, `plus` SF Symbol (24pt), positioned bottom-trailing with padding. Scale-down animation on press.
   - Ref: `docs/screens.md` § FAB, `docs/design-system.md` § Floating Action Button
   - Test: Renders at bottom-right, tap triggers action
-- [ ] 2.3.5: Build `CameraView` UIViewControllerRepresentable for camera capture
+- [x] 2.3.5: Build `CameraView` UIViewControllerRepresentable for camera capture
   - Files: Views/Shared/CameraView.swift
   - Implement: Wraps `UIImagePickerController` with `.camera` source type, returns captured `UIImage` via binding, handles cancel
   - Test: Representable creates UIImagePickerController with camera source
-- [ ] 2.3.6: Write tests for all shared components
+- [x] 2.3.6: Write tests for all shared components
   - Files: ListwellTests/Views/SharedComponentTests.swift
   - Test: Tests pass with ≥80% coverage
 
 ### 2.4 Feed Screen
 
-- [ ] 2.4.1: Create `FeedViewModel` observable for feed data management
+- [x] 2.4.1: Create `FeedViewModel` observable for feed data management
   - Files: ViewModels/FeedViewModel.swift
   - Implement: `@Observable @MainActor final class FeedViewModel` — properties: `listings: [Listing]`, `isLoading`, `errorMessage`, methods: `func loadListings()`, `func refresh()`
   - Uses AuthState token for API calls
   - Test: loadListings fetches and stores listings
-- [ ] 2.4.2: Build `ListingCardView` for feed display
+- [x] 2.4.2: Build `ListingCardView` for feed display
   - Files: Views/Feed/ListingCardView.swift
   - Implement: HStack with thumbnail (80x80, rounded, Kingfisher for async loading), VStack with title (or "Processing..." italic when processing), status badge, price (if ready+), pipeline step text + spinner (if processing), relative time
   - Ref: `docs/screens.md` § ListingCard Component
   - Test: Renders all states — processing with spinner, ready with price, sold with badge
-- [ ] 2.4.3: Build `FeedView` with listings list, empty state, and FAB
+- [x] 2.4.3: Build `FeedView` with listings list, empty state, and FAB
   - Files: Views/Feed/FeedView.swift
   - Implement: NavigationStack root, ScrollView with LazyVStack of ListingCardViews, EmptyStateView when no listings ("No listings yet" + "Tap + to create your first one"), FAB overlay, `.refreshable` for pull-to-refresh, `.task` for initial load
   - Ref: `docs/screens.md` § Screen 2: Listings Feed
   - Test: Shows listings, shows empty state, FAB visible
-- [ ] 2.4.4: Add header with title and overflow menu to FeedView
+- [x] 2.4.4: Add header with title and overflow menu to FeedView
   - Files: Views/Feed/FeedView.swift
   - Implement: HStack with "Your Listings" title (text-2xl bold), Menu with "Log out" item (calls authState.logout())
   - Ref: `docs/screens.md` § Screen 2: header
   - Test: Title renders, logout menu item works
-- [ ] 2.4.5: Add navigation from feed cards to listing detail
+- [x] 2.4.5: Add navigation from feed cards to listing detail
   - Files: Views/Feed/FeedView.swift
   - Implement: `NavigationLink` or `.navigationDestination` — tap card navigates to `ListingDetailView(listingId:)`
   - Test: Tap card pushes detail view
-- [ ] 2.4.6: Write tests for FeedView and FeedViewModel
+- [x] 2.4.6: Write tests for FeedView and FeedViewModel
   - Files: ListwellTests/Views/FeedViewTests.swift, ListwellTests/ViewModels/FeedViewModelTests.swift
   - Test: Tests pass with ≥80% coverage
 
 ### 2.5 New Listing — Capture
 
-- [ ] 2.5.1: Create `NewListingViewModel` observable for multi-step new listing flow
+- [x] 2.5.1: Create `NewListingViewModel` observable for multi-step new listing flow
   - Files: ViewModels/NewListingViewModel.swift
   - Implement: `@Observable @MainActor final class NewListingViewModel` — properties: `selectedImages: [UIImage]`, `description: String`, `isSubmitting`, `errorMessage`, `submittedListingId: String?`, methods: `addImage(_:)`, `removeImage(at:)`, `reset()`
   - Max 5 images, min 1 to proceed
   - Test: Can add/remove images, respects 5 limit
-- [ ] 2.5.2: Build `PhotoGridView` component for image thumbnail grid
+- [x] 2.5.2: Build `PhotoGridView` component for image thumbnail grid
   - Files: Views/NewListing/PhotoGridView.swift
   - Implement: LazyVGrid (3 columns, spacing 8) with image thumbnails (aspect ratio 1:1, rounded 8pt, object-fit cover) + remove button (X) overlay on each. Empty add slot with dashed border and `photo.badge.plus` icon when < 5 photos.
   - Ref: `docs/screens.md` § Screen 3: Photo Grid
   - Test: Grid shows images, X button removes, empty slot shows when under limit
-- [ ] 2.5.3: Build `CaptureView` with photo grid and capture buttons
+- [x] 2.5.3: Build `CaptureView` with photo grid and capture buttons
   - Files: Views/NewListing/CaptureView.swift
   - Implement: Navigation bar with back button + "Add Photos" title. PhotoGridView. Two buttons: "Take Photo" (camera SF Symbol, presents CameraView sheet) and "Choose from Library" (photo.badge.plus, presents PhotosPicker). Bottom bar with "Next" button (disabled when 0 photos, shows count "Next — N photo(s)"). Helper text: "Add 3-5 photos from different angles for best results"
   - Ref: `docs/screens.md` § Screen 3: New Listing — Capture
   - Test: Camera/gallery buttons trigger respective pickers, Next enabled only with ≥1 photo
-- [ ] 2.5.4: Write tests for CaptureView and PhotoGridView
+- [x] 2.5.4: Write tests for CaptureView and PhotoGridView
   - Files: ListwellTests/Views/CaptureViewTests.swift
   - Test: Tests pass with ≥80% coverage
 
 ### 2.6 New Listing — Describe & Submit
 
-- [ ] 2.6.1: Build `DescribeView` with photo strip and text editor
+- [x] 2.6.1: Build `DescribeView` with photo strip and text editor
   - Files: Views/NewListing/DescribeView.swift
   - Implement: Navigation bar with back + "Describe It" title. Horizontal ScrollView of photo thumbnails (64x64, rounded). TextEditor with placeholder "Tell us about this item — brand, condition, why you're selling... (optional)" (min height 160pt). Helper text: "More detail = better results. But you can also skip this." Bottom bar with "Skip" (secondary) and "Generate Listing" (primary) buttons.
   - Ref: `docs/screens.md` § Screen 4: New Listing — Describe
   - Test: Thumbnail strip shows photos, text editor accepts input, both buttons present
-- [ ] 2.6.2: Implement listing submission flow in NewListingViewModel
+- [x] 2.6.2: Implement listing submission flow in NewListingViewModel
   - Files: ViewModels/NewListingViewModel.swift
   - Implement: `func submitListing(token:) async throws` — compress images → upload via ImageUploadService → create listing via ListingsService → set `submittedListingId`
   - Show upload progress via `uploadProgress: Double` property
   - Test: Submission calls upload + create in sequence, sets listingId on success
-- [ ] 2.6.3: Wire DescribeView submission to navigate to listing detail
+- [x] 2.6.3: Wire DescribeView submission to navigate to listing detail
   - Files: Views/NewListing/DescribeView.swift
   - Implement: "Generate Listing" and "Skip" both call `viewModel.submitListing()`. Show loading overlay during submission. On success, navigate to `ListingDetailView(listingId:)` and reset NewListingViewModel.
   - Test: Submit shows loading, navigates on success, shows error on failure
-- [ ] 2.6.4: Write tests for DescribeView and submission flow
+- [x] 2.6.4: Write tests for DescribeView and submission flow
   - Files: ListwellTests/Views/DescribeViewTests.swift, ListwellTests/ViewModels/NewListingViewModelTests.swift
   - Test: Tests pass with ≥80% coverage
 
 ### 2.7 Listing Detail — Ready State
 
-- [ ] 2.7.1: Create `ListingDetailViewModel` observable for detail screen data
+- [x] 2.7.1: Create `ListingDetailViewModel` observable for detail screen data
   - Files: ViewModels/ListingDetailViewModel.swift
   - Implement: `@Observable @MainActor final class ListingDetailViewModel` — properties: `listing: Listing?`, `isLoading`, `errorMessage`, methods: `func loadListing(id:)`, `func updateStatus(_:)`, `func deleteListing()`, `func copyFullListing()`
   - Test: loadListing fetches and stores listing data
-- [ ] 2.7.2: Build `ImageCarouselView` with horizontal paging and dot indicators
+- [x] 2.7.2: Build `ImageCarouselView` with horizontal paging and dot indicators
   - Files: Views/Detail/ImageCarouselView.swift
   - Implement: TabView with `.tabViewStyle(.page(indexDisplayMode: .never))` for swipe between images. Kingfisher `KFImage` for async loading. Custom dot indicators below (active = accent color, inactive = muted). Aspect ratio 4:3.
   - Ref: `docs/screens.md` § Image Carousel, `docs/design-system.md` § Image Display Conventions
   - Test: Carousel shows images, dots reflect current page
-- [ ] 2.7.3: Build `ProductDetailsView` for brand/model/condition/category grid
+- [x] 2.7.3: Build `ProductDetailsView` for brand/model/condition/category grid
   - Files: Views/Detail/ProductDetailsView.swift
   - Implement: Card-like container with 2-column grid. Each cell: label (caption, muted, uppercase) + value (body, medium weight). Fields: Brand, Model, Condition, Category.
   - Ref: `docs/screens.md` § Screen 7: Product Details
   - Test: Renders all 4 detail fields
-- [ ] 2.7.4: Build `ComparablesView` for market comparable listings
+- [x] 2.7.4: Build `ComparablesView` for market comparable listings
   - Files: Views/Detail/ComparablesView.swift
   - Implement: "Market Comparables" heading. List of comparable cards — each shows title (truncated), source text (muted), price (semibold), external link button (opens URL in Safari via `Link`).
   - Ref: `docs/screens.md` § Screen 7: Comparable Listings
   - Test: Renders comparables with title, price, source
-- [ ] 2.7.5: Build `ListingDetailView` (ready state) assembling all sections
+- [x] 2.7.5: Build `ListingDetailView` (ready state) assembling all sections
   - Files: Views/Detail/ListingDetailView.swift
   - Implement: ScrollView with sections: ImageCarouselView, status badge + category row, title + CopyButton, price card (suggested price large + market range), description + CopyButton, ProductDetailsView, ComparablesView, market notes (researchNotes text). Bottom bar with "Copy Full Listing" button (doc.on.doc icon). `.task` loads listing on appear.
   - Ref: `docs/screens.md` § Screen 7: Listing Detail — Ready
   - Test: All sections render with sample listing data
-- [ ] 2.7.6: Add dropdown menu actions to ListingDetailView
+- [x] 2.7.6: Add dropdown menu actions to ListingDetailView
   - Files: Views/Detail/ListingDetailView.swift
   - Implement: Navigation bar trailing `Menu` with items: "Mark as Listed" (if READY), "Mark as Sold" (if LISTED), "Archive", "Delete Listing" (destructive). Status changes call `viewModel.updateStatus()`. Delete shows `.confirmationDialog`.
   - Ref: `docs/screens.md` § Screen 7: DropdownMenu
   - Test: Menu items show for correct statuses, delete shows confirmation
-- [ ] 2.7.7: Implement "Copy Full Listing" action with ListingFormatter
+- [x] 2.7.7: Implement "Copy Full Listing" action with ListingFormatter
   - Files: Views/Detail/ListingDetailView.swift
   - Implement: Bottom bar button calls `ListingFormatter.formatForClipboard(listing)`, copies to `UIPasteboard.general.string`, triggers haptic feedback, shows brief "Copied!" feedback
   - Test: Copy puts formatted text on pasteboard
-- [ ] 2.7.8: Write tests for ListingDetailView and all detail sub-components
+- [x] 2.7.8: Write tests for ListingDetailView and all detail sub-components
   - Files: ListwellTests/Views/ListingDetailViewTests.swift, ListwellTests/ViewModels/ListingDetailViewModelTests.swift
   - Test: Tests pass with ≥80% coverage
 
 **Phase 2 Checkpoint:**
 
-- [ ] Listings feed displays user's listings with status badges and thumbnails
-- [ ] Empty state shows when no listings exist
-- [ ] User can capture photos via camera and photo library (1-5 photos)
-- [ ] User can describe item via text editor
-- [ ] Submission compresses, uploads images, and creates listing
-- [ ] Listing detail shows all sections (images, title, price, description, details, comparables, notes)
-- [ ] Copy full listing and individual section copy work with haptic feedback
-- [ ] Status can be changed (Listed, Sold, Archive) and listings can be deleted
-- [ ] Pull-to-refresh works on feed
-- [ ] All tests pass with ≥80% code coverage on Phase 2 code
-- [ ] Commit: "feat(ios): complete core listing screens (Phase 2)"
+- [x] Listings feed displays user's listings with status badges and thumbnails
+- [x] Empty state shows when no listings exist
+- [x] User can capture photos via camera and photo library (1-5 photos)
+- [x] User can describe item via text editor
+- [x] Submission compresses, uploads images, and creates listing
+- [x] Listing detail shows all sections (images, title, price, description, details, comparables, notes)
+- [x] Copy full listing and individual section copy work with haptic feedback
+- [x] Status can be changed (Listed, Sold, Archive) and listings can be deleted
+- [x] Pull-to-refresh works on feed
+- [x] All tests pass with ≥80% code coverage on Phase 2 code
+- [x] Commit: "feat(ios): complete core listing screens (Phase 2)"
 
 ---
 
@@ -763,43 +763,43 @@
 | 1.3.2 | 2026-02-21 | 06e3899 | Email/password/confirm validation |
 | 1.3.3 | 2026-02-21 | 06e3899 | Wired to AuthState + loading/error |
 | 1.3.4 | 2026-02-21 | 06e3899 | LoginView + AuthState tests (17 tests) |
-| 2.1.1 |           |        |       |
-| 2.1.2 |           |        |       |
-| 2.1.3 |           |        |       |
-| 2.1.4 |           |        |       |
-| 2.1.5 |           |        |       |
-| 2.2.1 |           |        |       |
-| 2.2.2 |           |        |       |
-| 2.2.3 |           |        |       |
-| 2.2.4 |           |        |       |
-| 2.3.1 |           |        |       |
-| 2.3.2 |           |        |       |
-| 2.3.3 |           |        |       |
-| 2.3.4 |           |        |       |
-| 2.3.5 |           |        |       |
-| 2.3.6 |           |        |       |
-| 2.4.1 |           |        |       |
-| 2.4.2 |           |        |       |
-| 2.4.3 |           |        |       |
-| 2.4.4 |           |        |       |
-| 2.4.5 |           |        |       |
-| 2.4.6 |           |        |       |
-| 2.5.1 |           |        |       |
-| 2.5.2 |           |        |       |
-| 2.5.3 |           |        |       |
-| 2.5.4 |           |        |       |
-| 2.6.1 |           |        |       |
-| 2.6.2 |           |        |       |
-| 2.6.3 |           |        |       |
-| 2.6.4 |           |        |       |
-| 2.7.1 |           |        |       |
-| 2.7.2 |           |        |       |
-| 2.7.3 |           |        |       |
-| 2.7.4 |           |        |       |
-| 2.7.5 |           |        |       |
-| 2.7.6 |           |        |       |
-| 2.7.7 |           |        |       |
-| 2.7.8 |           |        |       |
+| 2.1.1 | 2026-02-22 | (batch) | fetchListings GET /listings |
+| 2.1.2 | 2026-02-22 | (batch) | fetchListing GET /listings/:id |
+| 2.1.3 | 2026-02-22 | (batch) | createListing POST /listings |
+| 2.1.4 | 2026-02-22 | (batch) | updateListing + deleteListing |
+| 2.1.5 | 2026-02-22 | (batch) | 12 ListingsService tests |
+| 2.2.1 | 2026-02-22 | (batch) | requestPresignedURLs POST /upload/presign |
+| 2.2.2 | 2026-02-22 | (batch) | uploadImage PUT to presigned URL |
+| 2.2.3 | 2026-02-22 | (batch) | uploadImages full flow + compression |
+| 2.2.4 | 2026-02-22 | (batch) | 9 ImageUploadService tests |
+| 2.3.1 | 2026-02-22 | (batch) | ListingStatusBadge w/ 7 statuses |
+| 2.3.2 | 2026-02-22 | (batch) | CopyButton w/ clipboard + haptic |
+| 2.3.3 | 2026-02-22 | (batch) | EmptyStateView centered placeholder |
+| 2.3.4 | 2026-02-22 | (batch) | FABButton 56pt circle + scale anim |
+| 2.3.5 | 2026-02-22 | (batch) | CameraView UIImagePickerController |
+| 2.3.6 | 2026-02-22 | (batch) | 13 shared component tests |
+| 2.4.1 | 2026-02-22 | (batch) | FeedViewModel w/ protocol mock |
+| 2.4.2 | 2026-02-22 | (batch) | ListingCardView w/ Kingfisher + states |
+| 2.4.3 | 2026-02-22 | (batch) | FeedView w/ empty state + FAB + pull-to-refresh |
+| 2.4.4 | 2026-02-22 | (batch) | Header + overflow menu + logout |
+| 2.4.5 | 2026-02-22 | (batch) | NavigationPath + navigationDestination |
+| 2.4.6 | 2026-02-22 | (batch) | 12 feed tests (6 ViewModel + 6 View) |
+| 2.5.1 | 2026-02-22 | (batch) | NewListingViewModel w/ add/remove/submit |
+| 2.5.2 | 2026-02-22 | (batch) | PhotoGridView 3-col grid + dashed add slot |
+| 2.5.3 | 2026-02-22 | (batch) | CaptureView w/ camera/gallery + PhotosPicker |
+| 2.5.4 | 2026-02-22 | (batch) | 13 tests (12 ViewModel + 1 Grid) |
+| 2.6.1 | 2026-02-22 |        |       |
+| 2.6.2 | 2026-02-22 |        |       |
+| 2.6.3 | 2026-02-22 |        |       |
+| 2.6.4 | 2026-02-22 |        |       |
+| 2.7.1 | 2026-02-22 |        |       |
+| 2.7.2 | 2026-02-22 |        |       |
+| 2.7.3 | 2026-02-22 |        |       |
+| 2.7.4 | 2026-02-22 |        |       |
+| 2.7.5 | 2026-02-22 |        |       |
+| 2.7.6 | 2026-02-22 |        |       |
+| 2.7.7 | 2026-02-22 |        |       |
+| 2.7.8 | 2026-02-22 |        |       |
 | 3.1.1 |           |        |       |
 | 3.1.2 |           |        |       |
 | 3.2.1 |           |        |       |
