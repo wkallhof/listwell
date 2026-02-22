@@ -105,6 +105,7 @@ export function createE2BProvider(): AgentProvider {
           `claude -p "$PROMPT" \\`,
           "  --dangerously-skip-permissions \\",
           "  --output-format stream-json \\",
+          "  --verbose \\",
           "  --model sonnet \\",
           "  --max-turns 15 < /dev/null",
         ].join("\n");
