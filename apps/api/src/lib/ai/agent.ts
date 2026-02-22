@@ -286,43 +286,38 @@ export async function runListingAgent(
     });
     await flushAgentLog(listingId, agentLog);
 
-    // --- Diagnose: what network calls does Claude CLI make? ---
+    // --- Diagnose: what is Claude CLI blocked on? ---
     agentLog.push({
       ts: Date.now(),
       type: "status",
-      content: "Tracing Claude CLI network calls (15s)...",
+      content: "Inspecting Claude CLI process state (12s)...",
     });
     await flushAgentLog(listingId, agentLog);
 
-    await sandbox.commands.run(
-      "apt-get install -y strace >/dev/null 2>&1 || true",
-      { timeoutMs: 30_000 },
-    );
+    const diagScript = [
+      "#!/bin/bash",
+      'claude -p "Say OK" --dangerously-skip-permissions --output-format json < /dev/null &',
+      "CPID=$!",
+      "sleep 8",
+      'echo "wchan: $(cat /proc/$CPID/wchan 2>&1)"',
+      'echo "state: $(grep State /proc/$CPID/status 2>&1)"',
+      'echo "threads: $(ls /proc/$CPID/task/ 2>&1 | wc -w)"',
+      'echo "fds: $(ls /proc/$CPID/fd/ 2>&1 | wc -w)"',
+      'echo "net: $(cat /proc/$CPID/net/tcp 2>&1 | tail -5)"',
+      'echo "cmdline: $(tr "\\0" " " < /proc/$CPID/cmdline 2>&1 | head -c 200)"',
+      "kill $CPID 2>/dev/null",
+      "wait $CPID 2>/dev/null",
+    ].join("\n");
 
-    const traceResult = await sandbox.commands.run(
-      [
-        'timeout 15 strace -f -e trace=connect -o /tmp/strace.txt',
-        'claude -p "Say OK" --dangerously-skip-permissions --output-format json 2>/dev/null;',
-        'grep -a "connect(" /tmp/strace.txt | grep -v "ENOENT\\|EINPROGRESS.*unix" | tail -20',
-      ].join(" "),
-      { timeoutMs: 50_000 },
+    await sandbox.files.write(`${SANDBOX_DIR}/diag.sh`, diagScript);
+    const diagResult = await sandbox.commands.run(
+      `bash ${SANDBOX_DIR}/diag.sh 2>&1`,
+      { timeoutMs: 20_000 },
     );
     agentLog.push({
       ts: Date.now(),
       type: "status",
-      content: `Network trace: ${traceResult.stdout.trim().slice(0, 500) || "no connect calls found"}`,
-    });
-    await flushAgentLog(listingId, agentLog);
-
-    // Also check ~/.claude/ state
-    const configCheck = await sandbox.commands.run(
-      "ls -la ~/.claude/ 2>&1; echo '---'; cat ~/.claude/statsig_metadata.json 2>&1 || true",
-      { timeoutMs: 5_000 },
-    );
-    agentLog.push({
-      ts: Date.now(),
-      type: "status",
-      content: `Claude config: ${configCheck.stdout.trim().slice(0, 400)}`,
+      content: `Process diag: ${diagResult.stdout.trim().slice(0, 600)}`,
     });
     await flushAgentLog(listingId, agentLog);
 
@@ -337,7 +332,7 @@ export async function runListingAgent(
       "  --output-format stream-json \\",
       "  --model sonnet \\",
       "  --max-turns 15 \\",
-      "  --verbose",
+      "  --verbose < /dev/null",
       "EXIT_CODE=$?",
       'echo "[runner] claude exited with code $EXIT_CODE" >&2',
       "exit $EXIT_CODE",
