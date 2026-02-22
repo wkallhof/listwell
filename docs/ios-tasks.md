@@ -727,31 +727,31 @@
 
 | Task  | Completed | Commit | Notes |
 | ----- | --------- | ------ | ----- |
-| 0.0.1 | 2026-02-21 | — | Pre-flight check |
-| 0.0.2 | 2026-02-21 | — | Clean working directory |
-| 0.1.1 | 2026-02-21 | — | Xcode project via XcodeGen |
-| 0.1.2 | 2026-02-21 | — | Kingfisher ~> 7.0 |
-| 0.1.3 | 2026-02-21 | — | Full folder structure |
-| 0.1.4 | 2026-02-21 | — | ListwellTests target |
-| 0.2.1 | 2026-02-21 | — | 10 base color sets (light+dark) |
-| 0.2.2 | 2026-02-21 | — | 14 status color sets (7 bg+fg pairs) |
-| 0.2.3 | 2026-02-21 | — | Typography, spacing, sizing constants |
-| 0.2.4 | 2026-02-21 | — | Color extension with status helpers |
-| 0.3.1 | 2026-02-21 | — | APIClient actor with URLSession |
-| 0.3.2 | 2026-02-21 | — | Generic request + bearer token |
-| 0.3.3 | 2026-02-21 | — | requestVoid + requestData methods |
-| 0.3.4 | 2026-02-21 | — | 10 APIClient tests with MockURLProtocol |
-| 0.4.1 | 2026-02-21 | — | KeychainManager with Security framework |
-| 0.4.2 | 2026-02-21 | — | 5 KeychainManager tests |
-| 0.5.1 | 2026-02-21 | — | ListingStatus, PipelineStep, ImageType enums |
-| 0.5.2 | 2026-02-21 | — | Listing Codable model |
-| 0.5.3 | 2026-02-21 | — | ListingImage Codable model |
-| 0.5.4 | 2026-02-21 | — | Comparable + AgentLogEntry models |
-| 0.5.5 | 2026-02-21 | — | User Codable model |
-| 0.5.6 | 2026-02-21 | — | All request/response DTOs |
-| 0.5.7 | 2026-02-21 | — | 25 model decoding tests |
-| 0.6.1 | 2026-02-21 | — | ListingFormatter (6 tests) |
-| 0.6.2 | 2026-02-21 | — | TimeAgo utility (5 tests) |
+| 0.0.1 | 2026-02-21 | 9d80519 | Pre-flight check |
+| 0.0.2 | 2026-02-21 | 9d80519 | Clean working directory |
+| 0.1.1 | 2026-02-21 | 9d80519 | Xcode project via XcodeGen |
+| 0.1.2 | 2026-02-21 | 9d80519 | Kingfisher ~> 7.0 |
+| 0.1.3 | 2026-02-21 | 9d80519 | Full folder structure |
+| 0.1.4 | 2026-02-21 | 9d80519 | ListwellTests target |
+| 0.2.1 | 2026-02-21 | 9d80519 | 10 base color sets (light+dark) |
+| 0.2.2 | 2026-02-21 | 9d80519 | 14 status color sets (7 bg+fg pairs) |
+| 0.2.3 | 2026-02-21 | 9d80519 | Typography, spacing, sizing constants |
+| 0.2.4 | 2026-02-21 | 9d80519 | Color extension with status helpers |
+| 0.3.1 | 2026-02-21 | 9d80519 | APIClient actor with URLSession |
+| 0.3.2 | 2026-02-21 | 9d80519 | Generic request + bearer token |
+| 0.3.3 | 2026-02-21 | 9d80519 | requestVoid + requestData methods |
+| 0.3.4 | 2026-02-21 | 9d80519 | 10 APIClient tests with MockURLProtocol |
+| 0.4.1 | 2026-02-21 | 9d80519 | KeychainManager with Security framework |
+| 0.4.2 | 2026-02-21 | 9d80519 | 5 KeychainManager tests |
+| 0.5.1 | 2026-02-21 | 9d80519 | ListingStatus, PipelineStep, ImageType enums |
+| 0.5.2 | 2026-02-21 | 9d80519 | Listing Codable model |
+| 0.5.3 | 2026-02-21 | 9d80519 | ListingImage Codable model |
+| 0.5.4 | 2026-02-21 | 9d80519 | Comparable + AgentLogEntry models |
+| 0.5.5 | 2026-02-21 | 9d80519 | User Codable model |
+| 0.5.6 | 2026-02-21 | 9d80519 | All request/response DTOs |
+| 0.5.7 | 2026-02-21 | 9d80519 | 25 model decoding tests |
+| 0.6.1 | 2026-02-21 | 9d80519 | ListingFormatter (6 tests) |
+| 0.6.2 | 2026-02-21 | 9d80519 | TimeAgo utility (5 tests) |
 | 1.1.1 |           |        |       |
 | 1.1.2 |           |        |       |
 | 1.1.3 |           |        |       |
