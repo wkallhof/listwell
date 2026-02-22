@@ -40,6 +40,7 @@ struct DescribeView: View {
                 submittingOverlay
             }
         }
+        .sensoryFeedback(.success, trigger: viewModel.submittedListingId)
         .onChange(of: viewModel.submittedListingId) { _, listingId in
             if let listingId {
                 promptForPushIfFirstSubmission()

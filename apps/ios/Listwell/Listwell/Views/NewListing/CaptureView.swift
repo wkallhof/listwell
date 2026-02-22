@@ -57,6 +57,7 @@ struct CaptureView: View {
             maxSelectionCount: max(0, APIConfig.maxPhotos - viewModel.selectedImages.count),
             matching: .images
         )
+        .sensoryFeedback(.selection, trigger: viewModel.selectedImages.count)
         .onChange(of: capturedImage) { _, newImage in
             if let image = newImage {
                 viewModel.addImage(image)

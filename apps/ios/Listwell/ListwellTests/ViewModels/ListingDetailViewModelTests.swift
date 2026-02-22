@@ -55,4 +55,61 @@ struct ListingDetailViewModelTests {
         viewModel.copyFullListing()
         #expect(viewModel.listing == nil)
     }
+
+    @Test("updateField requires token")
+    @MainActor
+    func updateFieldWithoutToken() async {
+        let viewModel = ListingDetailViewModel()
+        await viewModel.updateField(title: "New Title", token: nil)
+        #expect(viewModel.listing == nil)
+    }
+
+    @Test("updateField requires listingId to be loaded first")
+    @MainActor
+    func updateFieldWithoutListingId() async {
+        let viewModel = ListingDetailViewModel()
+        await viewModel.updateField(title: "New Title", token: "test-token")
+        #expect(viewModel.listing == nil)
+    }
+
+    @Test("updateStatus requires listingId to be loaded first")
+    @MainActor
+    func updateStatusWithoutListingId() async {
+        let viewModel = ListingDetailViewModel()
+        await viewModel.updateStatus("LISTED", token: "test-token")
+        #expect(viewModel.listing == nil)
+    }
+
+    @Test("deleteListing returns false without listingId")
+    @MainActor
+    func deleteListingWithoutListingId() async {
+        let viewModel = ListingDetailViewModel()
+        let result = await viewModel.deleteListing(token: "test-token")
+        #expect(!result)
+    }
+
+    @Test("retryGeneration requires listingId")
+    @MainActor
+    func retryWithoutListingId() async {
+        let viewModel = ListingDetailViewModel()
+        await viewModel.retryGeneration(token: "test-token")
+        #expect(viewModel.listing == nil)
+    }
+
+    @Test("cancelPolling is safe to call when not polling")
+    @MainActor
+    func cancelPollingWhenIdle() {
+        let viewModel = ListingDetailViewModel()
+        viewModel.cancelPolling()
+        #expect(!viewModel.isPolling)
+    }
+
+    @Test("stopPolling is idempotent")
+    @MainActor
+    func stopPollingIdempotent() {
+        let viewModel = ListingDetailViewModel()
+        viewModel.stopPolling()
+        viewModel.stopPolling()
+        #expect(!viewModel.isPolling)
+    }
 }

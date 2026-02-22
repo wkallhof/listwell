@@ -1,4 +1,5 @@
 import SwiftUI
+import Kingfisher
 
 @main
 struct ListwellApp: App {
@@ -6,12 +7,26 @@ struct ListwellApp: App {
     @State private var authState = AuthState()
     @State private var pushManager = PushNotificationManager()
 
+    init() {
+        configureKingfisher()
+    }
+
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environment(authState)
                 .environment(pushManager)
         }
+    }
+
+    private func configureKingfisher() {
+        let cache = ImageCache.default
+        cache.memoryStorage.config.totalCostLimit = 100 * 1024 * 1024 // 100 MB
+        cache.diskStorage.config.sizeLimit = 500 * 1024 * 1024 // 500 MB
+        cache.memoryStorage.config.countLimit = 150
+
+        let downloader = ImageDownloader.default
+        downloader.downloadTimeout = 30
     }
 }
 

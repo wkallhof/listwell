@@ -34,12 +34,60 @@ struct FeedView: View {
     private var mainContent: some View {
         VStack(spacing: 0) {
             headerView
-            if viewModel.listings.isEmpty && !viewModel.isLoading {
+            if viewModel.isLoading && viewModel.listings.isEmpty {
+                skeletonContent
+            } else if viewModel.listings.isEmpty {
                 emptyStateContent
             } else {
                 listingsContent
             }
         }
+    }
+
+    // MARK: - Skeleton
+
+    private var skeletonContent: some View {
+        ScrollView {
+            LazyVStack(spacing: Spacing.md) {
+                ForEach(0..<4, id: \.self) { _ in
+                    skeletonCard
+                }
+            }
+            .padding(.horizontal, Sizing.pagePadding)
+            .padding(.vertical, Spacing.lg)
+        }
+    }
+
+    private var skeletonCard: some View {
+        HStack(spacing: Spacing.md) {
+            RoundedRectangle(cornerRadius: CornerRadius.image)
+                .fill(Color.mutedBackground)
+                .frame(width: Sizing.thumbnailSize, height: Sizing.thumbnailSize)
+
+            VStack(alignment: .leading, spacing: Spacing.sm) {
+                RoundedRectangle(cornerRadius: CornerRadius.small)
+                    .fill(Color.mutedBackground)
+                    .frame(height: 16)
+                    .frame(maxWidth: 140)
+                RoundedRectangle(cornerRadius: CornerRadius.small)
+                    .fill(Color.mutedBackground)
+                    .frame(height: 12)
+                    .frame(maxWidth: 60)
+                RoundedRectangle(cornerRadius: CornerRadius.small)
+                    .fill(Color.mutedBackground)
+                    .frame(height: 12)
+                    .frame(maxWidth: 80)
+            }
+            Spacer()
+        }
+        .padding(Spacing.md)
+        .background(Color.cardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.default))
+        .overlay(
+            RoundedRectangle(cornerRadius: CornerRadius.default)
+                .stroke(Color.borderColor, lineWidth: 1)
+        )
+        .redacted(reason: .placeholder)
     }
 
     // MARK: - Header
@@ -94,6 +142,7 @@ struct FeedView: View {
             }
             .padding(.horizontal, Sizing.pagePadding)
             .padding(.vertical, Spacing.lg)
+            .animation(.easeOut(duration: 0.2), value: viewModel.listings.map(\.id))
         }
         .refreshable {
             await viewModel.refresh(token: authState.token)

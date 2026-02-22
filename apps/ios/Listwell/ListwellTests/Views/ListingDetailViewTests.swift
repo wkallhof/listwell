@@ -190,4 +190,60 @@ struct ListingDetailViewTests {
         #expect(formatted.contains("Classic sneakers"))
         #expect(formatted.contains("Brand: Nike"))
     }
+
+    @Test("processing listing has isProcessing true")
+    func processingState() {
+        let listing = makeListing(status: .processing, pipelineStep: .analyzing)
+        #expect(listing.isProcessing)
+        #expect(!listing.isReady)
+    }
+
+    @Test("error listing is not processing")
+    func errorState() {
+        let listing = Listing(
+            id: "test-err", userId: "user-1", rawDescription: nil, title: nil, description: nil,
+            suggestedPrice: nil, priceRangeLow: nil, priceRangeHigh: nil, category: nil,
+            condition: nil, brand: nil, model: nil, researchNotes: nil, comparables: nil,
+            status: .processing, pipelineStep: .error, pipelineError: "Failed",
+            agentLog: nil, inngestRunId: nil, createdAt: Date(), updatedAt: Date(), images: nil
+        )
+        #expect(!listing.isProcessing)
+        #expect(listing.pipelineStep == .error)
+    }
+
+    @Test("listing without title or price shows nil")
+    func emptyListing() {
+        let listing = makeListing(title: nil, suggestedPrice: nil)
+        #expect(listing.title == nil)
+        #expect(listing.suggestedPrice == nil)
+    }
+
+    @Test("archived status is archivable")
+    func archivedStatus() {
+        let listing = makeListing(status: .archived)
+        #expect(listing.status == .archived)
+    }
+
+    @Test("sold status is correct")
+    func soldStatus() {
+        let listing = makeListing(status: .sold)
+        #expect(listing.status == .sold)
+    }
+
+    @Test("listing formatter handles listing with no description")
+    @MainActor
+    func formatNoDescription() {
+        let listing = makeListing(description: nil)
+        let formatted = ListingFormatter.formatForClipboard(listing)
+        #expect(formatted.contains("Nike Air Max 90"))
+        #expect(formatted.contains("$85"))
+    }
+
+    @Test("listing formatter handles listing with no price")
+    @MainActor
+    func formatNoPrice() {
+        let listing = makeListing(suggestedPrice: nil)
+        let formatted = ListingFormatter.formatForClipboard(listing)
+        #expect(formatted.contains("Nike Air Max 90"))
+    }
 }

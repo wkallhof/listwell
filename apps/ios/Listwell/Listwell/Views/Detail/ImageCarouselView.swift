@@ -19,6 +19,10 @@ struct ImageCarouselView: View {
                     ForEach(Array(images.enumerated()), id: \.element.id) { index, image in
                         ZStack(alignment: .bottomTrailing) {
                             KFImage(image.imageURL)
+                                .placeholder {
+                                    Color.mutedBackground
+                                }
+                                .fade(duration: 0.2)
                                 .resizable()
                                 .scaledToFill()
                                 .frame(maxWidth: .infinity)
@@ -54,6 +58,7 @@ struct ImageCarouselView: View {
                     onImagesChanged?()
                 }
             )
+            .presentationDetents([.medium, .large])
         }
     }
 

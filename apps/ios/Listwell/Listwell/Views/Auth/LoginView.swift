@@ -100,6 +100,7 @@ struct LoginView: View {
         .background(Color.cardBackground)
         .clipShape(RoundedRectangle(cornerRadius: CornerRadius.default))
         .padding(.horizontal, Sizing.pagePadding)
+        .sensoryFeedback(.selection, trigger: activeTab)
         .onChange(of: activeTab) {
             clearForm()
         }

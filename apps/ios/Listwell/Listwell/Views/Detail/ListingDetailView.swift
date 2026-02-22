@@ -9,12 +9,18 @@ struct ListingDetailView: View {
     @State private var viewModel = ListingDetailViewModel()
     @State private var showDeleteConfirmation = false
     @State private var isCopied = false
+    @State private var statusChanged = false
+    @State private var editingTitle = false
+    @State private var editTitleText = ""
+    @State private var editingDescription = false
+    @State private var editDescriptionText = ""
+    @State private var editingPrice = false
+    @State private var editPriceText = ""
 
     var body: some View {
         Group {
             if viewModel.isLoading && viewModel.listing == nil {
-                ProgressView()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                detailSkeleton
             } else if let listing = viewModel.listing {
                 if listing.isProcessing || listing.pipelineStep == .error {
                     processingContent(listing)
@@ -25,6 +31,10 @@ struct ListingDetailView: View {
                 loadErrorView(error)
             }
         }
+        .animation(.easeOut(duration: 0.2), value: viewModel.listing?.status)
+        .animation(.easeOut(duration: 0.2), value: editingTitle)
+        .animation(.easeOut(duration: 0.2), value: editingDescription)
+        .animation(.easeOut(duration: 0.2), value: editingPrice)
         .background(Color.appBackground)
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
@@ -57,6 +67,8 @@ struct ListingDetailView: View {
         } message: {
             Text("This action cannot be undone.")
         }
+        .sensoryFeedback(.selection, trigger: statusChanged)
+        .sensoryFeedback(.warning, trigger: showDeleteConfirmation)
         .task {
             await viewModel.loadListing(id: listingId, token: authState.token)
         }
@@ -249,12 +261,31 @@ struct ListingDetailView: View {
     @ViewBuilder
     private func titleSection(_ listing: Listing) -> some View {
         if let title = listing.title {
-            HStack(alignment: .top, spacing: Spacing.sm) {
-                Text(title)
-                    .font(.system(size: Typography.pageTitle, weight: .bold))
-                    .foregroundStyle(Color.appForeground)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                CopyButton(text: title, label: "title")
+            if editingTitle {
+                VStack(alignment: .leading, spacing: Spacing.sm) {
+                    TextField("Title", text: $editTitleText)
+                        .font(.system(size: Typography.pageTitle, weight: .bold))
+                        .textFieldStyle(.plain)
+                        .editFieldStyle()
+                    editActions {
+                        await viewModel.updateField(title: editTitleText, token: authState.token)
+                        editingTitle = false
+                    } onCancel: {
+                        editingTitle = false
+                    }
+                }
+            } else {
+                HStack(alignment: .top, spacing: Spacing.sm) {
+                    Text(title)
+                        .font(.system(size: Typography.pageTitle, weight: .bold))
+                        .foregroundStyle(Color.appForeground)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .onTapGesture {
+                            editTitleText = title
+                            editingTitle = true
+                        }
+                    CopyButton(text: title, label: "title")
+                }
             }
         }
     }
@@ -265,14 +296,41 @@ struct ListingDetailView: View {
     private func priceCard(_ listing: Listing) -> some View {
         if let price = listing.suggestedPrice {
             VStack(spacing: Spacing.sm) {
-                HStack(alignment: .firstTextBaseline) {
-                    Text("$\(Int(price))")
-                        .font(.system(size: Typography.priceLarge, weight: .bold))
-                        .foregroundStyle(Color.appForeground)
-                    Spacer()
-                    Text("suggested price")
-                        .font(.system(size: Typography.caption))
-                        .foregroundStyle(Color.mutedForeground)
+                if editingPrice {
+                    VStack(alignment: .leading, spacing: Spacing.sm) {
+                        HStack(spacing: Spacing.xs) {
+                            Text("$")
+                                .font(.system(size: Typography.priceLarge, weight: .bold))
+                                .foregroundStyle(Color.appForeground)
+                            TextField("Price", text: $editPriceText)
+                                .font(.system(size: Typography.priceLarge, weight: .bold))
+                                .keyboardType(.decimalPad)
+                                .textFieldStyle(.plain)
+                                .editFieldStyle()
+                        }
+                        editActions {
+                            if let newPrice = Double(editPriceText) {
+                                await viewModel.updateField(suggestedPrice: newPrice, token: authState.token)
+                            }
+                            editingPrice = false
+                        } onCancel: {
+                            editingPrice = false
+                        }
+                    }
+                } else {
+                    HStack(alignment: .firstTextBaseline) {
+                        Text("$\(Int(price))")
+                            .font(.system(size: Typography.priceLarge, weight: .bold))
+                            .foregroundStyle(Color.appForeground)
+                            .onTapGesture {
+                                editPriceText = "\(Int(price))"
+                                editingPrice = true
+                            }
+                        Spacer()
+                        Text("suggested price")
+                            .font(.system(size: Typography.caption))
+                            .foregroundStyle(Color.mutedForeground)
+                    }
                 }
 
                 if let low = listing.priceRangeLow, let high = listing.priceRangeHigh {
@@ -305,10 +363,31 @@ struct ListingDetailView: View {
                     Spacer()
                     CopyButton(text: description, label: "description")
                 }
-                Text(description)
-                    .font(.system(size: Typography.body))
-                    .foregroundStyle(Color.appForeground)
-                    .lineSpacing(4)
+
+                if editingDescription {
+                    VStack(alignment: .leading, spacing: Spacing.sm) {
+                        TextEditor(text: $editDescriptionText)
+                            .font(.system(size: Typography.body))
+                            .frame(minHeight: 120)
+                            .scrollContentBackground(.hidden)
+                            .editFieldStyle()
+                        editActions {
+                            await viewModel.updateField(description: editDescriptionText, token: authState.token)
+                            editingDescription = false
+                        } onCancel: {
+                            editingDescription = false
+                        }
+                    }
+                } else {
+                    Text(description)
+                        .font(.system(size: Typography.body))
+                        .foregroundStyle(Color.appForeground)
+                        .lineSpacing(4)
+                        .onTapGesture {
+                            editDescriptionText = description
+                            editingDescription = true
+                        }
+                }
             }
         }
     }
@@ -369,6 +448,7 @@ struct ListingDetailView: View {
                 Button {
                     Task {
                         await viewModel.updateStatus(ListingStatus.listed.rawValue, token: authState.token)
+                        statusChanged.toggle()
                     }
                 } label: {
                     Label("Mark as Listed", systemImage: "tag")
@@ -378,6 +458,7 @@ struct ListingDetailView: View {
                 Button {
                     Task {
                         await viewModel.updateStatus(ListingStatus.sold.rawValue, token: authState.token)
+                        statusChanged.toggle()
                     }
                 } label: {
                     Label("Mark as Sold", systemImage: "checkmark.seal")
@@ -386,6 +467,7 @@ struct ListingDetailView: View {
             Button {
                 Task {
                     await viewModel.updateStatus(ListingStatus.archived.rawValue, token: authState.token)
+                    statusChanged.toggle()
                 }
             } label: {
                 Label("Archive", systemImage: "archivebox")
@@ -401,6 +483,53 @@ struct ListingDetailView: View {
                 .font(.system(size: 18))
                 .foregroundStyle(Color.mutedForeground)
                 .frame(width: Sizing.minTapTarget, height: Sizing.minTapTarget)
+        }
+    }
+
+    // MARK: - Skeleton Loading
+
+    private var detailSkeleton: some View {
+        ScrollView {
+            VStack(spacing: Spacing.xl) {
+                RoundedRectangle(cornerRadius: CornerRadius.default)
+                    .fill(Color.mutedBackground)
+                    .aspectRatio(4/3, contentMode: .fit)
+
+                VStack(alignment: .leading, spacing: Spacing.lg) {
+                    RoundedRectangle(cornerRadius: CornerRadius.small)
+                        .fill(Color.mutedBackground)
+                        .frame(height: 24)
+                        .frame(maxWidth: 200)
+                    RoundedRectangle(cornerRadius: CornerRadius.small)
+                        .fill(Color.mutedBackground)
+                        .frame(height: 40)
+                        .frame(maxWidth: 120)
+                    RoundedRectangle(cornerRadius: CornerRadius.small)
+                        .fill(Color.mutedBackground)
+                        .frame(height: 60)
+                    RoundedRectangle(cornerRadius: CornerRadius.small)
+                        .fill(Color.mutedBackground)
+                        .frame(height: 80)
+                }
+                .padding(.horizontal, Sizing.pagePadding)
+            }
+        }
+        .redacted(reason: .placeholder)
+    }
+
+    // MARK: - Edit Actions Helper
+
+    private func editActions(onSave: @escaping () async -> Void, onCancel: @escaping () -> Void) -> some View {
+        HStack(spacing: Spacing.sm) {
+            Button("Save") {
+                Task { await onSave() }
+            }
+            .font(.system(size: Typography.body, weight: .medium))
+            .foregroundStyle(Color.accentColor)
+
+            Button("Cancel", action: onCancel)
+                .font(.system(size: Typography.body))
+                .foregroundStyle(Color.mutedForeground)
         }
     }
 

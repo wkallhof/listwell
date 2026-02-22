@@ -87,6 +87,24 @@ final class ListingDetailViewModel {
         }
     }
 
+    func updateField(title: String? = nil, description: String? = nil, suggestedPrice: Double? = nil, token: String?) async {
+        guard let token, let id = listingId else { return }
+        var updates = PatchListingRequest()
+        updates.title = title
+        updates.description = description
+        updates.suggestedPrice = suggestedPrice
+
+        do {
+            listing = try await listingsService.updateListing(
+                id: id, updates: updates, token: token, client: .shared
+            )
+        } catch let error as APIError {
+            errorMessage = error.errorDescription
+        } catch {
+            errorMessage = "Failed to update listing."
+        }
+    }
+
     func copyFullListing() {
         guard let listing else { return }
         let text = ListingFormatter.formatForClipboard(listing)
