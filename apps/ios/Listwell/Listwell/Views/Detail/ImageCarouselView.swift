@@ -3,8 +3,12 @@ import Kingfisher
 
 struct ImageCarouselView: View {
     let images: [ListingImage]
+    let listingId: String
+    let token: String?
+    var onImagesChanged: (() -> Void)?
 
     @State private var currentIndex = 0
+    @State private var enhancingImage: ListingImage?
 
     var body: some View {
         VStack(spacing: Spacing.md) {
@@ -13,13 +17,19 @@ struct ImageCarouselView: View {
             } else {
                 TabView(selection: $currentIndex) {
                     ForEach(Array(images.enumerated()), id: \.element.id) { index, image in
-                        KFImage(image.imageURL)
-                            .resizable()
-                            .scaledToFill()
-                            .frame(maxWidth: .infinity)
-                            .aspectRatio(4/3, contentMode: .fit)
-                            .clipped()
-                            .tag(index)
+                        ZStack(alignment: .bottomTrailing) {
+                            KFImage(image.imageURL)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(maxWidth: .infinity)
+                                .aspectRatio(4/3, contentMode: .fit)
+                                .clipped()
+
+                            if image.isOriginal {
+                                enhanceButton(for: image)
+                            }
+                        }
+                        .tag(index)
                     }
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))
@@ -31,7 +41,44 @@ struct ImageCarouselView: View {
                 }
             }
         }
+        .sheet(item: $enhancingImage) { image in
+            EnhancementSheet(
+                viewModel: EnhancementViewModel(
+                    originalImage: image,
+                    listingId: listingId,
+                    allImages: images
+                ),
+                token: token,
+                onDismiss: {
+                    enhancingImage = nil
+                    onImagesChanged?()
+                }
+            )
+        }
     }
+
+    // MARK: - Enhance Button
+
+    private func enhanceButton(for image: ListingImage) -> some View {
+        Button {
+            enhancingImage = image
+        } label: {
+            HStack(spacing: Spacing.xs) {
+                Image(systemName: "wand.and.stars")
+                    .font(.system(size: 12))
+                Text("Enhance")
+                    .font(.system(size: Typography.caption, weight: .medium))
+            }
+            .foregroundStyle(Color.appForeground)
+            .padding(.horizontal, Spacing.md)
+            .padding(.vertical, Spacing.sm)
+            .background(.ultraThinMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: CornerRadius.small))
+        }
+        .padding(Spacing.md)
+    }
+
+    // MARK: - Placeholder
 
     private var placeholderView: some View {
         Color.mutedBackground
@@ -43,6 +90,8 @@ struct ImageCarouselView: View {
                     .foregroundStyle(Color.mutedForeground.opacity(0.3))
             }
     }
+
+    // MARK: - Dot Indicators
 
     private var dotIndicators: some View {
         HStack(spacing: 6) {

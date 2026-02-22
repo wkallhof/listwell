@@ -63,7 +63,18 @@ struct ListingDetailView: View {
         ZStack(alignment: .bottom) {
             ScrollView {
                 VStack(spacing: Spacing.xl) {
-                    ImageCarouselView(images: listing.images ?? [])
+                    ImageCarouselView(
+                        images: listing.images ?? [],
+                        listingId: listingId,
+                        token: authState.token,
+                        onImagesChanged: {
+                            Task {
+                                await viewModel.loadListing(
+                                    id: listingId, token: authState.token
+                                )
+                            }
+                        }
+                    )
 
                     VStack(spacing: Spacing.xl) {
                         statusRow(listing)
@@ -226,7 +237,7 @@ struct ListingDetailView: View {
             if listing.status == .ready {
                 Button {
                     Task {
-                        await viewModel.updateStatus("LISTED", token: authState.token)
+                        await viewModel.updateStatus(ListingStatus.listed.rawValue, token: authState.token)
                     }
                 } label: {
                     Label("Mark as Listed", systemImage: "tag")
@@ -235,7 +246,7 @@ struct ListingDetailView: View {
             if listing.status == .listed {
                 Button {
                     Task {
-                        await viewModel.updateStatus("SOLD", token: authState.token)
+                        await viewModel.updateStatus(ListingStatus.sold.rawValue, token: authState.token)
                     }
                 } label: {
                     Label("Mark as Sold", systemImage: "checkmark.seal")
@@ -243,7 +254,7 @@ struct ListingDetailView: View {
             }
             Button {
                 Task {
-                    await viewModel.updateStatus("ARCHIVED", token: authState.token)
+                    await viewModel.updateStatus(ListingStatus.archived.rawValue, token: authState.token)
                 }
             } label: {
                 Label("Archive", systemImage: "archivebox")

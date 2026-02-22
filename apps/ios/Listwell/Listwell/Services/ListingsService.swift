@@ -43,4 +43,25 @@ enum ListingsService {
     ) async throws {
         try await client.requestVoid(.delete, path: "/listings/\(id)", token: token)
     }
+
+    // MARK: - Image Enhancement
+
+    static func enhanceImage(
+        listingId: String,
+        imageId: String,
+        token: String,
+        client: APIClient = .shared
+    ) async throws {
+        let body = EnhanceRequest(imageId: imageId)
+        try await client.requestVoid(.post, path: "/listings/\(listingId)/enhance", body: body, token: token)
+    }
+
+    static func deleteImage(
+        listingId: String,
+        imageId: String,
+        token: String,
+        client: APIClient = .shared
+    ) async throws {
+        try await client.requestVoid(.delete, path: "/listings/\(listingId)/images?imageId=\(imageId)", token: token)
+    }
 }
