@@ -37,5 +37,13 @@
 	<array>
 		<string>arm64</string>
 	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Listwell uses speech recognition to describe your items by voice</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Listwell needs microphone access for voice descriptions</string>
 </dict>
 </plist>

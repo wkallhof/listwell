@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ContentView: View {
     @Environment(AuthState.self) private var authState
+    @Environment(PushNotificationManager.self) private var pushManager
 
     var body: some View {
         Group {
@@ -15,6 +16,16 @@ struct ContentView: View {
         }
         .task {
             await authState.checkExistingSession()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .didRegisterForRemoteNotifications)) { notification in
+            if let tokenData = notification.userInfo?["deviceToken"] as? Data {
+                pushManager.handleDeviceToken(tokenData)
+                if let authToken = authState.token {
+                    Task {
+                        await pushManager.subscribeToAPI(token: authToken)
+                    }
+                }
+            }
         }
     }
 
@@ -41,4 +52,5 @@ struct MainView: View {
 #Preview("Logged Out") {
     ContentView()
         .environment(AuthState())
+        .environment(PushNotificationManager())
 }

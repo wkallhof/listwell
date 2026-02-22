@@ -120,9 +120,11 @@ export const pushSubscriptions = pgTable(
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
-    endpoint: text("endpoint").notNull(),
-    p256dh: text("p256dh").notNull(),
-    auth: text("auth").notNull(),
+    type: text("type").notNull().default("web"),
+    endpoint: text("endpoint"),
+    p256dh: text("p256dh"),
+    auth: text("auth"),
+    deviceToken: text("device_token"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),

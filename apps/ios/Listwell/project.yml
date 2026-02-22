@@ -32,6 +32,11 @@ targets:
         TARGETED_DEVICE_FAMILY: "1"
         SUPPORTS_MACCATALYST: false
         SWIFT_EMIT_LOC_STRINGS: true
+        CODE_SIGN_ENTITLEMENTS: Listwell/Listwell.entitlements
+    entitlements:
+      path: Listwell/Listwell.entitlements
+      properties:
+        aps-environment: development
     dependencies:
       - package: Kingfisher
     scheme:

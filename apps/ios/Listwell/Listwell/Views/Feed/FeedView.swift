@@ -22,6 +22,11 @@ struct FeedView: View {
         .task {
             await viewModel.loadListings(token: authState.token)
         }
+        .onReceive(NotificationCenter.default.publisher(for: .navigateToListing)) { notification in
+            if let listingId = notification.userInfo?["listingId"] as? String {
+                navigationPath.append(listingId)
+            }
+        }
     }
 
     // MARK: - Main Content
