@@ -44,6 +44,10 @@
 	<array>
 		<string>remote-notification</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>Listwell uses the camera to take photos of items for your listings</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Listwell needs photo library access to select item photos for your listings</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>Listwell uses speech recognition to describe your items by voice</string>
 	<key>NSMicrophoneUsageDescription</key>

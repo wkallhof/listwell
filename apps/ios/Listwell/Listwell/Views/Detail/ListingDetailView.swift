@@ -1,5 +1,5 @@
 import SwiftUI
-import Kingfisher
+import MarkdownUI
 
 struct ListingDetailView: View {
     let listingId: String
@@ -84,7 +84,18 @@ struct ListingDetailView: View {
         ScrollView {
             VStack(spacing: Spacing.xl) {
                 processingHeader()
-                photoPreview(listing)
+                ImageCarouselView(
+                    images: listing.images ?? [],
+                    listingId: listingId,
+                    token: authState.token,
+                    onImagesChanged: {
+                        Task {
+                            await viewModel.loadListing(
+                                id: listingId, token: authState.token
+                            )
+                        }
+                    }
+                )
 
                 VStack(spacing: Spacing.xl) {
                     if listing.pipelineStep == .error {
@@ -118,24 +129,6 @@ struct ListingDetailView: View {
                 .foregroundStyle(Color.appForeground)
             Spacer()
         }
-        .padding(.horizontal, Sizing.pagePadding)
-    }
-
-    @ViewBuilder
-    private func photoPreview(_ listing: Listing) -> some View {
-        Group {
-            if let url = listing.primaryImageURL {
-                KFImage(url)
-                    .resizable()
-                    .aspectRatio(4/3, contentMode: .fill)
-                    .clipped()
-            } else {
-                Rectangle()
-                    .fill(Color.mutedBackground)
-                    .aspectRatio(4/3, contentMode: .fill)
-            }
-        }
-        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.image))
         .padding(.horizontal, Sizing.pagePadding)
     }
 
@@ -304,10 +297,11 @@ struct ListingDetailView: View {
                 Text("Market Notes")
                     .font(.system(size: Typography.sectionHeading, weight: .semibold))
                     .foregroundStyle(Color.appForeground)
-                Text(notes)
-                    .font(.system(size: Typography.body))
-                    .foregroundStyle(Color.mutedForeground)
-                    .lineSpacing(4)
+                Markdown(notes)
+                    .markdownTextStyle {
+                        FontSize(Typography.body)
+                        ForegroundColor(Color.mutedForeground)
+                    }
             }
         }
     }

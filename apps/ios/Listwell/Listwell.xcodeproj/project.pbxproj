@@ -12,6 +12,7 @@
 		08F41DFF8D39584C5B1B4AD0 /* APIModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54612F11132171C09C05608D /* APIModels.swift */; };
 		0BC4BCA70421214CCBAB2DCA /* PipelineStepsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CA2886DE964E9A3FD11E401 /* PipelineStepsView.swift */; };
 		174BFF9F1A81A4B009899048 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 448BB569502FA7F5E363C5A8 /* Kingfisher */; };
+		F9A0B1C2D3E4F5A6B7C8D9EA /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = E8F9A0B1C2D3E4F5A6B7C8D9 /* MarkdownUI */; };
 		18D05EB0125F4382E204874D /* CaptureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88924FFEEDE8B1AA1E1BB3C6 /* CaptureView.swift */; };
 		1B593F2ADBE50911C21D3103 /* SpeechRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F6FA20D983C1523214238EC /* SpeechRecognizer.swift */; };
 		24E8066DFF620B79A9BAF21F /* ListingFormatterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 122843332F2933508D6AAF68 /* ListingFormatterTests.swift */; };
@@ -185,6 +186,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				174BFF9F1A81A4B009899048 /* Kingfisher in Frameworks */,
+				F9A0B1C2D3E4F5A6B7C8D9EA /* MarkdownUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -496,6 +498,7 @@
 			name = Listwell;
 			packageProductDependencies = (
 				448BB569502FA7F5E363C5A8 /* Kingfisher */,
+				E8F9A0B1C2D3E4F5A6B7C8D9 /* MarkdownUI */,
 			);
 			productName = Listwell;
 			productReference = 9EAB2817E001FB0D7DDF3951 /* Listwell.app */;
@@ -530,6 +533,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				BE914173099417541AA10FF9 /* XCRemoteSwiftPackageReference "Kingfisher" */,
+				D7E8F9A0B1C2D3E4F5A6B7C8 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
 			);
 			projectDirPath = "";
 			projectRoot = "";
@@ -952,6 +956,14 @@
 				minimumVersion = 7.0.0;
 			};
 		};
+		D7E8F9A0B1C2D3E4F5A6B7C8 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/gonzalezreal/swift-markdown-ui.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -959,6 +971,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = BE914173099417541AA10FF9 /* XCRemoteSwiftPackageReference "Kingfisher" */;
 			productName = Kingfisher;
+		};
+		E8F9A0B1C2D3E4F5A6B7C8D9 /* MarkdownUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D7E8F9A0B1C2D3E4F5A6B7C8 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */;
+			productName = MarkdownUI;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

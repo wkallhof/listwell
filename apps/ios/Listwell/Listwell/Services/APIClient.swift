@@ -48,9 +48,21 @@ actor APIClient {
 
     let baseURL: String
 
-    init(baseURL: String = APIConfig.baseURL, session: URLSession = .shared) {
+    init(baseURL: String = APIConfig.baseURL, session: URLSession? = nil) {
         self.baseURL = baseURL
-        self.session = session
+        // Use a session that doesn't send cookies. The app authenticates
+        // via Bearer tokens, not cookies. Stale cookies from URLSession's
+        // shared cookie storage trigger BetterAuth's CSRF origin check,
+        // which fails because native apps don't send an Origin header.
+        if let session {
+            self.session = session
+        } else {
+            let config = URLSessionConfiguration.default
+            config.httpShouldSetCookies = false
+            config.httpCookieAcceptPolicy = .never
+            config.httpCookieStorage = nil
+            self.session = URLSession(configuration: config)
+        }
 
         self.encoder = JSONEncoder()
 
