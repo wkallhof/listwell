@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 import UIKit
 
 @Observable
@@ -25,7 +26,12 @@ final class ListingDetailViewModel {
         defer { isLoading = false }
 
         do {
-            listing = try await listingsService.fetchListing(id: id, token: token, client: .shared)
+            let fetched = try await listingsService.fetchListing(id: id, token: token, client: .shared)
+            if listing != nil && fetched.status != listing?.status {
+                withAnimation(.easeOut(duration: 0.2)) { listing = fetched }
+            } else {
+                listing = fetched
+            }
             startPollingIfNeeded(token: token)
         } catch let error as APIError {
             errorMessage = error.errorDescription
@@ -133,7 +139,14 @@ final class ListingDetailViewModel {
 
                 do {
                     let updated = try await service.fetchListing(id: id, token: token, client: .shared)
-                    self.listing = updated
+                    let statusChanged = updated.status != self.listing?.status
+                        || updated.pipelineStep != self.listing?.pipelineStep
+
+                    if statusChanged {
+                        withAnimation(.easeOut(duration: 0.2)) { self.listing = updated }
+                    } else {
+                        self.listing = updated
+                    }
 
                     if !updated.isProcessing {
                         self.stopPolling()

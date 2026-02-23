@@ -8,8 +8,8 @@ export default function manifest(): MetadataRoute.Manifest {
       "Turn photos of items into ready-to-post marketplace listings with AI",
     start_url: "/",
     display: "standalone",
-    background_color: "#ffffff",
-    theme_color: "#279E89",
+    background_color: "#F4F1EB",
+    theme_color: "#259E89",
     icons: [
       {
         src: "/icon-192x192.png",

@@ -31,10 +31,6 @@ struct ListingDetailView: View {
                 loadErrorView(error)
             }
         }
-        .animation(.easeOut(duration: 0.2), value: viewModel.listing?.status)
-        .animation(.easeOut(duration: 0.2), value: editingTitle)
-        .animation(.easeOut(duration: 0.2), value: editingDescription)
-        .animation(.easeOut(duration: 0.2), value: editingPrice)
         .background(Color.appBackground)
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)

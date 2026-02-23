@@ -1,12 +1,18 @@
 // @vitest-environment node
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+vi.mock("next/font/google", () => ({
+  Fraunces: () => ({ variable: "--font-fraunces" }),
+  Instrument_Sans: () => ({ variable: "--font-instrument-sans" }),
+  JetBrains_Mono: () => ({ variable: "--font-jetbrains-mono" }),
+}));
 
 describe("RootLayout", () => {
   it("exports viewport with cover viewport-fit", async () => {
     const mod = await import("@/app/layout");
     expect(mod.viewport).toBeDefined();
     expect(mod.viewport.viewportFit).toBe("cover");
-    expect(mod.viewport.themeColor).toBe("#279E89");
+    expect(mod.viewport.themeColor).toBe("#259E89");
   });
 
   it("exports metadata with apple web app config", async () => {

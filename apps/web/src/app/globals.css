@@ -6,104 +6,162 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --radius: 0.625rem;
+  --radius: 10px;
 
-  /* Backgrounds */
-  --background: hsl(0 0% 100%);
-  --foreground: hsl(240 10% 8%);
-
-  --card: hsl(0 0% 100%);
-  --card-foreground: hsl(240 10% 8%);
-
-  --popover: hsl(0 0% 100%);
-  --popover-foreground: hsl(240 10% 8%);
-
-  /* Brand / Primary — warm teal-green */
-  --primary: hsl(168 60% 38%);
+  /* --- Primary --- */
+  --primary: hsl(166 62% 38%);
   --primary-foreground: hsl(0 0% 100%);
+  --primary-hover: hsl(166 62% 30%);
+  --primary-light: hsl(166 50% 95%);
+  --primary-glow: hsl(166 62% 38% / 0.12);
 
-  /* Secondary — neutral warm gray */
-  --secondary: hsl(240 5% 96%);
-  --secondary-foreground: hsl(240 10% 25%);
+  /* --- Backgrounds --- */
+  --background: hsl(36 18% 95%);
+  --background-warm: hsl(36 18% 91%);
+  --background-bright: hsl(36 18% 98%);
 
-  /* Muted */
-  --muted: hsl(240 5% 96%);
-  --muted-foreground: hsl(240 5% 46%);
+  /* --- Surfaces --- */
+  --card: hsl(0 0% 100%);
+  --card-foreground: hsl(160 6% 18%);
+  --popover: hsl(0 0% 100%);
+  --popover-foreground: hsl(160 6% 18%);
 
-  /* Accent — light teal tint */
-  --accent: hsl(168 50% 95%);
-  --accent-foreground: hsl(168 60% 28%);
+  /* --- Text --- */
+  --foreground: hsl(160 6% 18%);
+  --muted-foreground: hsl(160 4% 36%);
+  --faint-foreground: hsl(160 3% 55%);
 
-  /* Destructive */
-  --destructive: hsl(0 72% 51%);
+  /* --- Borders --- */
+  --border: hsl(160 8% 90%);
+  --border-strong: hsl(160 8% 82%);
+  --input: hsl(160 8% 90%);
+  --ring: hsl(166 62% 38%);
+
+  /* --- Semantic --- */
+  --destructive: hsl(4 72% 51%);
   --destructive-foreground: hsl(0 0% 100%);
+  --gold: hsl(43 80% 55%);
+  --gold-soft: hsl(43 80% 55% / 0.15);
 
-  /* Borders & Inputs */
-  --border: hsl(240 6% 90%);
-  --input: hsl(240 6% 90%);
-  --ring: hsl(168 60% 38%);
+  /* --- Shed (dark accent sections) --- */
+  --shed: hsl(160 22% 14%);
+  --shed-deep: hsl(160 25% 8%);
+  --shed-foreground: hsl(36 18% 95%);
 
-  /* Chart colors */
-  --chart-1: hsl(168 60% 38%);
-  --chart-2: hsl(168 50% 50%);
-  --chart-3: hsl(168 40% 60%);
-  --chart-4: hsl(168 30% 70%);
-  --chart-5: hsl(168 20% 80%);
+  /* --- shadcn mapped --- */
+  --secondary: hsl(36 18% 91%);
+  --secondary-foreground: hsl(160 6% 18%);
+  --accent: hsl(166 50% 95%);
+  --accent-foreground: hsl(166 62% 28%);
+  --muted: hsl(36 12% 92%);
 
-  /* Sidebar */
-  --sidebar: hsl(0 0% 98%);
-  --sidebar-foreground: hsl(240 10% 8%);
-  --sidebar-primary: hsl(168 60% 38%);
+  /* --- Chart --- */
+  --chart-1: hsl(166 62% 38%);
+  --chart-2: hsl(166 50% 50%);
+  --chart-3: hsl(166 40% 60%);
+  --chart-4: hsl(166 30% 70%);
+  --chart-5: hsl(166 20% 80%);
+
+  /* --- Sidebar --- */
+  --sidebar: hsl(36 18% 98%);
+  --sidebar-foreground: hsl(160 6% 18%);
+  --sidebar-primary: hsl(166 62% 38%);
   --sidebar-primary-foreground: hsl(0 0% 100%);
-  --sidebar-accent: hsl(168 50% 95%);
-  --sidebar-accent-foreground: hsl(168 60% 28%);
-  --sidebar-border: hsl(240 6% 90%);
-  --sidebar-ring: hsl(168 60% 38%);
+  --sidebar-accent: hsl(166 50% 95%);
+  --sidebar-accent-foreground: hsl(166 62% 28%);
+  --sidebar-border: hsl(160 8% 90%);
+  --sidebar-ring: hsl(166 62% 38%);
+
+  /* --- Shadows (warm-shifted) --- */
+  --shadow-xs: 0 1px 2px hsl(160 22% 14% / 0.04);
+  --shadow-sm: 0 1px 3px hsl(160 22% 14% / 0.06), 0 1px 2px hsl(160 22% 14% / 0.04);
+  --shadow-md: 0 4px 12px hsl(160 22% 14% / 0.06), 0 2px 4px hsl(160 22% 14% / 0.03);
+  --shadow-lg: 0 8px 24px hsl(160 22% 14% / 0.08), 0 4px 8px hsl(160 22% 14% / 0.04);
+  --shadow-xl: 0 20px 48px hsl(160 22% 14% / 0.1), 0 8px 16px hsl(160 22% 14% / 0.05);
+  --shadow-primary: 0 2px 12px hsl(166 62% 38% / 0.25), 0 1px 3px hsl(166 62% 38% / 0.15);
+
+  /* --- Motion --- */
+  --duration-fast: 120ms;
+  --duration-normal: 200ms;
+  --duration-slow: 350ms;
+  --duration-reveal: 650ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.45, 0, 0.55, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .dark {
-  --background: hsl(240 10% 6%);
-  --foreground: hsl(0 0% 95%);
+  /* --- Primary --- */
+  --primary: hsl(166 55% 45%);
+  --primary-foreground: hsl(160 25% 8%);
+  --primary-hover: hsl(166 55% 52%);
+  --primary-light: hsl(166 40% 12%);
+  --primary-glow: hsl(166 55% 45% / 0.15);
 
-  --card: hsl(240 8% 10%);
-  --card-foreground: hsl(0 0% 95%);
+  /* --- Backgrounds --- */
+  --background: hsl(160 15% 6%);
+  --background-warm: hsl(160 12% 8%);
+  --background-bright: hsl(160 10% 10%);
 
-  --popover: hsl(240 8% 10%);
-  --popover-foreground: hsl(0 0% 95%);
+  /* --- Surfaces --- */
+  --card: hsl(160 10% 10%);
+  --card-foreground: hsl(36 12% 88%);
+  --popover: hsl(160 10% 10%);
+  --popover-foreground: hsl(36 12% 88%);
 
-  --primary: hsl(168 55% 45%);
-  --primary-foreground: hsl(0 0% 100%);
+  /* --- Text --- */
+  --foreground: hsl(36 12% 90%);
+  --muted-foreground: hsl(36 6% 55%);
+  --faint-foreground: hsl(36 4% 40%);
 
-  --secondary: hsl(240 6% 16%);
-  --secondary-foreground: hsl(0 0% 85%);
+  /* --- Borders --- */
+  --border: hsl(160 8% 16%);
+  --border-strong: hsl(160 8% 22%);
+  --input: hsl(160 8% 16%);
+  --ring: hsl(166 55% 45%);
 
-  --muted: hsl(240 6% 16%);
-  --muted-foreground: hsl(240 5% 55%);
-
-  --accent: hsl(168 40% 14%);
-  --accent-foreground: hsl(168 55% 65%);
-
-  --destructive: hsl(0 62% 55%);
+  /* --- Semantic --- */
+  --destructive: hsl(4 72% 55%);
   --destructive-foreground: hsl(0 0% 100%);
+  --gold: hsl(43 75% 55%);
+  --gold-soft: hsl(43 75% 55% / 0.15);
 
-  --border: hsl(240 6% 18%);
-  --input: hsl(240 6% 18%);
-  --ring: hsl(168 55% 45%);
+  /* --- Shed --- */
+  --shed: hsl(36 12% 90%);
+  --shed-deep: hsl(160 15% 4%);
+  --shed-foreground: hsl(160 15% 6%);
 
-  --chart-1: hsl(168 55% 45%);
-  --chart-2: hsl(168 45% 55%);
-  --chart-3: hsl(168 35% 65%);
-  --chart-4: hsl(168 25% 75%);
-  --chart-5: hsl(168 15% 85%);
+  /* --- shadcn mapped --- */
+  --secondary: hsl(160 10% 12%);
+  --secondary-foreground: hsl(36 12% 88%);
+  --accent: hsl(166 40% 12%);
+  --accent-foreground: hsl(166 55% 60%);
+  --muted: hsl(160 8% 14%);
 
-  --sidebar: hsl(240 8% 10%);
-  --sidebar-foreground: hsl(0 0% 95%);
-  --sidebar-primary: hsl(168 55% 45%);
-  --sidebar-primary-foreground: hsl(0 0% 100%);
-  --sidebar-accent: hsl(168 40% 14%);
-  --sidebar-accent-foreground: hsl(168 55% 65%);
-  --sidebar-border: hsl(240 6% 18%);
-  --sidebar-ring: hsl(168 55% 45%);
+  /* --- Chart --- */
+  --chart-1: hsl(166 55% 45%);
+  --chart-2: hsl(166 45% 55%);
+  --chart-3: hsl(166 35% 65%);
+  --chart-4: hsl(166 25% 75%);
+  --chart-5: hsl(166 15% 85%);
+
+  /* --- Sidebar --- */
+  --sidebar: hsl(160 10% 10%);
+  --sidebar-foreground: hsl(36 12% 88%);
+  --sidebar-primary: hsl(166 55% 45%);
+  --sidebar-primary-foreground: hsl(160 25% 8%);
+  --sidebar-accent: hsl(166 40% 12%);
+  --sidebar-accent-foreground: hsl(166 55% 60%);
+  --sidebar-border: hsl(160 8% 16%);
+  --sidebar-ring: hsl(166 55% 45%);
+
+  /* --- Shadows (dark mode) --- */
+  --shadow-xs: 0 1px 2px hsl(0 0% 0% / 0.2);
+  --shadow-sm: 0 1px 3px hsl(0 0% 0% / 0.3);
+  --shadow-md: 0 4px 12px hsl(0 0% 0% / 0.3);
+  --shadow-lg: 0 8px 24px hsl(0 0% 0% / 0.4);
+  --shadow-xl: 0 20px 48px hsl(0 0% 0% / 0.5);
+  --shadow-primary: 0 2px 12px hsl(166 55% 45% / 0.2), 0 1px 3px hsl(166 55% 45% / 0.1);
 }
 
 @layer base {
@@ -113,16 +171,8 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family:
-      ui-sans-serif,
-      system-ui,
-      -apple-system,
-      BlinkMacSystemFont,
-      "Segoe UI",
-      Roboto,
-      "Helvetica Neue",
-      Arial,
-      sans-serif;
+    font-family: var(--font-instrument-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 0.9rem;
   }
 }
 
@@ -142,14 +192,21 @@
 }
 
 @theme inline {
+  /* --- Colors --- */
   --color-background: var(--background);
+  --color-background-warm: var(--background-warm);
+  --color-background-bright: var(--background-bright);
   --color-foreground: var(--foreground);
+  --color-faint-foreground: var(--faint-foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-light: var(--primary-light);
+  --color-primary-glow: var(--primary-glow);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
@@ -159,8 +216,14 @@
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
+  --color-shed: var(--shed);
+  --color-shed-deep: var(--shed-deep);
+  --color-shed-foreground: var(--shed-foreground);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
@@ -175,18 +238,15 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 8px);
-  --radius-3xl: calc(var(--radius) + 12px);
-  --radius-4xl: calc(var(--radius) + 16px);
+  /* --- Radius --- */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
 
-  --font-sans:
-    ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-mono:
-    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
-    "Liberation Mono", monospace;
+  /* --- Fonts --- */
+  --font-sans: var(--font-instrument-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: var(--font-fraunces), "Georgia", serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
 }

@@ -15,16 +15,16 @@ struct ListingDetailTitleSection: View {
                     .editFieldStyle()
                 EditActionsView {
                     await onSave()
-                    isEditing = false
+                    withAnimation(.easeOut(duration: 0.2)) { isEditing = false }
                 } onCancel: {
-                    isEditing = false
+                    withAnimation(.easeOut(duration: 0.2)) { isEditing = false }
                 }
             }
         } else {
             HStack(alignment: .top, spacing: Spacing.sm) {
                 Button {
                     editText = title
-                    isEditing = true
+                    withAnimation(.easeOut(duration: 0.2)) { isEditing = true }
                 } label: {
                     Text(title)
                         .font(.system(size: Typography.pageTitle, weight: .bold))

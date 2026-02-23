@@ -24,16 +24,16 @@ struct ListingDetailPriceCard: View {
                     }
                     EditActionsView {
                         await onSave()
-                        isEditing = false
+                        withAnimation(.easeOut(duration: 0.2)) { isEditing = false }
                     } onCancel: {
-                        isEditing = false
+                        withAnimation(.easeOut(duration: 0.2)) { isEditing = false }
                     }
                 }
             } else {
                 HStack(alignment: .firstTextBaseline) {
                     Button {
                         editText = "\(Int(price))"
-                        isEditing = true
+                        withAnimation(.easeOut(duration: 0.2)) { isEditing = true }
                     } label: {
                         Text("$\(Int(price))")
                             .font(.system(size: Typography.priceLarge, weight: .bold))

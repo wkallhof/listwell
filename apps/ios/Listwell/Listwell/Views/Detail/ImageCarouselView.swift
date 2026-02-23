@@ -18,25 +18,27 @@ struct ImageCarouselView: View {
                 ScrollView(.horizontal) {
                     LazyHStack(spacing: 0) {
                         ForEach(Array(images.enumerated()), id: \.element.id) { index, image in
-                            ZStack(alignment: .bottomTrailing) {
-                                KFImage(image.imageURL)
-                                    .placeholder {
-                                        Color.mutedBackground
-                                    }
-                                    .fade(duration: 0.2)
-                                    .resizable()
-                                    .scaledToFill()
-                                    .containerRelativeFrame(.horizontal)
-                                    .aspectRatio(4/3, contentMode: .fit)
-                                    .clipped()
-
-                                if image.isOriginal {
-                                    enhanceButton(for: image)
+                            Color.clear
+                                .aspectRatio(4/3, contentMode: .fit)
+                                .overlay {
+                                    KFImage(image.imageURL)
+                                        .placeholder {
+                                            Color.mutedBackground
+                                        }
+                                        .fade(duration: 0.2)
+                                        .resizable()
+                                        .scaledToFill()
                                 }
-                            }
-                            .containerRelativeFrame(.horizontal)
-                            .id(index)
-                            .accessibilityLabel("Photo \(index + 1) of \(images.count)")
+                                .clipped()
+                                .overlay(alignment: .bottomTrailing) {
+                                    if image.isOriginal {
+                                        enhanceButton(for: image)
+                                    }
+                                }
+                                .contentShape(Rectangle())
+                                .containerRelativeFrame(.horizontal)
+                                .id(index)
+                                .accessibilityLabel("Photo \(index + 1) of \(images.count)")
                         }
                     }
                     .scrollTargetLayout()
@@ -45,7 +47,7 @@ struct ImageCarouselView: View {
                 .scrollIndicators(.hidden)
                 .scrollPosition(id: Binding(
                     get: { currentIndex },
-                    set: { if let newValue = $0 { currentIndex = newValue } }
+                    set: { if let newValue = $0, newValue != currentIndex { currentIndex = newValue } }
                 ))
                 .aspectRatio(4/3, contentMode: .fit)
                 .clipShape(RoundedRectangle(cornerRadius: CornerRadius.default))

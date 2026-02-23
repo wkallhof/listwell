@@ -15,8 +15,8 @@ describe("manifest", () => {
   it("includes brand colors", () => {
     const result = manifest();
 
-    expect(result.background_color).toBe("#ffffff");
-    expect(result.theme_color).toBe("#279E89");
+    expect(result.background_color).toBe("#F4F1EB");
+    expect(result.theme_color).toBe("#259E89");
   });
 
   it("includes required icon sizes", () => {

@@ -25,15 +25,15 @@ struct ListingDetailDescriptionSection: View {
                         .editFieldStyle()
                     EditActionsView {
                         await onSave()
-                        isEditing = false
+                        withAnimation(.easeOut(duration: 0.2)) { isEditing = false }
                     } onCancel: {
-                        isEditing = false
+                        withAnimation(.easeOut(duration: 0.2)) { isEditing = false }
                     }
                 }
             } else {
                 Button {
                     editText = description
-                    isEditing = true
+                    withAnimation(.easeOut(duration: 0.2)) { isEditing = true }
                 } label: {
                     Text(description)
                         .font(.system(size: Typography.body))
