@@ -134,16 +134,16 @@ describe("ImageCarousel", () => {
     });
   });
 
-  it("opens lightbox when image is clicked", () => {
+  it("opens fullscreen viewer when image is clicked", () => {
     const { container } = render(<ImageCarousel images={mockImages} />);
 
     const images = container.querySelectorAll("img");
     fireEvent.click(images[0]);
 
-    expect(screen.getByRole("dialog", { name: "Fullscreen image" })).toBeInTheDocument();
+    expect(screen.getByRole("dialog", { name: "Fullscreen image viewer" })).toBeInTheDocument();
   });
 
-  it("shows close button in lightbox", () => {
+  it("shows close button in fullscreen viewer", () => {
     const { container } = render(<ImageCarousel images={mockImages} />);
 
     const images = container.querySelectorAll("img");
@@ -152,7 +152,16 @@ describe("ImageCarousel", () => {
     expect(screen.getByLabelText("Close fullscreen")).toBeInTheDocument();
   });
 
-  it("closes lightbox when close button is clicked", () => {
+  it("shows image counter in fullscreen viewer", () => {
+    const { container } = render(<ImageCarousel images={mockImages} />);
+
+    const images = container.querySelectorAll("img");
+    fireEvent.click(images[0]);
+
+    expect(screen.getByText(/1 of 3/)).toBeInTheDocument();
+  });
+
+  it("closes fullscreen viewer when close button is clicked", () => {
     const { container } = render(<ImageCarousel images={mockImages} />);
 
     const images = container.querySelectorAll("img");
@@ -165,19 +174,7 @@ describe("ImageCarousel", () => {
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
-  it("closes lightbox when backdrop is clicked", () => {
-    const { container } = render(<ImageCarousel images={mockImages} />);
-
-    const images = container.querySelectorAll("img");
-    fireEvent.click(images[0]);
-
-    const backdrop = screen.getByRole("dialog");
-    fireEvent.click(backdrop);
-
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-  });
-
-  it("closes lightbox on Escape key", () => {
+  it("closes fullscreen viewer on Escape key", () => {
     const { container } = render(<ImageCarousel images={mockImages} />);
 
     const images = container.querySelectorAll("img");
@@ -188,5 +185,88 @@ describe("ImageCarousel", () => {
     fireEvent.keyDown(document, { key: "Escape" });
 
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("shows trash button in fullscreen viewer when onDelete is provided", () => {
+    const onDelete = vi.fn();
+    const { container } = render(
+      <ImageCarousel images={mockImages} onDelete={onDelete} />,
+    );
+
+    const images = container.querySelectorAll("img");
+    fireEvent.click(images[0]);
+
+    expect(screen.getByLabelText("Delete image")).toBeInTheDocument();
+  });
+
+  it("does not show trash button when onDelete is not provided", () => {
+    const { container } = render(<ImageCarousel images={mockImages} />);
+
+    const images = container.querySelectorAll("img");
+    fireEvent.click(images[0]);
+
+    expect(screen.queryByLabelText("Delete image")).not.toBeInTheDocument();
+  });
+
+  it("calls onDelete with image id when trash button is clicked", () => {
+    const onDelete = vi.fn();
+    const { container } = render(
+      <ImageCarousel images={mockImages} onDelete={onDelete} />,
+    );
+
+    const images = container.querySelectorAll("img");
+    fireEvent.click(images[0]);
+
+    fireEvent.click(screen.getByLabelText("Delete image"));
+
+    expect(onDelete).toHaveBeenCalledWith("img-1");
+  });
+
+  it("shows scan-line overlay when enhancingImageId matches", () => {
+    const { container } = render(
+      <ImageCarousel images={mockImages} enhancingImageId="img-1" />,
+    );
+
+    expect(container.querySelector(".animate-scan-line")).toBeInTheDocument();
+  });
+
+  it("hides enhance button on the image being enhanced", () => {
+    const onEnhance = vi.fn();
+    render(
+      <ImageCarousel
+        images={mockImages}
+        onEnhance={onEnhance}
+        enhancingImageId="img-1"
+      />,
+    );
+
+    // img-1 is being enhanced so its button is hidden, only img-2's button shows
+    const enhanceButtons = screen.getAllByLabelText("Enhance this image");
+    expect(enhanceButtons).toHaveLength(1);
+  });
+
+  it("disables other enhance buttons during enhancement", () => {
+    const onEnhance = vi.fn();
+    render(
+      <ImageCarousel
+        images={mockImages}
+        onEnhance={onEnhance}
+        enhancingImageId="img-1"
+      />,
+    );
+
+    const enhanceButtons = screen.getAllByLabelText("Enhance this image");
+    expect(enhanceButtons[0]).toBeDisabled();
+  });
+
+  it("shows arrow navigation buttons on desktop in fullscreen viewer", () => {
+    const { container } = render(<ImageCarousel images={mockImages} />);
+
+    const images = container.querySelectorAll("img");
+    fireEvent.click(images[0]);
+
+    // First image: no prev button, has next button
+    expect(screen.queryByLabelText("Previous image")).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Next image")).toBeInTheDocument();
   });
 });

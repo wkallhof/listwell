@@ -37,7 +37,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ImageCarousel } from "@/components/image-carousel";
-import { ImageEnhancementSheet } from "@/components/image-enhancement-sheet";
 import { ListingStatusBadge } from "@/components/listing-status-badge";
 import { CopyButton } from "@/components/copy-button";
 import { BottomBar } from "@/components/bottom-bar";
@@ -115,36 +114,98 @@ export default function ListingDetailPage() {
   const [editValue, setEditValue] = useState("");
   const [saving, setSaving] = useState(false);
   const editInputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
-  const [enhanceSheetOpen, setEnhanceSheetOpen] = useState(false);
-  const [enhanceImageId, setEnhanceImageId] = useState<string | null>(null);
+  const [enhancingImageId, setEnhancingImageId] = useState<string | null>(null);
+  const [autoScrollToIndex, setAutoScrollToIndex] = useState<number | null>(null);
+  const [deleteImageId, setDeleteImageId] = useState<string | null>(null);
+  const [deletingImage, setDeletingImage] = useState(false);
+  const enhancePollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  function handleOpenEnhanceSheet(imageId: string) {
-    setEnhanceImageId(imageId);
-    setEnhanceSheetOpen(true);
+  async function handleEnhance(imageId: string) {
+    if (!listing) return;
+    setEnhancingImageId(imageId);
+
+    try {
+      const response = await fetch(`/api/listings/${params.id}/enhance`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ imageId }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Enhancement request failed");
+      }
+
+      const previousImageCount = listing.images.length;
+
+      enhancePollingRef.current = setInterval(async () => {
+        const listingRes = await fetch(`/api/listings/${params.id}`);
+        if (!listingRes.ok) return;
+
+        const updated = await listingRes.json();
+        if (updated.images.length > previousImageCount) {
+          if (enhancePollingRef.current) {
+            clearInterval(enhancePollingRef.current);
+            enhancePollingRef.current = null;
+          }
+          setListing(updated);
+          setEnhancingImageId(null);
+
+          // Find the new enhanced image and scroll to it
+          const sortedImages = [...updated.images].sort(
+            (a: ListingImage, b: ListingImage) => a.sortOrder - b.sortOrder,
+          );
+          const newImageIndex = sortedImages.findIndex(
+            (img: ListingImage) =>
+              img.type === "ENHANCED" && img.parentImageId === imageId &&
+              !listing.images.some((existing) => existing.id === img.id),
+          );
+          if (newImageIndex >= 0) {
+            setAutoScrollToIndex(newImageIndex);
+          }
+          toast.success("Enhanced photo ready");
+        }
+      }, 3000);
+    } catch {
+      setEnhancingImageId(null);
+      toast.error("Enhancement failed — try again");
+    }
   }
 
-  function handleVariantsChange(variants: { id: string; blobUrl: string }[]) {
-    if (!listing || !enhanceImageId) return;
+  // Clean up enhance polling on unmount
+  useEffect(() => {
+    return () => {
+      if (enhancePollingRef.current) {
+        clearInterval(enhancePollingRef.current);
+      }
+    };
+  }, []);
 
-    // Rebuild images: keep non-enhanced-for-this-parent images, then add new variants
-    const otherImages = listing.images.filter(
-      (img) => !(img.type === "ENHANCED" && img.parentImageId === enhanceImageId),
+  function handleImageDelete(imageId: string) {
+    setDeleteImageId(imageId);
+  }
+
+  async function confirmImageDelete() {
+    if (!listing || !deleteImageId) return;
+    setDeletingImage(true);
+
+    const response = await fetch(
+      `/api/listings/${params.id}/images?imageId=${deleteImageId}`,
+      { method: "DELETE" },
     );
 
-    const parentImage = listing.images.find((img) => img.id === enhanceImageId);
-    const variantImages: ListingImage[] = variants.map((v) => ({
-      id: v.id,
-      blobUrl: v.blobUrl,
-      type: "ENHANCED",
-      sortOrder: parentImage?.sortOrder ?? 0,
-      isPrimary: false,
-      parentImageId: enhanceImageId,
-    }));
+    if (response.ok) {
+      setListing({
+        ...listing,
+        images: listing.images.filter((img) => img.id !== deleteImageId),
+      });
+      toast.success("Image deleted");
+    } else {
+      const data = await response.json().catch(() => null);
+      toast.error(data?.error ?? "Failed to delete image");
+    }
 
-    setListing({
-      ...listing,
-      images: [...otherImages, ...variantImages],
-    });
+    setDeletingImage(false);
+    setDeleteImageId(null);
   }
 
   function startEditing(field: "title" | "description" | "price") {
@@ -507,7 +568,14 @@ export default function ListingDetailPage() {
 
       {/* Image Carousel */}
       <div className="px-5">
-        <ImageCarousel images={images} onEnhance={handleOpenEnhanceSheet} />
+        <ImageCarousel
+          images={images}
+          onEnhance={handleEnhance}
+          onDelete={handleImageDelete}
+          enhancingImageId={enhancingImageId}
+          scrollToIndex={autoScrollToIndex}
+          onScrollComplete={() => setAutoScrollToIndex(null)}
+        />
       </div>
 
       <div className="mt-4 space-y-5 px-5">
@@ -759,26 +827,39 @@ export default function ListingDetailPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Image Enhancement Sheet */}
-      {enhanceImageId && (
-        <ImageEnhancementSheet
-          open={enhanceSheetOpen}
-          onOpenChange={setEnhanceSheetOpen}
-          listingId={listing.id}
-          imageId={enhanceImageId}
-          originalUrl={
-            images.find((img) => img.id === enhanceImageId)?.blobUrl ?? ""
-          }
-          variants={images
-            .filter(
-              (img) =>
-                img.type === "ENHANCED" &&
-                img.parentImageId === enhanceImageId,
-            )
-            .map((img) => ({ id: img.id, blobUrl: img.blobUrl }))}
-          onVariantsChange={handleVariantsChange}
-        />
-      )}
+      {/* Image Delete Confirmation Dialog */}
+      <AlertDialog
+        open={deleteImageId !== null}
+        onOpenChange={(open) => {
+          if (!open) setDeleteImageId(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this image?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This image will be permanently removed from the listing.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={confirmImageDelete}
+              disabled={deletingImage}
+            >
+              {deletingImage ? (
+                <>
+                  <Loader2 className="animate-spin" size={16} />
+                  Deleting...
+                </>
+              ) : (
+                "Delete"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

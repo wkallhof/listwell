@@ -38,8 +38,16 @@ listingImagesRoutes.delete("/listings/:id/images", async (c) => {
     return c.json({ error: "Image not found" }, 404);
   }
 
-  if (image.type !== "ENHANCED") {
-    return c.json({ error: "Cannot delete original images" }, 400);
+  // Prevent deleting the last remaining image
+  const allImages = await db.query.listingImages.findMany({
+    where: eq(listingImages.listingId, listingId),
+  });
+
+  if (allImages.length <= 1) {
+    return c.json(
+      { error: "Cannot delete the last image. Delete the listing instead." },
+      400,
+    );
   }
 
   await deleteImage(image.blobUrl);
