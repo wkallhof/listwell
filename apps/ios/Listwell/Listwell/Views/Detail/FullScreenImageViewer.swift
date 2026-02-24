@@ -13,7 +13,7 @@ struct FullScreenImageViewer: View {
     var body: some View {
         ZStack {
             Color.black
-                .opacity(1 - min(abs(dragOffset.height) / 400, 0.5))
+                .opacity(1 - min(abs(dragOffset.height) / CGFloat(400), 0.5))
                 .ignoresSafeArea()
 
             VStack(spacing: 0) {
