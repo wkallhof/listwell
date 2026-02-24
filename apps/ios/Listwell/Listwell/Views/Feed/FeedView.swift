@@ -132,19 +132,11 @@ struct FeedView: View {
                 .font(.display(size: Typography.pageTitle, weight: .bold))
                 .foregroundStyle(Color.appForeground)
             Spacer()
-            Menu {
-                Button(role: .destructive) {
-                    Task { await authState.logout() }
-                } label: {
-                    Label("Log out", systemImage: "rectangle.portrait.and.arrow.right")
-                }
-            } label: {
-                Image(systemName: "ellipsis")
-                    .font(.system(size: 18))
-                    .foregroundStyle(Color.mutedForeground)
+            NavigationLink(destination: SettingsView()) {
+                UserAvatarView(name: authState.currentUser?.name)
                     .frame(width: Sizing.minTapTarget, height: Sizing.minTapTarget)
             }
-            .accessibilityLabel("More options")
+            .accessibilityLabel("Preferences")
         }
         .padding(.horizontal, Sizing.pagePadding)
         .padding(.top, Spacing.sm)

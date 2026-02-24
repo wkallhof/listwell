@@ -12,6 +12,8 @@ import { listingEnhanceRoutes } from "./routes/listing-enhance";
 import { uploadRoutes } from "./routes/upload";
 import { transcribeRoutes } from "./routes/transcribe";
 import { pushRoutes } from "./routes/push";
+import { preferencesRoutes } from "./routes/preferences";
+import { meRoutes } from "./routes/me";
 import { inngestHandler } from "./inngest/handler";
 import { requireAuth } from "./middleware/auth";
 
@@ -38,6 +40,8 @@ app.use("/listings/*", requireAuth);
 app.use("/upload/*", requireAuth);
 app.use("/transcribe", requireAuth);
 app.use("/push/*", requireAuth);
+app.use("/preferences", requireAuth);
+app.use("/me", requireAuth);
 
 // Routes
 app.route("/", authRoutes);
@@ -49,6 +53,8 @@ app.route("/", listingEnhanceRoutes);
 app.route("/", uploadRoutes);
 app.route("/", transcribeRoutes);
 app.route("/", pushRoutes);
+app.route("/", preferencesRoutes);
+app.route("/", meRoutes);
 
 // Inngest webhook handler
 app.on(["GET", "POST", "PUT"], "/inngest", (c) => inngestHandler(c));

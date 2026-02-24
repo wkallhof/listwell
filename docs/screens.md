@@ -83,7 +83,8 @@ There is **no persistent navigation bar, tab bar, or sidebar.** Navigation is co
 <div> (px-5 pt-8 pb-24)  ← pb-24 to clear FAB
 ├── <header> (flex items-center justify-between mb-6)
 │   ├── <h1> "Your Listings" — text-2xl font-bold
-│   └── <Button variant="ghost" size="icon"> <MoreVertical> (settings/overflow)
+│   └── <UserAvatarLink> (navigates to /preferences)
+│       └── 32px circle: profile image or first initial (bg-primary text-primary-foreground)
 │
 ├── [Filter/Sort Row — optional v1]
 │   └── <div> (flex gap-2 mb-4 overflow-x-auto)
@@ -149,7 +150,7 @@ Each card in the feed:
 - Tap FAB → navigate to `/new` (capture screen)
 - Poll or use event source for listings with status=PROCESSING to live-update pipeline step
 - Pull-to-refresh (optional v1, nice-to-have)
-- Overflow menu: "Settings" (future), "Log out"
+- Tap avatar → navigate to `/preferences`
 
 ---
 
@@ -698,6 +699,64 @@ No dialog — direct action with undo via toast:
 
 ---
 
+## Screen 10: Preferences
+
+**Route:** `/preferences`
+**Purpose:** User settings for theme, notifications, and account management. Accessed via the user avatar in the feed header.
+
+### Structure
+
+```
+<div> (min-h-svh px-5 pb-safe pt-safe)
+├── <header> (flex items-center gap-3 mb-8)
+│   ├── <Button variant="ghost" size="icon"> <ArrowLeft> ← back to feed
+│   └── <h1> "Preferences" — text-2xl font-bold
+│
+├── [Appearance Section]
+│   ├── <h2> "Appearance" — text-sm font-medium text-muted-foreground mb-3
+│   └── <div> (flex gap-2)
+│       └── [ThemeButton] × 3
+│           └── <button> (flex-1 flex flex-col items-center gap-1.5 rounded-lg
+│                         border p-3 transition-colors)
+│               ├── <Sun> / <Moon> / <Monitor> icon (size={20})
+│               └── <span> "Light" / "Dark" / "System" — text-xs font-medium
+│               Selected: border-primary bg-primary/5 text-primary
+│               Unselected: border-border text-muted-foreground
+│
+├── [Notifications Section]
+│   ├── <h2> "Notifications" — text-sm font-medium text-muted-foreground mb-3
+│   └── <div> (flex items-center justify-between rounded-lg border p-4)
+│       ├── <div>
+│       │   ├── <Label> "Push notifications" — text-sm font-medium
+│       │   └── <p> "Get notified when listings are ready" — text-xs text-muted-foreground
+│       └── <Switch>
+│
+└── [Account Section]
+    ├── <h2> "Account" — text-sm font-medium text-muted-foreground mb-3
+    └── <div> (space-y-4 rounded-lg border p-4)
+        ├── <p> user.email — text-sm text-muted-foreground
+        └── <Button variant="ghost" className="text-destructive">
+            ├── <LogOut> icon (size={16})
+            └── "Log out"
+```
+
+### shadcn Components
+`Button`, `Switch`, `Label`
+
+### Data
+- User: `GET /api/me` → `{ id, name, email, image }`
+- Preferences: `GET /api/preferences` → `{ themePreference, notificationsEnabled }`
+- Updates: `PATCH /api/preferences` with partial body
+
+### Behavior
+- Theme selection immediately changes theme via `next-themes` `setTheme()` + persists via `PATCH /api/preferences`
+- Notifications toggle auto-saves on change with toast feedback
+- "Log out" calls `authClient.signOut()` → redirect to `/login`
+- Back arrow navigates to `/`
+- On initial load, syncs stored theme preference from API to local theme
+
+---
+
 ## Toast Messages
 
 All toasts use `<Sonner>` positioned at top-center.
@@ -715,6 +774,9 @@ All toasts use `<Sonner>` positioned at top-center.
 | Delete enhanced image         | "Image deleted" + Undo     | info    | 5s       |
 | Listing deleted               | "Listing deleted"          | success | 3s       |
 | Status changed                | "Marked as [status]"       | success | 2s       |
+| Theme changed                 | "Theme set to [theme]"     | success | 2s       |
+| Notifications enabled         | "Notifications enabled"    | success | 2s       |
+| Notifications disabled        | "Notifications disabled"   | success | 2s       |
 
 ---
 
@@ -737,5 +799,9 @@ All toasts use `<Sonner>` positioned at top-center.
    │                              ├── Generate → /new/submitted → /
    │                              └── Skip → /new/submitted → /
    │
-   └── overflow → settings (future)
+   └── tap avatar ──► /preferences
+                       ├── Theme toggle (Light/Dark/System)
+                       ├── Notifications toggle
+                       ├── Log out → /login
+                       └── back arrow → /
 ```

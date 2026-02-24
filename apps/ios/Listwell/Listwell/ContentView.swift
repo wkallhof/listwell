@@ -3,6 +3,7 @@ import SwiftUI
 struct ContentView: View {
     @Environment(AuthState.self) private var authState
     @Environment(PushNotificationManager.self) private var pushManager
+    @Environment(SettingsStore.self) private var settingsStore
 
     var body: some View {
         Group {
@@ -16,6 +17,7 @@ struct ContentView: View {
         }
         .task {
             await authState.checkExistingSession()
+            await settingsStore.load(token: authState.token)
         }
         .onReceive(NotificationCenter.default.publisher(for: .didRegisterForRemoteNotifications)) { notification in
             if let tokenData = notification.userInfo?["deviceToken"] as? Data {
@@ -53,4 +55,5 @@ struct MainView: View {
     ContentView()
         .environment(AuthState())
         .environment(PushNotificationManager())
+        .environment(SettingsStore())
 }
