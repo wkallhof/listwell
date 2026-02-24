@@ -404,12 +404,17 @@ Each card in the feed:
 │           ├── <DropdownMenuItem> "Archive"
 │           └── <DropdownMenuItem className="text-destructive"> "Delete Listing"
 │
-├── [Image Carousel]
+├── [Image Carousel — ImageCarousel component]
 │   └── <div> (overflow-x-auto scroll-snap-x-mandatory flex)
 │       └── <div> × N (scroll-snap-align-center flex-shrink-0 w-full)
 │           └── <div> (aspect-[4/3] bg-muted relative)
-│               ├── <img> (object-cover w-full h-full)
-│               └── [Enhance Button — on ORIGINAL images only]
+│               ├── <img> (object-contain w-full h-full cursor-zoom-in)
+│               │   → tap opens fullscreen image viewer
+│               ├── [Scan-line overlay — when enhancingImageId matches]
+│               │   └── <div> (absolute inset-0 overflow-hidden)
+│               │       ├── animated gradient band (scan-line-sweep keyframes)
+│               │       └── centered "Enhancing..." pill
+│               └── [Enhance Button — on ORIGINAL images only, hidden during enhance]
 │                   └── <Button variant="secondary" size="sm"
 │                               className="absolute bottom-3 right-3">
 │                       ├── <Sparkles> icon (size={14})
@@ -419,6 +424,20 @@ Each card in the feed:
 │           └── <span> × N (h-1.5 w-1.5 rounded-full)
 │               Active: bg-primary
 │               Inactive: bg-muted-foreground/30
+│
+│   [Fullscreen Image Viewer — opens on image tap]
+│   └── <div> (fixed inset-0 z-50 bg-black/95)
+│       ├── <header> (absolute top-0 z-10 flex items-center justify-between)
+│       │   ├── <Button> X (close)
+│       │   ├── <span> "2 of 5" counter — text-sm text-white
+│       │   └── <Button> <Trash2> (delete image)
+│       ├── <img> (max-h-full max-w-full object-contain)
+│       │   → touch swipe left/right to navigate
+│       ├── [Arrow navigation — desktop only, hidden sm:flex]
+│       │   ├── <Button> <ChevronLeft> (absolute left-2)
+│       │   └── <Button> <ChevronRight> (absolute right-2)
+│       ├── Keyboard: Escape=close, ArrowLeft/Right=navigate
+│       └── [Dot indicators at bottom]
 │
 ├── <div> (px-5 space-y-5 mt-4)
 │
@@ -491,6 +510,13 @@ Each card in the feed:
             ├── <Copy> icon (size={16})
             └── "Copy Full Listing"
             → copies title + price + description formatted for marketplace paste
+
+[Image Delete Confirmation — AlertDialog]
+└── <AlertDialog>
+    ├── Title: "Delete this image?"
+    ├── Description: "This image will be permanently removed from the listing."
+    ├── Cancel button
+    └── Delete button (destructive styling)
 ```
 
 ### CopyButton Component
@@ -505,7 +531,7 @@ Small inline copy trigger used next to title and description:
 Uses `navigator.clipboard.writeText()`. Shows a `<Sonner>` toast: "Copied!"
 
 ### shadcn Components
-`Card`, `CardContent`, `Button`, `Badge`, `DropdownMenu`, `DropdownMenuTrigger`, `DropdownMenuContent`, `DropdownMenuItem`, `Sonner` (toast)
+`Card`, `CardContent`, `Button`, `Badge`, `DropdownMenu`, `DropdownMenuTrigger`, `DropdownMenuContent`, `DropdownMenuItem`, `AlertDialog`, `Sonner` (toast)
 
 ### Data
 - Full listing object from `GET /api/listings/[id]`
@@ -514,76 +540,26 @@ Uses `navigator.clipboard.writeText()`. Shows a `<Sonner>` toast: "Copied!"
 
 ### Behavior
 - Carousel: horizontal scroll-snap, swipe between images
-- "Enhance" button on each original image → opens enhancement sheet (Screen 8)
+- Tap image → opens fullscreen navigable viewer with swipe/arrow navigation
+- Fullscreen viewer shows "2 of 5" counter, trash icon for deletion, close button
+- "Enhance" button on ORIGINAL images → inline enhancement with scan-line animation
+  - Scan-line: semi-transparent overlay with animated gradient band sweeping top-to-bottom
+  - Centered "Enhancing..." pill during processing
+  - On completion: carousel auto-scrolls to newly enhanced image, toast "Enhanced photo ready"
+- Delete image (from fullscreen viewer) → confirmation AlertDialog → DELETE API call
+  - Cannot delete the last remaining image (API returns 400)
 - "Copy Full Listing" → formats and copies: `{title}\n${price}\n\n{description}`
 - Dropdown menu actions → PATCH listing status
 - "Delete Listing" → confirmation dialog → DELETE listing → navigate to feed
 
+### Removed
+- **Image Enhancement Sheet (formerly Screen 8)** — replaced by inline enhancement in the carousel with scan-line animation overlay. No separate sheet/drawer needed.
+
 ---
 
-## Screen 8: Image Enhancement
+## Screen 8: (Removed — Image Enhancement)
 
-**Route:** Rendered as a `<Sheet>` (bottom drawer) over the listing detail screen, not a separate route.
-**Purpose:** AI image enhancement with before/after comparison.
-
-### Structure
-
-```
-<Sheet>
-├── <SheetHeader>
-│   ├── <SheetTitle> "Enhance Photo"
-│   └── <SheetDescription> "AI will clean up lighting and background"
-│
-├── <SheetContent className="h-[85svh]" side="bottom">
-│   ├── [Original Image]
-│   │   └── <div> (aspect-[4/3] rounded-lg overflow-hidden bg-muted)
-│   │       ├── <img> original image
-│   │       └── <span> "Original" — absolute top-2 left-2
-│   │           text-xs bg-black/50 text-white px-2 py-0.5 rounded
-│   │
-│   ├── [Enhanced Variants — if any exist]
-│   │   └── <div> (mt-4)
-│   │       ├── <p> "Enhanced versions" — text-sm font-medium mb-2
-│   │       └── <div> (grid grid-cols-2 gap-2)
-│   │           └── [VariantCard] × N
-│   │               └── <div> (aspect-[4/3] rounded-lg overflow-hidden relative
-│   │                          ring-2 ring-transparent hover:ring-primary/30)
-│   │                   ├── <img> enhanced variant
-│   │                   └── <Button variant="ghost" size="icon"
-│   │                               className="absolute top-1 right-1 h-7 w-7
-│   │                                          bg-black/40 text-white">
-│   │                       └── <Trash2> (size={14}) — delete this variant
-│   │
-│   ├── [Enhance Action]
-│   │   └── <Button variant="outline" className="w-full h-11 mt-4">
-│   │       ├── <Sparkles> icon
-│   │       └── "Generate Enhanced Version"
-│   │       → triggers POST /api/listings/[id]/enhance
-│   │
-│   ├── [Enhancement In Progress — when running]
-│   │   └── <div> (flex items-center justify-center gap-2 py-8)
-│   │       ├── <Loader2> (animate-spin, text-primary)
-│   │       └── <span> "Enhancing..." — text-sm text-muted-foreground
-│   │
-│   └── <SheetFooter>
-│       └── <Button variant="secondary" className="w-full"> "Done"
-```
-
-### shadcn Components
-`Sheet`, `SheetContent`, `SheetHeader`, `SheetTitle`, `SheetDescription`, `SheetFooter`, `Button`
-
-### Data
-- Original image: blobUrl, id
-- Enhanced variants: array of ListingImage records where parentImageId === original image id
-- Enhancement status: idle / processing / done / error
-
-### Behavior
-- "Generate Enhanced Version" → POST `/api/listings/[id]/enhance` with imageId
-- Poll or wait for Inngest completion, then fetch and display new variant
-- Delete variant → DELETE `/api/listings/[id]/images` with variant imageId
-- User can generate multiple variants (no hard limit, but UI shows max ~4 in grid)
-- "Done" closes the sheet, returns to listing detail
-- Original image is never modified or deletable from this screen
+Previously a `<Sheet>` bottom drawer for enhancement. Now handled inline in the ImageCarousel component on Screen 7 via scan-line overlay animation and polling. See Screen 7's "Behavior" section for details.
 
 ---
 

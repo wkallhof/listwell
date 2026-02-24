@@ -3,74 +3,71 @@ import Foundation
 @Observable
 @MainActor
 final class EnhancementViewModel {
-    var originalImage: ListingImage
-    var enhancedVariants: [ListingImage]
+    var enhancingImageId: String?
+    var newlyEnhancedImageId: String?
     var isEnhancing = false
     var errorMessage: String?
+
+    var onEnhancementComplete: (([ListingImage]) -> Void)?
 
     private let listingId: String
     private nonisolated(unsafe) var pollingTask: Task<Void, Never>?
 
-    init(originalImage: ListingImage, listingId: String, allImages: [ListingImage]) {
-        self.originalImage = originalImage
+    init(listingId: String) {
         self.listingId = listingId
-        self.enhancedVariants = Self.variants(of: originalImage, in: allImages)
-    }
-
-    private static func variants(of image: ListingImage, in images: [ListingImage]) -> [ListingImage] {
-        images.filter { $0.type == .enhanced && $0.parentImageId == image.id }
     }
 
     deinit {
         pollingTask?.cancel()
     }
 
-    func requestEnhancement(token: String?) async {
+    func requestEnhancement(for imageId: String, token: String?) async {
         guard let token else { return }
         isEnhancing = true
+        enhancingImageId = imageId
         errorMessage = nil
 
         do {
             try await ListingsService.enhanceImage(
                 listingId: listingId,
-                imageId: originalImage.id,
+                imageId: imageId,
                 token: token
             )
-            await pollForNewVariant(token: token)
+            await pollForNewImage(imageId: imageId, token: token)
         } catch let error as APIError {
             isEnhancing = false
+            enhancingImageId = nil
             errorMessage = error.errorDescription
         } catch {
             isEnhancing = false
+            enhancingImageId = nil
             errorMessage = "Enhancement failed."
         }
     }
 
-    func deleteVariant(_ variant: ListingImage, token: String?) async {
+    func deleteImage(_ imageId: String, token: String?) async {
         guard let token else { return }
 
         do {
             try await ListingsService.deleteImage(
                 listingId: listingId,
-                imageId: variant.id,
+                imageId: imageId,
                 token: token
             )
-            enhancedVariants.removeAll { $0.id == variant.id }
         } catch let error as APIError {
             errorMessage = error.errorDescription
         } catch {
-            errorMessage = "Failed to delete variant."
+            errorMessage = "Failed to delete image."
         }
     }
 
-    private func pollForNewVariant(token: String) async {
-        let previousCount = enhancedVariants.count
+    private func pollForNewImage(imageId: String, token: String) async {
         pollingTask?.cancel()
 
         pollingTask = Task { [weak self] in
             guard let self else { return }
 
-            for _ in 0..<30 { // max ~90 seconds of polling
+            for _ in 0..<30 {
                 guard !Task.isCancelled else { return }
 
                 do {
@@ -85,11 +82,16 @@ final class EnhancementViewModel {
                     let listing = try await ListingsService.fetchListing(
                         id: listingId, token: token
                     )
-                    let newVariants = Self.variants(of: originalImage, in: listing.images ?? [])
+                    let images = listing.images ?? []
+                    let newEnhanced = images.first {
+                        $0.type == .enhanced && $0.parentImageId == imageId
+                    }
 
-                    if newVariants.count > previousCount {
-                        enhancedVariants = newVariants
+                    if let newEnhanced {
+                        enhancingImageId = nil
                         isEnhancing = false
+                        newlyEnhancedImageId = newEnhanced.id
+                        onEnhancementComplete?(images)
                         return
                     }
                 } catch {
@@ -99,6 +101,7 @@ final class EnhancementViewModel {
 
             // Polling timed out
             isEnhancing = false
+            enhancingImageId = nil
             errorMessage = "Enhancement is taking longer than expected. Pull to refresh."
         }
 

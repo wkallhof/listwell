@@ -2,8 +2,8 @@ import Testing
 import Foundation
 @testable import Listwell
 
-@Suite("EnhancementSheet")
-struct EnhancementSheetTests {
+@Suite("EnhancementViewModel")
+struct EnhancementViewModelTests {
 
     // MARK: - Test Helpers
 
@@ -42,51 +42,14 @@ struct EnhancementSheetTests {
 
     // MARK: - View Model State
 
-    @Test("sheet creates view model with correct original image")
+    @Test("view model initializes with listingId")
     @MainActor
-    func viewModelOriginalImage() {
-        let original = makeOriginalImage()
-        let viewModel = EnhancementViewModel(
-            originalImage: original,
-            listingId: "listing-1",
-            allImages: [original]
-        )
+    func viewModelInit() {
+        let viewModel = EnhancementViewModel(listingId: "listing-1")
 
-        #expect(viewModel.originalImage.id == "img-1")
-        #expect(viewModel.originalImage.isOriginal)
-    }
-
-    @Test("sheet view model filters enhanced variants by parentImageId")
-    @MainActor
-    func viewModelFiltersVariants() {
-        let original = makeOriginalImage()
-        let enhanced1 = makeEnhancedImage(id: "img-2", parentId: "img-1")
-        let enhanced2 = makeEnhancedImage(id: "img-3", parentId: "img-1")
-        let unrelated = makeEnhancedImage(id: "img-4", parentId: "other-img")
-
-        let viewModel = EnhancementViewModel(
-            originalImage: original,
-            listingId: "listing-1",
-            allImages: [original, enhanced1, enhanced2, unrelated]
-        )
-
-        #expect(viewModel.enhancedVariants.count == 2)
-        #expect(viewModel.enhancedVariants.allSatisfy { $0.parentImageId == "img-1" })
-    }
-
-    @Test("sheet view model shows empty variants for image with no enhancements")
-    @MainActor
-    func viewModelEmptyVariants() {
-        let original = makeOriginalImage()
-
-        let viewModel = EnhancementViewModel(
-            originalImage: original,
-            listingId: "listing-1",
-            allImages: [original]
-        )
-
-        #expect(viewModel.enhancedVariants.isEmpty)
         #expect(!viewModel.isEnhancing)
+        #expect(viewModel.enhancingImageId == nil)
+        #expect(viewModel.newlyEnhancedImageId == nil)
     }
 
     // MARK: - Enhancement State
@@ -94,27 +57,29 @@ struct EnhancementSheetTests {
     @Test("isEnhancing defaults to false")
     @MainActor
     func isEnhancingDefaultFalse() {
-        let original = makeOriginalImage()
-        let viewModel = EnhancementViewModel(
-            originalImage: original,
-            listingId: "listing-1",
-            allImages: [original]
-        )
-
+        let viewModel = EnhancementViewModel(listingId: "listing-1")
         #expect(!viewModel.isEnhancing)
     }
 
     @Test("errorMessage defaults to nil")
     @MainActor
     func errorMessageDefaultNil() {
-        let original = makeOriginalImage()
-        let viewModel = EnhancementViewModel(
-            originalImage: original,
-            listingId: "listing-1",
-            allImages: [original]
-        )
-
+        let viewModel = EnhancementViewModel(listingId: "listing-1")
         #expect(viewModel.errorMessage == nil)
+    }
+
+    @Test("enhancingImageId defaults to nil")
+    @MainActor
+    func enhancingImageIdDefaultNil() {
+        let viewModel = EnhancementViewModel(listingId: "listing-1")
+        #expect(viewModel.enhancingImageId == nil)
+    }
+
+    @Test("newlyEnhancedImageId defaults to nil")
+    @MainActor
+    func newlyEnhancedImageIdDefaultNil() {
+        let viewModel = EnhancementViewModel(listingId: "listing-1")
+        #expect(viewModel.newlyEnhancedImageId == nil)
     }
 
     // MARK: - Image Types

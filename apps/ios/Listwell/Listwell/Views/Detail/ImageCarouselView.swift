@@ -8,7 +8,9 @@ struct ImageCarouselView: View {
     var onImagesChanged: (() -> Void)?
 
     @State private var currentIndex = 0
-    @State private var enhancingImage: ListingImage?
+    @State private var showFullScreen = false
+    @State private var enhancementVM: EnhancementViewModel?
+    @State private var imageToDelete: ListingImage?
 
     var body: some View {
         VStack(spacing: Spacing.md) {
@@ -30,12 +32,21 @@ struct ImageCarouselView: View {
                                         .scaledToFill()
                                 }
                                 .clipped()
+                                .overlay {
+                                    ScanLineOverlay(
+                                        isActive: enhancementVM?.enhancingImageId == image.id
+                                    )
+                                }
                                 .overlay(alignment: .bottomTrailing) {
-                                    if image.isOriginal {
+                                    if image.isOriginal && enhancementVM?.enhancingImageId != image.id {
                                         enhanceButton(for: image)
                                     }
                                 }
                                 .contentShape(Rectangle())
+                                .onTapGesture {
+                                    currentIndex = index
+                                    showFullScreen = true
+                                }
                                 .containerRelativeFrame(.horizontal)
                                 .id(index)
                                 .accessibilityLabel("Photo \(index + 1) of \(images.count)")
@@ -57,20 +68,45 @@ struct ImageCarouselView: View {
                 }
             }
         }
-        .sheet(item: $enhancingImage) { image in
-            EnhancementSheet(
-                viewModel: EnhancementViewModel(
-                    originalImage: image,
-                    listingId: listingId,
-                    allImages: images
-                ),
-                token: token,
+        .fullScreenCover(isPresented: $showFullScreen) {
+            FullScreenImageViewer(
+                images: images,
+                currentIndex: $currentIndex,
+                onDelete: { image in
+                    showFullScreen = false
+                    imageToDelete = image
+                },
                 onDismiss: {
-                    enhancingImage = nil
-                    onImagesChanged?()
+                    showFullScreen = false
                 }
             )
-            .presentationDetents([.medium, .large])
+        }
+        .alert(
+            "Delete this image?",
+            isPresented: Binding(
+                get: { imageToDelete != nil },
+                set: { if !$0 { imageToDelete = nil } }
+            ),
+            presenting: imageToDelete
+        ) { image in
+            Button("Delete", role: .destructive) {
+                Task {
+                    let vm = getOrCreateEnhancementVM()
+                    await vm.deleteImage(image.id, token: token)
+                    onImagesChanged?()
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: { _ in
+            Text("This image will be permanently removed from the listing.")
+        }
+        .onChange(of: enhancementVM?.newlyEnhancedImageId) { _, newId in
+            guard let newId else { return }
+            if let index = images.firstIndex(where: { $0.id == newId }) {
+                withAnimation {
+                    currentIndex = index
+                }
+            }
         }
     }
 
@@ -78,7 +114,10 @@ struct ImageCarouselView: View {
 
     private func enhanceButton(for image: ListingImage) -> some View {
         Button {
-            enhancingImage = image
+            let vm = getOrCreateEnhancementVM()
+            Task {
+                await vm.requestEnhancement(for: image.id, token: token)
+            }
         } label: {
             HStack(spacing: Spacing.xs) {
                 Image(systemName: "wand.and.stars")
@@ -92,6 +131,7 @@ struct ImageCarouselView: View {
             .background(.ultraThinMaterial)
             .clipShape(RoundedRectangle(cornerRadius: CornerRadius.small))
         }
+        .disabled(enhancementVM?.isEnhancing == true)
         .padding(Spacing.md)
     }
 
@@ -118,5 +158,17 @@ struct ImageCarouselView: View {
                     .frame(width: 6, height: 6)
             }
         }
+    }
+
+    // MARK: - Helpers
+
+    private func getOrCreateEnhancementVM() -> EnhancementViewModel {
+        if let vm = enhancementVM { return vm }
+        let vm = EnhancementViewModel(listingId: listingId)
+        vm.onEnhancementComplete = { _ in
+            onImagesChanged?()
+        }
+        enhancementVM = vm
+        return vm
     }
 }

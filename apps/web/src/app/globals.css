@@ -191,6 +191,19 @@
   animation: fade-in-scale 200ms ease-out;
 }
 
+@keyframes scan-line-sweep {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(200%);
+  }
+}
+
+.animate-scan-line {
+  animation: scan-line-sweep 2s ease-in-out infinite;
+}
+
 @theme inline {
   /* --- Colors --- */
   --color-background: var(--background);
