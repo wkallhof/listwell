@@ -87,12 +87,44 @@ export const verification = pgTable(
   (table) => [index("verification_identifier_idx").on(table.identifier)],
 );
 
+// ─── User Preferences Table ─────────────────────────────────────────────────
+
+export const userPreferences = pgTable("user_preferences", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => createId()),
+  userId: text("user_id")
+    .notNull()
+    .unique()
+    .references(() => user.id, { onDelete: "cascade" }),
+  themePreference: text("theme_preference").notNull().default("system"),
+  notificationsEnabled: boolean("notifications_enabled").notNull().default(true),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+});
+
+export const userPreferencesRelations = relations(
+  userPreferences,
+  ({ one }) => ({
+    user: one(user, {
+      fields: [userPreferences.userId],
+      references: [user.id],
+    }),
+  }),
+);
+
 // Auth relations
-export const userRelations = relations(user, ({ many }) => ({
+export const userRelations = relations(user, ({ many, one }) => ({
   sessions: many(session),
   accounts: many(account),
   listings: many(listings),
   pushSubscriptions: many(pushSubscriptions),
+  preferences: one(userPreferences),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({

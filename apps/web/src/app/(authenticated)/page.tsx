@@ -1,17 +1,11 @@
 import { redirect } from "next/navigation";
-import { ImagePlus, MoreVertical } from "lucide-react";
+import { ImagePlus } from "lucide-react";
 import { apiFetch } from "@/lib/api";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { EmptyState } from "@/components/empty-state";
 import { ListingCard } from "@/components/listing-card";
 import { FAB } from "@/components/fab";
 import { PullToRefresh } from "@/components/pull-to-refresh";
-import { LogoutButton } from "./logout-button";
+import { UserAvatarLink } from "@/components/user-avatar-link";
 
 interface ListingImage {
   id: string;
@@ -30,29 +24,26 @@ interface Listing {
 }
 
 export default async function FeedPage() {
-  const response = await apiFetch("/api/listings");
+  const [response, meResponse] = await Promise.all([
+    apiFetch("/api/listings"),
+    apiFetch("/api/me"),
+  ]);
 
-  if (response.status === 401) {
+  if (response.status === 401 || meResponse.status === 401) {
     redirect("/login");
   }
 
   const listings: Listing[] = response.ok ? await response.json() : [];
+  const me: { name: string | null; image: string | null } = meResponse.ok
+    ? await meResponse.json()
+    : { name: null, image: null };
 
   return (
     <PullToRefresh>
       <main className="mx-auto min-h-svh w-full max-w-xl px-5 pb-24 pt-[max(env(safe-area-inset-top,0px)+0.5rem,2rem)]">
         <header className="mb-6 flex items-center justify-between">
           <h1 className="text-2xl font-bold">Your Listings</h1>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <MoreVertical size={20} />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <LogoutButton />
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <UserAvatarLink name={me.name} image={me.image} />
         </header>
 
         {listings.length === 0 ? (

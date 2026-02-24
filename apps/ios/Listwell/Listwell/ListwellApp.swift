@@ -6,6 +6,7 @@ struct ListwellApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @State private var authState = AuthState()
     @State private var pushManager = PushNotificationManager()
+    @State private var settingsStore = SettingsStore()
 
     init() {
         configureKingfisher()
@@ -16,6 +17,8 @@ struct ListwellApp: App {
             ContentView()
                 .environment(authState)
                 .environment(pushManager)
+                .environment(settingsStore)
+                .preferredColorScheme(settingsStore.colorScheme)
         }
     }
 
