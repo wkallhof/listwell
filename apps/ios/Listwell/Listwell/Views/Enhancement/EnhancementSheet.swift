@@ -53,7 +53,7 @@ struct EnhancementSheet: View {
 
     private var headerDescription: some View {
         Text("AI will clean up lighting and background")
-            .font(.system(size: Typography.body))
+            .font(.bodyFont(size: Typography.body))
             .foregroundStyle(Color.mutedForeground)
             .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -71,7 +71,7 @@ struct EnhancementSheet: View {
                 .clipShape(RoundedRectangle(cornerRadius: CornerRadius.default))
 
             Text("Original")
-                .font(.system(size: Typography.caption))
+                .font(.bodyFont(size: Typography.caption))
                 .foregroundStyle(.white)
                 .padding(.horizontal, Spacing.sm)
                 .padding(.vertical, Spacing.xs)
@@ -88,7 +88,7 @@ struct EnhancementSheet: View {
         if !viewModel.enhancedVariants.isEmpty {
             VStack(alignment: .leading, spacing: Spacing.sm) {
                 Text("Enhanced versions")
-                    .font(.system(size: Typography.body, weight: .medium))
+                    .font(.bodyFont(size: Typography.body, weight: .medium))
                     .foregroundStyle(Color.appForeground)
 
                 LazyVGrid(
@@ -138,7 +138,7 @@ struct EnhancementSheet: View {
                 ProgressView()
                     .tint(Color.accentColor)
                 Text("Enhancing...")
-                    .font(.system(size: Typography.body))
+                    .font(.bodyFont(size: Typography.body))
                     .foregroundStyle(Color.mutedForeground)
             }
             .frame(maxWidth: .infinity)
@@ -153,7 +153,7 @@ struct EnhancementSheet: View {
                     Image(systemName: "wand.and.stars")
                         .font(.system(size: 16))
                     Text("Generate Enhanced Version")
-                        .font(.system(size: Typography.body, weight: .medium))
+                        .font(.bodyFont(size: Typography.body, weight: .medium))
                 }
                 .frame(maxWidth: .infinity)
                 .frame(height: Sizing.minTapTarget)
@@ -169,7 +169,7 @@ struct EnhancementSheet: View {
 
         if let error = viewModel.errorMessage {
             Text(error)
-                .font(.system(size: Typography.caption))
+                .font(.bodyFont(size: Typography.caption))
                 .foregroundStyle(Color.destructive)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }

@@ -90,7 +90,7 @@ struct DescribeView: View {
         VStack(spacing: Spacing.sm) {
             ZStack(alignment: .topLeading) {
                 TextEditor(text: Bindable(viewModel).description)
-                    .font(.system(size: Typography.body))
+                    .font(.bodyFont(size: Typography.body))
                     .frame(minHeight: 160)
                     .scrollContentBackground(.hidden)
                     .padding(Spacing.sm)
@@ -107,7 +107,7 @@ struct DescribeView: View {
 
                 if viewModel.description.isEmpty && !speechRecognizer.isRecording {
                     Text("Tell us about this item — brand, condition, why you're selling... (optional)")
-                        .font(.system(size: Typography.body))
+                        .font(.bodyFont(size: Typography.body))
                         .foregroundStyle(Color.mutedForeground)
                         .padding(.horizontal, Spacing.md)
                         .padding(.vertical, Spacing.md)
@@ -153,7 +153,7 @@ struct DescribeView: View {
                 .frame(width: 8, height: 8)
 
             Text("Listening...")
-                .font(.system(size: Typography.caption))
+                .font(.bodyFont(size: Typography.caption))
                 .foregroundStyle(Color.mutedForeground)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -177,7 +177,7 @@ struct DescribeView: View {
 
     private var helperText: some View {
         Text("More detail = better results. But you can also skip this.")
-            .font(.system(size: Typography.caption))
+            .font(.bodyFont(size: Typography.caption))
             .foregroundStyle(Color.mutedForeground)
             .multilineTextAlignment(.center)
     }
@@ -192,7 +192,7 @@ struct DescribeView: View {
                     Task { await submit() }
                 } label: {
                     Text("Skip")
-                        .font(.system(size: Typography.body, weight: .medium))
+                        .font(.bodyFont(size: Typography.body, weight: .medium))
                         .frame(maxWidth: .infinity)
                         .frame(height: Sizing.minTapTarget)
                         .background(Color.secondaryBackground)
@@ -204,7 +204,7 @@ struct DescribeView: View {
                     Task { await submit() }
                 } label: {
                     Text("Generate Listing")
-                        .font(.system(size: Typography.body, weight: .semibold))
+                        .font(.bodyFont(size: Typography.body, weight: .semibold))
                         .frame(maxWidth: .infinity)
                         .frame(height: Sizing.minTapTarget)
                         .background(Color.accentColor)
@@ -228,7 +228,7 @@ struct DescribeView: View {
                     ProgressView()
                         .controlSize(.large)
                     Text("Creating listing...")
-                        .font(.system(size: Typography.body, weight: .medium))
+                        .font(.bodyFont(size: Typography.body, weight: .medium))
                         .foregroundStyle(.white)
                 }
             }

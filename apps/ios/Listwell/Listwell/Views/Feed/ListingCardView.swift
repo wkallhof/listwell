@@ -61,12 +61,12 @@ struct ListingCardView: View {
         Group {
             if listing.isProcessing {
                 Text("Processing...")
-                    .font(.system(size: Typography.cardTitle, weight: .medium))
+                    .font(.bodyFont(size: Typography.cardTitle, weight: .medium))
                     .italic()
                     .foregroundStyle(Color.mutedForeground)
             } else {
                 Text(listing.title ?? "Untitled")
-                    .font(.system(size: Typography.cardTitle, weight: .medium))
+                    .font(.bodyFont(size: Typography.cardTitle, weight: .medium))
                     .foregroundStyle(Color.appForeground)
                     .lineLimit(1)
             }
@@ -77,7 +77,7 @@ struct ListingCardView: View {
         HStack {
             if let price = listing.suggestedPrice, !listing.isProcessing {
                 Text("$\(Int(price))")
-                    .font(.system(size: Typography.body, weight: .semibold))
+                    .font(.mono(size: Typography.body, weight: .semibold))
                     .foregroundStyle(Color.appForeground)
             }
 
@@ -86,7 +86,7 @@ struct ListingCardView: View {
                     ProgressView()
                         .controlSize(.mini)
                     Text(listing.pipelineStep.displayName)
-                        .font(.system(size: Typography.caption))
+                        .font(.bodyFont(size: Typography.caption))
                         .foregroundStyle(Color.mutedForeground)
                 }
             }
@@ -94,7 +94,7 @@ struct ListingCardView: View {
             Spacer()
 
             Text(TimeAgo.string(from: listing.createdAt))
-                .font(.system(size: Typography.caption))
+                .font(.bodyFont(size: Typography.caption))
                 .foregroundStyle(Color.mutedForeground)
         }
     }

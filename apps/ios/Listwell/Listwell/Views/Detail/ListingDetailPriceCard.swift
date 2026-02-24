@@ -14,10 +14,10 @@ struct ListingDetailPriceCard: View {
                 VStack(alignment: .leading, spacing: Spacing.sm) {
                     HStack(spacing: Spacing.xs) {
                         Text("$")
-                            .font(.system(size: Typography.priceLarge, weight: .bold))
+                            .font(.mono(size: Typography.priceLarge, weight: .bold))
                             .foregroundStyle(Color.appForeground)
                         TextField("Price", text: $editText)
-                            .font(.system(size: Typography.priceLarge, weight: .bold))
+                            .font(.mono(size: Typography.priceLarge, weight: .bold))
                             .keyboardType(.decimalPad)
                             .textFieldStyle(.plain)
                             .editFieldStyle()
@@ -36,21 +36,21 @@ struct ListingDetailPriceCard: View {
                         withAnimation(.easeOut(duration: 0.2)) { isEditing = true }
                     } label: {
                         Text("$\(Int(price))")
-                            .font(.system(size: Typography.priceLarge, weight: .bold))
+                            .font(.mono(size: Typography.priceLarge, weight: .bold))
                             .foregroundStyle(Color.appForeground)
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel("Edit price")
                     Spacer()
                     Text("suggested price")
-                        .font(.system(size: Typography.caption))
+                        .font(.bodyFont(size: Typography.caption))
                         .foregroundStyle(Color.mutedForeground)
                 }
             }
 
             if let low = priceRangeLow, let high = priceRangeHigh {
                 Text("Market range: $\(Int(low)) – $\(Int(high))")
-                    .font(.system(size: Typography.body))
+                    .font(.mono(size: Typography.body))
                     .foregroundStyle(Color.mutedForeground)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }

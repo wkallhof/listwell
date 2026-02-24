@@ -7,7 +7,7 @@ struct ComparablesView: View {
         if !comparables.isEmpty {
             VStack(alignment: .leading, spacing: Spacing.md) {
                 Text("Market Comparables")
-                    .font(.system(size: Typography.sectionHeading, weight: .semibold))
+                    .font(.display(size: Typography.sectionHeading, weight: .semibold))
                     .foregroundStyle(Color.appForeground)
 
                 VStack(spacing: Spacing.sm) {
@@ -23,17 +23,17 @@ struct ComparablesView: View {
         HStack(spacing: Spacing.md) {
             VStack(alignment: .leading, spacing: Spacing.xs) {
                 Text(comparable.title)
-                    .font(.system(size: Typography.body, weight: .medium))
+                    .font(.bodyFont(size: Typography.body, weight: .medium))
                     .foregroundStyle(Color.appForeground)
                     .lineLimit(1)
                 Text(comparable.source)
-                    .font(.system(size: Typography.caption))
+                    .font(.bodyFont(size: Typography.caption))
                     .foregroundStyle(Color.mutedForeground)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
             Text("$\(Int(comparable.price))")
-                .font(.system(size: Typography.body, weight: .semibold))
+                .font(.mono(size: Typography.body, weight: .semibold))
                 .foregroundStyle(Color.appForeground)
 
             if let urlString = comparable.url, let url = URL(string: urlString) {

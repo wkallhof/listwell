@@ -32,7 +32,7 @@ struct ContentView: View {
     private var splashView: some View {
         VStack(spacing: Spacing.lg) {
             Text("Listwell")
-                .font(.system(size: Typography.pageTitle, weight: .bold))
+                .font(.display(size: Typography.pageTitle, weight: .bold))
                 .foregroundStyle(Color.appForeground)
             ProgressView()
         }

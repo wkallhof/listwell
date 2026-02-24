@@ -3,12 +3,23 @@ import SwiftUI
 // MARK: - Typography
 
 enum Typography {
-    static let pageTitle: CGFloat = 24
-    static let sectionHeading: CGFloat = 18
-    static let cardTitle: CGFloat = 16
+    // Design system scale
+    static let xs: CGFloat = 12
+    static let sm: CGFloat = 13
+    static let base: CGFloat = 14
+    static let md: CGFloat = 16
+    static let lg: CGFloat = 18
+    static let xl: CGFloat = 22
+    static let xxl: CGFloat = 28
+    static let xxxl: CGFloat = 36
+
+    // Backward-compatible aliases
+    static let pageTitle: CGFloat = 28
+    static let sectionHeading: CGFloat = 22
+    static let cardTitle: CGFloat = 18
     static let body: CGFloat = 14
     static let caption: CGFloat = 12
-    static let priceLarge: CGFloat = 30
+    static let priceLarge: CGFloat = 28
     static let priceCard: CGFloat = 18
 }
 
@@ -27,10 +38,16 @@ enum Spacing {
 // MARK: - Corner Radius
 
 enum CornerRadius {
-    static let `default`: CGFloat = 10
     static let small: CGFloat = 6
-    static let image: CGFloat = 8
+    static let `default`: CGFloat = 10
+    static let md: CGFloat = 12
+    static let lg: CGFloat = 16
+    static let xl: CGFloat = 20
+    static let xxl: CGFloat = 24
     static let full: CGFloat = 9999
+
+    // Backward-compatible alias
+    static let image: CGFloat = 12
 }
 
 // MARK: - Sizing
@@ -72,6 +89,58 @@ enum KeychainKeys {
     static let authToken = "com.listwell.auth.token"
 }
 
+// MARK: - Font Helpers
+
+extension Font {
+    /// Display / Headings — Fraunces (serif variable font)
+    static func display(size: CGFloat, weight: Font.Weight = .semibold) -> Font {
+        let fontName: String
+        switch weight {
+        case .bold, .heavy, .black:
+            fontName = "Fraunces-Bold"
+        case .semibold:
+            fontName = "Fraunces-SemiBold"
+        case .light, .ultraLight, .thin:
+            fontName = "Fraunces-Light"
+        default:
+            fontName = "Fraunces-Regular"
+        }
+        return .custom(fontName, size: size)
+    }
+
+    /// Body / UI text — Instrument Sans (sans-serif variable font)
+    static func bodyFont(size: CGFloat, weight: Font.Weight = .regular) -> Font {
+        let fontName: String
+        switch weight {
+        case .bold, .heavy, .black:
+            fontName = "InstrumentSans-Bold"
+        case .semibold:
+            fontName = "InstrumentSans-SemiBold"
+        case .medium:
+            fontName = "InstrumentSans-Medium"
+        default:
+            fontName = "InstrumentSans-Regular"
+        }
+        return .custom(fontName, size: size)
+    }
+
+    /// Data / Monospace — JetBrains Mono (mono variable font)
+    static func mono(size: CGFloat, weight: Font.Weight = .regular) -> Font {
+        let fontName: String
+        switch weight {
+        case .bold, .heavy, .black:
+            fontName = "JetBrainsMonoRoman-Bold"
+        case .medium, .semibold:
+            fontName = "JetBrainsMonoRoman-Medium"
+        case .light:
+            fontName = "JetBrainsMonoRoman-Light"
+        default:
+            fontName = "JetBrainsMono-Regular"
+        }
+        return .custom(fontName, size: size)
+    }
+}
+
 // MARK: - Color Extension
 
 extension Color {
@@ -84,6 +153,14 @@ extension Color {
     static let borderColor = Color("BorderColor")
     static let secondaryBackground = Color("SecondaryBackground")
     static let secondaryForeground = Color("SecondaryForeground")
+
+    // New design system colors
+    static let backgroundWarm = Color("BackgroundWarm")
+    static let backgroundBright = Color("BackgroundBright")
+    static let faintForeground = Color("FaintForeground")
+    static let borderStrong = Color("BorderStrong")
+    static let gold = Color("Gold")
+    static let shed = Color("Shed")
 
     // MARK: Status Colors
 

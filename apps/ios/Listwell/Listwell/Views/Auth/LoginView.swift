@@ -28,11 +28,11 @@ struct LoginView: View {
         VStack(spacing: Spacing.xxl) {
             VStack(spacing: Spacing.sm) {
                 Text("Listwell")
-                    .font(.system(size: Typography.pageTitle, weight: .bold))
+                    .font(.display(size: Typography.pageTitle, weight: .bold))
                     .foregroundStyle(Color.appForeground)
 
                 Text("Turn photos into listings")
-                    .font(.system(size: Typography.body))
+                    .font(.bodyFont(size: Typography.body))
                     .foregroundStyle(Color.mutedForeground)
             }
 
@@ -74,7 +74,7 @@ struct LoginView: View {
 
             if let error = authState.errorMessage {
                 Text(error)
-                    .font(.system(size: Typography.caption))
+                    .font(.bodyFont(size: Typography.caption))
                     .foregroundStyle(Color.destructive)
                     .multilineTextAlignment(.center)
             }
@@ -162,10 +162,10 @@ private struct FormField<Content: View>: View {
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
             Text(label)
-                .font(.system(size: Typography.caption, weight: .medium))
+                .font(.bodyFont(size: Typography.caption, weight: .medium))
                 .foregroundStyle(Color.appForeground)
             content
-                .font(.system(size: Typography.body))
+                .font(.bodyFont(size: Typography.body))
                 .padding(Spacing.md)
                 .background(Color.secondaryBackground)
                 .clipShape(RoundedRectangle(cornerRadius: CornerRadius.small))

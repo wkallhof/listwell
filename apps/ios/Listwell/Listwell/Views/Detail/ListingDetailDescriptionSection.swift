@@ -10,7 +10,7 @@ struct ListingDetailDescriptionSection: View {
         VStack(alignment: .leading, spacing: Spacing.sm) {
             HStack {
                 Text("Description")
-                    .font(.system(size: Typography.sectionHeading, weight: .semibold))
+                    .font(.display(size: Typography.sectionHeading, weight: .semibold))
                     .foregroundStyle(Color.appForeground)
                 Spacer()
                 CopyButton(text: description, label: "description")
@@ -19,7 +19,7 @@ struct ListingDetailDescriptionSection: View {
             if isEditing {
                 VStack(alignment: .leading, spacing: Spacing.sm) {
                     TextEditor(text: $editText)
-                        .font(.system(size: Typography.body))
+                        .font(.bodyFont(size: Typography.body))
                         .frame(minHeight: 120)
                         .scrollContentBackground(.hidden)
                         .editFieldStyle()
@@ -36,7 +36,7 @@ struct ListingDetailDescriptionSection: View {
                     withAnimation(.easeOut(duration: 0.2)) { isEditing = true }
                 } label: {
                     Text(description)
-                        .font(.system(size: Typography.body))
+                        .font(.bodyFont(size: Typography.body))
                         .foregroundStyle(Color.appForeground)
                         .lineSpacing(4)
                         .frame(maxWidth: .infinity, alignment: .leading)

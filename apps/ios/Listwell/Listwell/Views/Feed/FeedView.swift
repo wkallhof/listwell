@@ -129,7 +129,7 @@ struct FeedView: View {
     private var headerView: some View {
         HStack {
             Text("Your Listings")
-                .font(.system(size: Typography.pageTitle, weight: .bold))
+                .font(.display(size: Typography.pageTitle, weight: .bold))
                 .foregroundStyle(Color.appForeground)
             Spacer()
             Menu {

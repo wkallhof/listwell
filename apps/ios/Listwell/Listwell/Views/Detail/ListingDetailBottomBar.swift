@@ -19,7 +19,7 @@ struct ListingDetailBottomBar: View {
                     Image(systemName: isCopied ? "checkmark" : "doc.on.doc")
                         .font(.system(size: 16))
                     Text(isCopied ? "Copied!" : "Copy Full Listing")
-                        .font(.system(size: Typography.body, weight: .semibold))
+                        .font(.bodyFont(size: Typography.body, weight: .semibold))
                 }
                 .frame(maxWidth: .infinity)
                 .frame(height: Sizing.minTapTarget)

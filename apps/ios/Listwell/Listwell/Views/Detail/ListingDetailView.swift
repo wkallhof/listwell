@@ -103,14 +103,14 @@ struct ListingDetailView: View {
                     if let agentLog = listing.agentLog, !agentLog.isEmpty {
                         VStack(alignment: .leading, spacing: Spacing.sm) {
                             Text("Activity")
-                                .font(.system(size: Typography.caption, weight: .medium))
+                                .font(.bodyFont(size: Typography.caption, weight: .medium))
                                 .foregroundStyle(Color.mutedForeground)
                             AgentLogView(entries: agentLog)
                         }
                     }
 
                     Text("This usually takes 30-90 seconds")
-                        .font(.system(size: Typography.caption))
+                        .font(.bodyFont(size: Typography.caption))
                         .foregroundStyle(Color.mutedForeground)
                 }
                 .padding(.horizontal, Sizing.pagePadding)
@@ -121,7 +121,7 @@ struct ListingDetailView: View {
     private func processingHeader() -> some View {
         HStack {
             Text("Generating...")
-                .font(.system(size: Typography.sectionHeading, weight: .semibold))
+                .font(.display(size: Typography.sectionHeading, weight: .semibold))
                 .foregroundStyle(Color.appForeground)
             Spacer()
         }
@@ -139,12 +139,12 @@ struct ListingDetailView: View {
 
                 VStack(alignment: .leading, spacing: Spacing.xs) {
                     Text("Generation failed")
-                        .font(.system(size: Typography.body, weight: .medium))
+                        .font(.bodyFont(size: Typography.body, weight: .medium))
                         .foregroundStyle(Color.appForeground)
 
                     if let error = listing.pipelineError {
                         Text(error)
-                            .font(.system(size: Typography.body))
+                            .font(.bodyFont(size: Typography.body))
                             .foregroundStyle(Color.mutedForeground)
                     }
                 }
@@ -157,7 +157,7 @@ struct ListingDetailView: View {
                     }
                 } label: {
                     Text("Retry")
-                        .font(.system(size: Typography.body, weight: .medium))
+                        .font(.bodyFont(size: Typography.body, weight: .medium))
                         .frame(maxWidth: .infinity)
                         .frame(height: Sizing.minTapTarget)
                         .background(Color.accentColor)
@@ -169,7 +169,7 @@ struct ListingDetailView: View {
                     showDeleteConfirmation = true
                 } label: {
                     Text("Delete")
-                        .font(.system(size: Typography.body, weight: .medium))
+                        .font(.bodyFont(size: Typography.body, weight: .medium))
                         .frame(maxWidth: .infinity)
                         .frame(height: Sizing.minTapTarget)
                         .foregroundStyle(Color.destructive)
@@ -277,7 +277,7 @@ struct ListingDetailView: View {
             ListingStatusBadge(status: listing.status, pipelineStep: listing.pipelineStep)
             if let category = listing.category {
                 Text(category)
-                    .font(.system(size: Typography.caption))
+                    .font(.bodyFont(size: Typography.caption))
                     .foregroundStyle(Color.mutedForeground)
             }
             Spacer()
@@ -291,7 +291,7 @@ struct ListingDetailView: View {
         if let notes = listing.researchNotes {
             VStack(alignment: .leading, spacing: Spacing.sm) {
                 Text("Market Notes")
-                    .font(.system(size: Typography.sectionHeading, weight: .semibold))
+                    .font(.display(size: Typography.sectionHeading, weight: .semibold))
                     .foregroundStyle(Color.appForeground)
                 Markdown(notes)
                     .markdownTextStyle {
@@ -388,7 +388,7 @@ struct ListingDetailView: View {
                 .font(.system(size: 48))
                 .foregroundStyle(Color.mutedForeground.opacity(0.3))
             Text(message)
-                .font(.system(size: Typography.body))
+                .font(.bodyFont(size: Typography.body))
                 .foregroundStyle(Color.mutedForeground)
                 .multilineTextAlignment(.center)
             Button("Try Again") {
@@ -396,7 +396,7 @@ struct ListingDetailView: View {
                     await viewModel.loadListing(id: listingId, token: authState.token)
                 }
             }
-            .font(.system(size: Typography.body, weight: .medium))
+            .font(.bodyFont(size: Typography.body, weight: .medium))
         }
         .padding(Sizing.pagePadding)
         .frame(maxWidth: .infinity, maxHeight: .infinity)

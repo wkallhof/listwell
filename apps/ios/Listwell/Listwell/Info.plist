@@ -52,5 +52,11 @@
 	<string>Listwell uses speech recognition to describe your items by voice</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Listwell needs microphone access for voice descriptions</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Fraunces-Variable.ttf</string>
+		<string>InstrumentSans-Variable.ttf</string>
+		<string>JetBrainsMono-Variable.ttf</string>
+	</array>
 </dict>
 </plist>

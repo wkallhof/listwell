@@ -26,7 +26,7 @@ struct CaptureView: View {
                     captureButtons
 
                     Text("Add 3-5 photos from different angles for best results")
-                        .font(.system(size: Typography.caption))
+                        .font(.bodyFont(size: Typography.caption))
                         .foregroundStyle(Color.mutedForeground)
                         .multilineTextAlignment(.center)
                 }
@@ -85,7 +85,7 @@ struct CaptureView: View {
                 showCamera = true
             } label: {
                 Label("Take Photo", systemImage: "camera")
-                    .font(.system(size: Typography.body, weight: .medium))
+                    .font(.bodyFont(size: Typography.body, weight: .medium))
                     .frame(maxWidth: .infinity)
                     .frame(height: Sizing.minTapTarget)
                     .background(Color.secondaryBackground)
@@ -97,7 +97,7 @@ struct CaptureView: View {
                 showPhotoPicker = true
             } label: {
                 Label("Choose from Library", systemImage: "photo.badge.plus")
-                    .font(.system(size: Typography.body, weight: .medium))
+                    .font(.bodyFont(size: Typography.body, weight: .medium))
                     .frame(maxWidth: .infinity)
                     .frame(height: Sizing.minTapTarget)
                     .background(Color.secondaryBackground)
@@ -116,7 +116,7 @@ struct CaptureView: View {
                 onNext()
             } label: {
                 Text("Next — \(viewModel.selectedImages.count) photo\(viewModel.selectedImages.count == 1 ? "" : "s")")
-                    .font(.system(size: Typography.body, weight: .semibold))
+                    .font(.bodyFont(size: Typography.body, weight: .semibold))
                     .frame(maxWidth: .infinity)
                     .frame(height: Sizing.minTapTarget)
                     .background(viewModel.canProceed ? Color.accentColor : Color.mutedBackground)

@@ -13,11 +13,11 @@ struct EmptyStateView: View {
                 .padding(.bottom, Spacing.sm)
 
             Text(title)
-                .font(.system(size: Typography.sectionHeading, weight: .medium))
+                .font(.display(size: Typography.sectionHeading, weight: .medium))
                 .foregroundStyle(Color.mutedForeground)
 
             Text(description)
-                .font(.system(size: Typography.body))
+                .font(.bodyFont(size: Typography.body))
                 .foregroundStyle(Color.mutedForeground)
         }
         .multilineTextAlignment(.center)

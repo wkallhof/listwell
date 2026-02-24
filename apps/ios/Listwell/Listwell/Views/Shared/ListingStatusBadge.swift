@@ -44,7 +44,7 @@ struct ListingStatusBadge: View {
                     .font(.system(size: Typography.caption))
             }
             Text(displayStatus)
-                .font(.system(size: Typography.caption, weight: .medium))
+                .font(.bodyFont(size: Typography.caption, weight: .medium))
         }
         .foregroundStyle(foregroundColor)
         .padding(.horizontal, 10)

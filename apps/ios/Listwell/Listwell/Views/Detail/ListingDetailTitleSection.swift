@@ -10,7 +10,7 @@ struct ListingDetailTitleSection: View {
         if isEditing {
             VStack(alignment: .leading, spacing: Spacing.sm) {
                 TextField("Title", text: $editText)
-                    .font(.system(size: Typography.pageTitle, weight: .bold))
+                    .font(.display(size: Typography.pageTitle, weight: .bold))
                     .textFieldStyle(.plain)
                     .editFieldStyle()
                 EditActionsView {
@@ -27,7 +27,7 @@ struct ListingDetailTitleSection: View {
                     withAnimation(.easeOut(duration: 0.2)) { isEditing = true }
                 } label: {
                     Text(title)
-                        .font(.system(size: Typography.pageTitle, weight: .bold))
+                        .font(.display(size: Typography.pageTitle, weight: .bold))
                         .foregroundStyle(Color.appForeground)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .multilineTextAlignment(.leading)

@@ -38,14 +38,14 @@ struct AgentLogView: View {
                 .frame(width: 16, height: 16)
 
             Text(entry.content)
-                .font(.system(size: Typography.caption))
+                .font(.bodyFont(size: Typography.caption))
                 .foregroundStyle(Color.mutedForeground)
                 .lineLimit(2)
 
             Spacer()
 
             Text(TimeAgo.string(from: entry.date))
-                .font(.system(size: 10))
+                .font(.bodyFont(size: 10))
                 .foregroundStyle(Color.mutedForeground.opacity(0.6))
         }
     }

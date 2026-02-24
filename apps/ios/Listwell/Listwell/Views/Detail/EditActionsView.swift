@@ -9,11 +9,11 @@ struct EditActionsView: View {
             Button("Save") {
                 Task { await onSave() }
             }
-            .font(.system(size: Typography.body, weight: .medium))
+            .font(.bodyFont(size: Typography.body, weight: .medium))
             .foregroundStyle(Color.accentColor)
 
             Button("Cancel", action: onCancel)
-                .font(.system(size: Typography.body))
+                .font(.bodyFont(size: Typography.body))
                 .foregroundStyle(Color.mutedForeground)
         }
     }

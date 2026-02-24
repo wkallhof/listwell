@@ -84,7 +84,7 @@ struct ImageCarouselView: View {
                 Image(systemName: "wand.and.stars")
                     .font(.system(size: 12))
                 Text("Enhance")
-                    .font(.system(size: Typography.caption, weight: .medium))
+                    .font(.bodyFont(size: Typography.caption, weight: .medium))
             }
             .foregroundStyle(Color.appForeground)
             .padding(.horizontal, Spacing.md)

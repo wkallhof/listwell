@@ -33,7 +33,7 @@ struct PipelineStepsView: View {
                 .frame(width: 20, height: 20)
 
             Text(label)
-                .font(.system(size: Typography.body, weight: state == .active ? .medium : .regular))
+                .font(.bodyFont(size: Typography.body, weight: state == .active ? .medium : .regular))
                 .foregroundStyle(stepTextColor(state))
 
             Spacer()
