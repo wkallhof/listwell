@@ -45,6 +45,7 @@
 - Phase 3: [x] Complete
 - Phase 4: [x] Complete
 - Phase 5: [x] Complete
+- Phase 6: [ ] iOS App Store Submission Readiness
 - **MVP Status:** Not Started
 
 ---
@@ -602,6 +603,120 @@
 - [x] Image enhancement uses category-aware prompts
 - [x] All tests pass with ≥80% code coverage
 - [x] Commit: "feat: complete listing intelligence (Phase 5)"
+
+---
+
+## Phase 6: iOS App Store Submission Readiness
+
+> Review of the iOS codebase and Xcode configuration to identify everything
+> needed before submitting to the App Store.
+
+### 6.1 Xcode Project & Build Configuration
+
+- [ ] 6.1.1: Set `DEVELOPMENT_TEAM` in project.yml to your Apple Developer Team ID
+  - Currently empty string — required for code signing and provisioning
+  - Files: `apps/ios/Listwell/project.yml` (line 28)
+- [ ] 6.1.2: Configure entitlements for production
+  - `Listwell.entitlements` is currently an empty dict — needs push notifications (`aps-environment = production`), and any other capabilities (e.g., Keychain sharing if used across extensions)
+  - The project.yml sets `aps-environment: development` — needs `production` for App Store
+  - Files: `apps/ios/Listwell/Listwell/Listwell.entitlements`, `apps/ios/Listwell/project.yml`
+- [ ] 6.1.3: Verify provisioning profile and certificate setup
+  - Ensure an App Store distribution certificate exists in your Apple Developer account
+  - Ensure an App Store provisioning profile is created for `com.listwell.app`
+  - Verify push notification capability is enabled for the App ID in the Developer portal
+- [ ] 6.1.4: Create an `ExportOptions.plist` for App Store archive exports
+  - Needed for `xcodebuild -exportArchive` CI/CD or manual archive exports
+  - Files: `apps/ios/Listwell/ExportOptions.plist`
+- [ ] 6.1.5: Add a Privacy Manifest (`PrivacyInfo.xcprivacy`)
+  - Required since iOS 17 — declare API usage reasons for required reason APIs (e.g., UserDefaults, disk space, file timestamp APIs)
+  - Check if Kingfisher or other dependencies also require privacy manifest declarations
+  - Files: `apps/ios/Listwell/Listwell/PrivacyInfo.xcprivacy`
+
+### 6.2 App Icon & Launch Screen
+
+- [ ] 6.2.1: Create and add the 1024x1024 App Icon
+  - `AppIcon.appiconset/Contents.json` declares a 1024x1024 slot but no image file exists
+  - Must be a single 1024x1024 PNG (no alpha channel, no rounded corners — Apple applies those)
+  - Files: `apps/ios/Listwell/Listwell/Resources/Assets.xcassets/AppIcon.appiconset/`
+- [ ] 6.2.2: Review launch screen configuration
+  - Currently uses `UILaunchScreen` with just `UIColorName: AccentColor` — consider adding a branded launch screen with your app icon/logo for a more polished first impression
+  - Files: `apps/ios/Listwell/Listwell/Info.plist`
+
+### 6.3 App Store Connect Metadata
+
+> These are things Apple requires you to fill out in App Store Connect before submission.
+> Prepare all of this content ahead of time.
+
+- [ ] 6.3.1: Prepare App Store screenshots
+  - Required sizes: 6.7" (iPhone 15 Pro Max — 1290x2796), 6.5" (iPhone 14 Plus — 1284x2778), 5.5" (iPhone 8 Plus — 1242x2208) — minimum 6.7" required
+  - Need 1-10 screenshots per size — at minimum: feed screen, capture screen, listing detail (ready), processing/AI pipeline, image enhancement
+  - Consider using a tool like Fastlane Snapshot or manual Simulator screenshots
+- [ ] 6.3.2: Prepare App Store description and metadata
+  - **App Name** (max 30 chars): e.g., "Listwell"
+  - **Subtitle** (max 30 chars): e.g., "AI Marketplace Listings"
+  - **Description** (max 4000 chars): Full marketing description of features
+  - **Promotional Text** (max 170 chars): Can be updated without a new build
+  - **Keywords** (max 100 chars, comma-separated): SEO keywords for search
+  - **Support URL**: Required — link to support page or email
+  - **Marketing URL**: Optional
+  - **Privacy Policy URL**: Required — must be a publicly accessible URL
+- [ ] 6.3.3: Prepare App Review information
+  - **Demo account credentials**: Apple reviewers need a working login to test the app — create a dedicated review account
+  - **Review notes**: Explain the app's purpose, how the AI pipeline works, that it connects to your backend API
+  - **Contact info**: Phone number and email for the review team to reach you
+- [ ] 6.3.4: Set the app's content rating
+  - Complete Apple's age rating questionnaire in App Store Connect
+  - This app likely qualifies for 4+ (no objectionable content)
+- [ ] 6.3.5: Determine pricing and availability
+  - Free or paid? In-app purchases planned?
+  - Select which countries/regions to distribute in
+
+### 6.4 Legal & Compliance
+
+- [ ] 6.4.1: Create a Privacy Policy
+  - Required for any app that collects user data (this app collects: email, photos, voice recordings, listing data)
+  - Must be hosted at a public URL
+  - Must disclose use of AI services (Anthropic Claude, Google Gemini) and what data is sent to them
+- [ ] 6.4.2: Review Apple's App Store Review Guidelines for compliance
+  - Section 2.3: Accurate metadata — ensure description matches actual functionality
+  - Section 4.0: Design guidelines — ensure the app meets minimum quality bar
+  - Section 5.1: Privacy — ensure all data collection is disclosed and permission prompts are clear (camera, microphone, photo library, speech recognition are already declared in Info.plist)
+  - Section 5.1.2: Data Use and Sharing — disclose third-party data sharing (AI APIs, push notifications)
+- [ ] 6.4.3: Add App Tracking Transparency if applicable
+  - If using any analytics or tracking SDKs, add `NSUserTrackingUsageDescription` to Info.plist
+  - Currently not needed if no tracking is implemented
+
+### 6.5 Production Readiness
+
+- [ ] 6.5.1: Configure the API base URL for production
+  - Verify `Constants.swift` API endpoints point to production server (not localhost)
+  - Ensure the app handles API URL configuration (hardcoded vs. build config vs. environment)
+- [ ] 6.5.2: Set up APNs (Apple Push Notification service) for production
+  - Create an APNs key or certificate in the Apple Developer portal
+  - Configure your API server to send push notifications via APNs (not just web-push/VAPID)
+  - Test push notifications on a real device with a production/ad-hoc build
+- [ ] 6.5.3: Run a full build and archive test
+  - `xcodebuild archive` should succeed with Release configuration
+  - Verify the app runs correctly in Release mode (optimizations can surface bugs not seen in Debug)
+- [ ] 6.5.4: Test on multiple device sizes
+  - Test on: iPhone SE (3rd gen), iPhone 15, iPhone 15 Pro Max at minimum
+  - Verify all layouts work correctly, no truncated text, no clipped views
+- [ ] 6.5.5: Verify all permission prompts appear correctly on first use
+  - Camera, Photo Library, Microphone, Speech Recognition — each should show the custom description from Info.plist
+  - Push notification permission prompt should appear at the right moment
+
+**Phase 6 Checkpoint:**
+
+- [ ] App icon is present and renders correctly
+- [ ] Privacy manifest is included
+- [ ] Entitlements are configured for production
+- [ ] Code signing works for App Store distribution
+- [ ] All screenshots are captured and sized correctly
+- [ ] App Store Connect metadata is prepared
+- [ ] Privacy Policy is published and URL is ready
+- [ ] Demo account is created for App Review
+- [ ] App runs correctly in Release build on real devices
+- [ ] Push notifications work in production configuration
 
 ---
 
