@@ -4768,6 +4768,409 @@
           ]
         }
       ]
+    },
+    {
+      "type": "frame",
+      "id": "QZp1e",
+      "x": 1900,
+      "y": 0,
+      "name": "Onboarding: Seller Type",
+      "clip": true,
+      "width": 375,
+      "height": 812,
+      "fill": "$--bg",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "tjspX",
+          "name": "Top Bar",
+          "width": "fill_container",
+          "height": 44,
+          "padding": [
+            0,
+            20
+          ],
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "YAkp9",
+              "name": "stepLabel",
+              "fill": "$--muted-fg",
+              "content": "Step 1 of 3",
+              "fontFamily": "Instrument Sans",
+              "fontSize": 13,
+              "fontWeight": "500"
+            },
+            {
+              "type": "text",
+              "id": "tFkHL",
+              "name": "skipBtn",
+              "fill": "$--primary",
+              "content": "Skip",
+              "fontFamily": "Instrument Sans",
+              "fontSize": 14,
+              "fontWeight": "500"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "JLAfl",
+          "name": "Progress Bar",
+          "width": "fill_container",
+          "height": 4,
+          "gap": 4,
+          "padding": [
+            0,
+            20
+          ],
+          "children": [
+            {
+              "type": "rectangle",
+              "cornerRadius": 2,
+              "id": "Wz4K6",
+              "name": "prog1",
+              "fill": "$--primary",
+              "width": "fill_container",
+              "height": 4
+            },
+            {
+              "type": "rectangle",
+              "cornerRadius": 2,
+              "id": "8p3qI",
+              "name": "prog2",
+              "fill": "$--border",
+              "width": "fill_container",
+              "height": 4
+            },
+            {
+              "type": "rectangle",
+              "cornerRadius": 2,
+              "id": "LLAVD",
+              "name": "prog3",
+              "fill": "$--border",
+              "width": "fill_container",
+              "height": 4
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "k4GZv",
+          "name": "Header",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 8,
+          "padding": [
+            28,
+            20,
+            8,
+            20
+          ],
+          "children": [
+            {
+              "type": "text",
+              "id": "u0UCe",
+              "name": "headline",
+              "fill": "$--foreground",
+              "content": "How do you sell?",
+              "fontFamily": "Fraunces",
+              "fontSize": 28,
+              "fontWeight": "700",
+              "letterSpacing": -0.5
+            },
+            {
+              "type": "text",
+              "id": "TCPxu",
+              "name": "subtitle",
+              "fill": "$--muted-fg",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "This helps us tailor your experience. You can always change this later.",
+              "lineHeight": 1.4,
+              "fontFamily": "Instrument Sans",
+              "fontSize": 15
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "blZ2w",
+          "name": "Cards Section",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 14,
+          "padding": [
+            16,
+            20
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "ChS5Y",
+              "name": "Casual Seller Card",
+              "width": "fill_container",
+              "fill": "$--card",
+              "cornerRadius": 16,
+              "stroke": {
+                "align": "inside",
+                "thickness": 2,
+                "fill": "$--primary"
+              },
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "$--shadow",
+                "offset": {
+                  "x": 0,
+                  "y": 2
+                },
+                "blur": 12
+              },
+              "gap": 16,
+              "padding": 20,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "1Rzpa",
+                  "name": "Icon Container",
+                  "width": 52,
+                  "height": 52,
+                  "fill": "$--primary-light",
+                  "cornerRadius": 14,
+                  "layout": "vertical",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "BqcJt",
+                      "name": "casualIconGlyph",
+                      "width": 24,
+                      "height": 24,
+                      "iconFontName": "shirt",
+                      "iconFontFamily": "lucide",
+                      "fill": "$--primary"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "BclHe",
+                  "name": "Casual Text",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 6,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "1EU0A",
+                      "name": "casualTitle",
+                      "fill": "$--foreground",
+                      "content": "Closet Cleanout",
+                      "fontFamily": "Instrument Sans",
+                      "fontSize": 17,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "NPK1E",
+                      "name": "casualDesc",
+                      "fill": "$--muted-fg",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Selling a few things you no longer need — clothes, gadgets, furniture, or random finds around the house.",
+                      "lineHeight": 1.4,
+                      "fontFamily": "Instrument Sans",
+                      "fontSize": 13
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "N37BQ",
+                  "name": "Selected Check",
+                  "width": 24,
+                  "height": 24,
+                  "fill": "$--primary",
+                  "cornerRadius": 12,
+                  "layout": "vertical",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "7ZRda",
+                      "name": "checkIcon",
+                      "width": 14,
+                      "height": 14,
+                      "iconFontName": "check",
+                      "iconFontFamily": "lucide",
+                      "fill": "$--primary-fg"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "val5N",
+              "name": "Pro Seller Card",
+              "width": "fill_container",
+              "fill": "$--card",
+              "cornerRadius": 16,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1,
+                "fill": "$--border"
+              },
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "$--shadow",
+                "offset": {
+                  "x": 0,
+                  "y": 2
+                },
+                "blur": 12
+              },
+              "gap": 16,
+              "padding": 20,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "yjeci",
+                  "name": "Icon Container",
+                  "width": 52,
+                  "height": 52,
+                  "fill": "#E8B93120",
+                  "cornerRadius": 14,
+                  "layout": "vertical",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "rTvCJ",
+                      "name": "proIconGlyph",
+                      "width": 24,
+                      "height": 24,
+                      "iconFontName": "store",
+                      "iconFontFamily": "lucide",
+                      "fill": "$--gold"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "RCjzf",
+                  "name": "Pro Text",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 6,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "JK7sD",
+                      "name": "proTitle",
+                      "fill": "$--foreground",
+                      "content": "High-Volume Seller",
+                      "fontFamily": "Instrument Sans",
+                      "fontSize": 17,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "HmXeY",
+                      "name": "proDesc",
+                      "fill": "$--muted-fg",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "You run a pawn shop, thrift store, or resale business and list items regularly in bulk.",
+                      "lineHeight": 1.4,
+                      "fontFamily": "Instrument Sans",
+                      "fontSize": 13
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "aXSjz",
+                  "name": "Unselected Circle",
+                  "width": 24,
+                  "height": 24,
+                  "cornerRadius": 12,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 2,
+                    "fill": "$--border-strong"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "S8tTG",
+          "name": "Spacer",
+          "width": "fill_container",
+          "height": "fill_container"
+        },
+        {
+          "type": "frame",
+          "id": "7Da3d",
+          "name": "Bottom Section",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 16,
+          "padding": [
+            0,
+            20,
+            40,
+            20
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "wQ9x2",
+              "name": "Continue Button",
+              "width": "fill_container",
+              "height": 52,
+              "fill": "$--primary",
+              "cornerRadius": 14,
+              "gap": 8,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "5lmQP",
+                  "name": "continueText",
+                  "fill": "$--primary-fg",
+                  "content": "Continue",
+                  "fontFamily": "Instrument Sans",
+                  "fontSize": 16,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "icon_font",
+                  "id": "sNDon",
+                  "name": "continueArrow",
+                  "width": 18,
+                  "height": 18,
+                  "iconFontName": "arrow-right",
+                  "iconFontFamily": "lucide",
+                  "fill": "$--primary-fg"
+                }
+              ]
+            }
+          ]
+        }
+      ]
     }
   ],
   "variables": {
