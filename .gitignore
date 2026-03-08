@@ -26,6 +26,9 @@ dist
 .DS_Store
 *.pem
 
+# Xcode
+xcuserdata/
+
 # debug
 npm-debug.log*
 yarn-debug.log*
