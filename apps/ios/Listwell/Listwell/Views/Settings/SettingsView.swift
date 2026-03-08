@@ -4,10 +4,13 @@ struct SettingsView: View {
     @Environment(AuthState.self) private var authState
     @Environment(SettingsStore.self) private var settingsStore
     @State private var viewModel = SettingsViewModel()
+    @State private var creditsViewModel = CreditsViewModel()
+    @State private var showPurchaseCredits = false
 
     var body: some View {
         ScrollView {
             VStack(spacing: Spacing.xxl) {
+                creditsSection
                 appearanceSection
                 notificationsSection
                 accountSection
@@ -18,8 +21,55 @@ struct SettingsView: View {
         .background(Color.appBackground)
         .navigationTitle("Preferences")
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(isPresented: $showPurchaseCredits) {
+            PurchaseCreditsView()
+        }
         .task {
             await viewModel.load(token: authState.token)
+            await creditsViewModel.fetchBalance(token: authState.token)
+        }
+        .onChange(of: showPurchaseCredits) {
+            if !showPurchaseCredits {
+                Task { await creditsViewModel.fetchBalance(token: authState.token) }
+            }
+        }
+    }
+
+    // MARK: - Credits
+
+    private var creditsSection: some View {
+        VStack(alignment: .leading, spacing: Spacing.md) {
+            Text("Credits")
+                .font(.bodyFont(size: Typography.sm, weight: .medium))
+                .foregroundStyle(Color.mutedForeground)
+
+            Button { showPurchaseCredits = true } label: {
+                HStack {
+                    VStack(alignment: .leading, spacing: Spacing.xs) {
+                        Text("Listing Credits")
+                            .font(.bodyFont(size: Typography.base, weight: .medium))
+                            .foregroundStyle(Color.appForeground)
+                        Text("Used to create AI-powered listings")
+                            .font(.bodyFont(size: Typography.xs))
+                            .foregroundStyle(Color.mutedForeground)
+                    }
+                    Spacer()
+                    HStack(spacing: Spacing.xs) {
+                        Text("\(creditsViewModel.balance)")
+                            .font(.mono(size: Typography.md, weight: .bold))
+                            .foregroundStyle(Color.accentColor)
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 12))
+                            .foregroundStyle(Color.mutedForeground)
+                    }
+                }
+                .padding(Spacing.lg)
+                .background(
+                    RoundedRectangle(cornerRadius: CornerRadius.default)
+                        .stroke(Color.borderColor, lineWidth: 1)
+                )
+            }
+            .buttonStyle(.plain)
         }
     }
 

@@ -1,0 +1,35 @@
+{
+  "identifier" : "com.listwell.storekit",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+    {
+      "displayPrice" : "4.99",
+      "familyShareable" : false,
+      "internalID" : "1",
+      "localizations" : [
+        {
+          "description" : "Purchase 5 listing credits for creating AI-powered marketplace listings",
+          "displayName" : "5 Listing Credits",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.listwell.credits5",
+      "referenceName" : "5 Listing Credits",
+      "type" : "Consumable"
+    }
+  ],
+  "settings" : {
+    "_applicationInternalID" : "1",
+    "_developerTeamID" : "",
+    "_lastSynchronizedDate" : 0
+  },
+  "subscriptionGroups" : [
+
+  ],
+  "version" : {
+    "major" : 3,
+    "minor" : 0
+  }
+}

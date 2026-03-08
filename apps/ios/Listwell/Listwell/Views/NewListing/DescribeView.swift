@@ -52,6 +52,9 @@ struct DescribeView: View {
                 }
             }
         }
+        .sheet(isPresented: Bindable(viewModel).needsCredits) {
+            PurchaseCreditsView()
+        }
         .alert("Enable Notifications?", isPresented: $showPushPrompt) {
             Button("Enable") {
                 Task {

@@ -125,6 +125,8 @@ export const userRelations = relations(user, ({ many, one }) => ({
   listings: many(listings),
   pushSubscriptions: many(pushSubscriptions),
   preferences: one(userPreferences),
+  credits: one(userCredits),
+  creditTransactions: many(creditTransactions),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({
@@ -199,6 +201,13 @@ export const pipelineStepEnum = pgEnum("pipeline_step", [
 
 export const imageTypeEnum = pgEnum("image_type", ["ORIGINAL", "ENHANCED"]);
 
+export const creditTransactionTypeEnum = pgEnum("credit_transaction_type", [
+  "FREE_GRANT",
+  "PURCHASE",
+  "USAGE",
+  "REFUND",
+]);
+
 // Comparable listing shape stored as JSON
 export interface Comparable {
   title: string;
@@ -267,6 +276,73 @@ export const listingImages = pgTable("listing_images", {
     .notNull()
     .defaultNow(),
 });
+
+// ─── Credits Tables ─────────────────────────────────────────────────────────
+
+export const userCredits = pgTable("user_credits", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => createId()),
+  userId: text("user_id")
+    .notNull()
+    .unique()
+    .references(() => user.id, { onDelete: "cascade" }),
+  balance: integer("balance").notNull().default(0),
+  freeCreditsGranted: boolean("free_credits_granted").notNull().default(false),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+});
+
+export const creditTransactions = pgTable(
+  "credit_transactions",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    type: creditTransactionTypeEnum("type").notNull(),
+    amount: integer("amount").notNull(),
+    balanceAfter: integer("balance_after").notNull(),
+    appleTransactionId: text("apple_transaction_id"),
+    listingId: text("listing_id").references(() => listings.id),
+    note: text("note"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("credit_txn_userId_idx").on(table.userId),
+    index("credit_txn_appleTransactionId_idx").on(table.appleTransactionId),
+  ],
+);
+
+export const userCreditsRelations = relations(userCredits, ({ one }) => ({
+  user: one(user, {
+    fields: [userCredits.userId],
+    references: [user.id],
+  }),
+}));
+
+export const creditTransactionsRelations = relations(
+  creditTransactions,
+  ({ one }) => ({
+    user: one(user, {
+      fields: [creditTransactions.userId],
+      references: [user.id],
+    }),
+    listing: one(listings, {
+      fields: [creditTransactions.listingId],
+      references: [listings.id],
+    }),
+  }),
+);
 
 // ─── Relations ───────────────────────────────────────────────────────────────
 
