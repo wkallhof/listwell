@@ -3,6 +3,7 @@ import { eq, desc } from "drizzle-orm";
 import { db } from "@listwell/db";
 import { listings, listingImages } from "@listwell/db/schema";
 import { inngest } from "../inngest/client";
+import { getOrCreateUserCredits, deductCredit } from "../lib/credits";
 
 export const listingsRoutes = new Hono();
 
@@ -40,6 +41,15 @@ listingsRoutes.post("/listings", async (c) => {
     return c.json({ error: "Maximum 5 images allowed" }, 400);
   }
 
+  // Credit gate: ensure user has credits
+  const credits = await getOrCreateUserCredits(user.id);
+  if (credits.balance < 1) {
+    return c.json(
+      { error: "Insufficient credits", creditsRemaining: 0 },
+      402,
+    );
+  }
+
   const [listing] = await db
     .insert(listings)
     .values({
@@ -49,6 +59,16 @@ listingsRoutes.post("/listings", async (c) => {
       pipelineStep: "PENDING",
     })
     .returning();
+
+  // Atomic deduction — if it fails (race condition), clean up
+  const deduction = await deductCredit(user.id, listing.id);
+  if (!deduction.success) {
+    await db.delete(listings).where(eq(listings.id, listing.id));
+    return c.json(
+      { error: "Insufficient credits", creditsRemaining: 0 },
+      402,
+    );
+  }
 
   const imageRecords = await Promise.all(
     images.map(async (image, index) => {
@@ -77,6 +97,10 @@ listingsRoutes.post("/listings", async (c) => {
     },
   });
 
-  const result = { ...listing, images: imageRecords };
+  const result = {
+    ...listing,
+    images: imageRecords,
+    creditsRemaining: deduction.balance,
+  };
   return c.json(result, 201);
 });

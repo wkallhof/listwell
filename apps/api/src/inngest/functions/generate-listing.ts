@@ -5,6 +5,7 @@ import { listings, type Comparable } from "@listwell/db/schema";
 import { inngest } from "../client";
 import { runListingAgent, type RunAgentResult } from "../../lib/ai/agent";
 import { sendListingReadyNotification } from "../../lib/notifications";
+import { refundCredit } from "../../lib/credits";
 
 export const generateListing = inngest.createFunction(
   {
@@ -50,6 +51,15 @@ export const generateListing = inngest.createFunction(
             updatedAt: new Date(),
           })
           .where(eq(listings.id, listingId));
+
+        // Auto-refund the credit on pipeline failure
+        const listing = await db.query.listings.findFirst({
+          where: eq(listings.id, listingId),
+        });
+        if (listing) {
+          await refundCredit(listing.userId, listingId);
+        }
+
         throw error;
       }
     });

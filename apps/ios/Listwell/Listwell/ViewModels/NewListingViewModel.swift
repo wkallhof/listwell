@@ -10,6 +10,7 @@ final class NewListingViewModel {
     var errorMessage: String?
     var submittedListingId: String?
     var uploadProgress: Double = 0
+    var needsCredits = false
 
     var canAddMore: Bool {
         selectedImages.count < APIConfig.maxPhotos
@@ -33,8 +34,20 @@ final class NewListingViewModel {
         guard let token, !selectedImages.isEmpty else { return }
         isSubmitting = true
         errorMessage = nil
+        needsCredits = false
         uploadProgress = 0
         defer { isSubmitting = false }
+
+        // Pre-check credit balance
+        do {
+            let credits = try await CreditsService.fetchBalance(token: token)
+            if credits.balance < 1 {
+                needsCredits = true
+                return
+            }
+        } catch {
+            // Continue with submission — the API will gate it anyway
+        }
 
         do {
             let imageRefs = try await ImageUploadService.uploadImages(
@@ -50,7 +63,12 @@ final class NewListingViewModel {
             uploadProgress = 1.0
             submittedListingId = listing.id
         } catch let error as APIError {
-            errorMessage = error.errorDescription
+            // Handle 402 from API as a credit gate
+            if case .httpError(let code, _) = error, code == 402 {
+                needsCredits = true
+            } else {
+                errorMessage = error.errorDescription
+            }
         } catch {
             errorMessage = "Failed to create listing."
         }
@@ -63,5 +81,6 @@ final class NewListingViewModel {
         errorMessage = nil
         submittedListingId = nil
         uploadProgress = 0
+        needsCredits = false
     }
 }

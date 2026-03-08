@@ -14,6 +14,8 @@ import { transcribeRoutes } from "./routes/transcribe";
 import { pushRoutes } from "./routes/push";
 import { preferencesRoutes } from "./routes/preferences";
 import { meRoutes } from "./routes/me";
+import { creditsRoutes } from "./routes/credits";
+import { applePurchaseRoutes } from "./routes/apple-purchase";
 import { inngestHandler } from "./inngest/handler";
 import { requireAuth } from "./middleware/auth";
 
@@ -42,6 +44,9 @@ app.use("/transcribe", requireAuth);
 app.use("/push/*", requireAuth);
 app.use("/preferences", requireAuth);
 app.use("/me", requireAuth);
+app.use("/credits", requireAuth);
+app.use("/credits/*", requireAuth);
+app.use("/purchases/*", requireAuth);
 
 // Routes
 app.route("/", authRoutes);
@@ -55,6 +60,8 @@ app.route("/", transcribeRoutes);
 app.route("/", pushRoutes);
 app.route("/", preferencesRoutes);
 app.route("/", meRoutes);
+app.route("/", creditsRoutes);
+app.route("/", applePurchaseRoutes);
 
 // Inngest webhook handler
 app.on(["GET", "POST", "PUT"], "/inngest", (c) => inngestHandler(c));

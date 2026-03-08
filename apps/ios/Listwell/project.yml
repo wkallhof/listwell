@@ -43,6 +43,7 @@ targets:
       testTargets:
         - ListwellTests
         - ListwellUITests
+      storeKitConfiguration: Configuration.storekit
 
   ListwellTests:
     type: bundle.unit-test

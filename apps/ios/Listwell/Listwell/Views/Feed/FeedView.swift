@@ -7,6 +7,8 @@ struct FeedView: View {
     @State private var navigationPath = NavigationPath()
     @State private var newListingViewModel = NewListingViewModel()
     @State private var newListingStep = NewListingStep.capture
+    @State private var creditsViewModel = CreditsViewModel()
+    @State private var showPurchaseCredits = false
 
     private enum NewListingStep {
         case capture, describe
@@ -43,8 +45,12 @@ struct FeedView: View {
                 }
             }
         }
+        .sheet(isPresented: $showPurchaseCredits) {
+            PurchaseCreditsView()
+        }
         .task {
             await viewModel.loadListings(token: authState.token)
+            await creditsViewModel.fetchBalance(token: authState.token)
         }
         .onChange(of: navigationPath) {
             if navigationPath.isEmpty {
@@ -53,7 +59,15 @@ struct FeedView: View {
         }
         .onChange(of: showNewListing) {
             if !showNewListing {
-                Task { await viewModel.refresh(token: authState.token) }
+                Task {
+                    await viewModel.refresh(token: authState.token)
+                    await creditsViewModel.fetchBalance(token: authState.token)
+                }
+            }
+        }
+        .onChange(of: showPurchaseCredits) {
+            if !showPurchaseCredits {
+                Task { await creditsViewModel.fetchBalance(token: authState.token) }
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .navigateToListing)) { notification in
@@ -132,6 +146,22 @@ struct FeedView: View {
                 .font(.display(size: Typography.pageTitle, weight: .bold))
                 .foregroundStyle(Color.appForeground)
             Spacer()
+            Button { showPurchaseCredits = true } label: {
+                HStack(spacing: Spacing.xs) {
+                    Image(systemName: "creditcard.fill")
+                        .font(.system(size: 14))
+                    Text("\(creditsViewModel.balance)")
+                        .font(.mono(size: Typography.sm, weight: .medium))
+                }
+                .foregroundStyle(Color.accentColor)
+                .padding(.horizontal, Spacing.sm)
+                .padding(.vertical, Spacing.xs)
+                .background(
+                    Capsule()
+                        .fill(Color.accentColor.opacity(0.1))
+                )
+            }
+            .accessibilityLabel("\(creditsViewModel.balance) credits")
             NavigationLink(destination: SettingsView()) {
                 UserAvatarView(name: authState.currentUser?.name)
                     .frame(width: Sizing.minTapTarget, height: Sizing.minTapTarget)
