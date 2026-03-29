@@ -6,6 +6,7 @@ import {
 import { readFileSync } from "fs";
 import { join } from "path";
 import { addPurchasedCredits, getOrCreateUserCredits } from "../lib/credits";
+import { logActivity, ACTIVITY_EVENTS } from "../lib/activity-log";
 
 const CREDITS_PER_PURCHASE = 5;
 
@@ -93,6 +94,15 @@ applePurchaseRoutes.post("/purchases/apple/verify", async (c) => {
       CREDITS_PER_PURCHASE,
       originalTransactionId,
     );
+
+    if (!result.alreadyProcessed) {
+      await logActivity({
+        userId: user.id,
+        eventType: ACTIVITY_EVENTS.CREDITS_PURCHASED,
+        description: `Purchased ${CREDITS_PER_PURCHASE} credits via Apple IAP`,
+        metadata: { amount: CREDITS_PER_PURCHASE, appleTransactionId: originalTransactionId },
+      });
+    }
 
     return c.json({
       success: true,

@@ -6,11 +6,32 @@ import { inngest } from "../client";
 import { enhanceImage } from "../../lib/ai/gemini";
 import { buildEnhancementPrompt } from "../../lib/ai/enhancement-prompt";
 import { uploadBuffer } from "../../lib/blob";
+import { logActivity, ACTIVITY_EVENTS } from "../../lib/activity-log";
 
 export const enhanceImageFunction = inngest.createFunction(
   {
     id: "enhance-image",
     retries: 1,
+    onFailure: async ({ event }) => {
+      const { listingId, imageId } = event.data.event.data as {
+        listingId: string;
+        imageId: string;
+      };
+      const failedListing = await db.query.listings.findFirst({
+        where: eq(listings.id, listingId),
+        columns: { userId: true },
+      });
+      if (failedListing) {
+        await logActivity({
+          userId: failedListing.userId,
+          eventType: ACTIVITY_EVENTS.IMAGE_ENHANCE_FAILED,
+          description: "Image enhancement failed after retries",
+          resourceType: "listing",
+          resourceId: listingId,
+          metadata: { imageId },
+        });
+      }
+    },
   },
   { event: "image.enhance.requested" },
   async ({ event, step }) => {
@@ -18,6 +39,24 @@ export const enhanceImageFunction = inngest.createFunction(
       imageId: string;
       listingId: string;
     };
+
+    // Look up the listing to get userId for activity logging
+    const parentListing = await db.query.listings.findFirst({
+      where: eq(listings.id, listingId),
+      columns: { userId: true },
+    });
+    const enhanceUserId = parentListing?.userId;
+
+    if (enhanceUserId) {
+      await logActivity({
+        userId: enhanceUserId,
+        eventType: ACTIVITY_EVENTS.IMAGE_ENHANCE_REQUESTED,
+        description: "Image enhancement requested",
+        resourceType: "listing",
+        resourceId: listingId,
+        metadata: { imageId },
+      });
+    }
 
     const result = await step.run(
       "enhance-and-upload",
@@ -98,6 +137,17 @@ export const enhanceImageFunction = inngest.createFunction(
         };
       },
     );
+
+    if (enhanceUserId) {
+      await logActivity({
+        userId: enhanceUserId,
+        eventType: ACTIVITY_EVENTS.IMAGE_ENHANCE_COMPLETED,
+        description: "Image enhancement completed",
+        resourceType: "listing",
+        resourceId: listingId,
+        metadata: { imageId, enhancedImageId: result.imageId },
+      });
+    }
 
     return result;
   },

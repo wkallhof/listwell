@@ -37,7 +37,7 @@
 
 - Phase 0: [x] Complete
 - Phase 1: [x] Complete
-- Phase 2: [ ] Not Started
+- Phase 2: [x] Complete
 - Phase 3: [ ] Not Started
 - Phase 4: [ ] Not Started
 - Phase 5: [x] Complete
@@ -193,101 +193,101 @@
 
 ### 2.1 Admin User API Routes
 
-- [ ] 2.1.1: Create `GET /admin/users` route — paginated list with search (name/email), sort, and filters (has credits, has listings, date range). Join userCredits for balance. Return total count for pagination.
+- [x] 2.1.1: Create `GET /admin/users` route — paginated list with search (name/email), sort, and filters (has credits, has listings, date range). Join userCredits for balance. Return total count for pagination.
   - Files: `apps/api/src/routes/admin/users.ts`
   - Test: Unit tests — pagination works, search filters correctly, sort applies
-- [ ] 2.1.2: Create `GET /admin/users/:id` route — user detail with credit balance, transaction history, listing summary, and recent activity
+- [x] 2.1.2: Create `GET /admin/users/:id` route — user detail with credit balance, transaction history, listing summary, and recent activity
   - Files: `apps/api/src/routes/admin/users.ts`
   - Test: Unit test — returns complete user detail
-- [ ] 2.1.3: Create `POST /admin/users/:id/credits` route — grant or deduct credits. Body: `{ action: "grant" | "deduct", amount: number, reason: string }`. Creates credit transaction with `adminUserId`, updates balance, logs activity.
+- [x] 2.1.3: Create `POST /admin/users/:id/credits` route — grant or deduct credits. Body: `{ action: "grant" | "deduct", amount: number, reason: string }`. Creates credit transaction with `adminUserId`, updates balance, logs activity.
   - Files: `apps/api/src/routes/admin/users.ts`
   - Test: Unit tests — grant increases balance, deduct decreases, deduct below zero returns 400, reason required
-- [ ] 2.1.4: Create `POST /admin/users/:id/suspend` route — toggle suspension. Body: `{ action: "suspend" | "unsuspend", reason: string }`. Updates user record, logs activity.
+- [x] 2.1.4: Create `POST /admin/users/:id/suspend` route — toggle suspension. Body: `{ action: "suspend" | "unsuspend", reason: string }`. Updates user record, logs activity.
   - Files: `apps/api/src/routes/admin/users.ts`
   - Test: Unit tests — suspend sets flag, unsuspend clears it, reason required
-- [ ] 2.1.5: Create `GET /admin/users/:id/activity` route — paginated activity timeline for a specific user, newest first. Filter by eventType and date range.
+- [x] 2.1.5: Create `GET /admin/users/:id/activity` route — paginated activity timeline for a specific user, newest first. Filter by eventType and date range.
   - Files: `apps/api/src/routes/admin/users.ts`
   - Test: Unit test — returns paginated, filtered results
-- [ ] 2.1.6: Create `GET /admin/activity` route — global activity feed across all users, paginated, filterable by eventType and date range
+- [x] 2.1.6: Create `GET /admin/activity` route — global activity feed across all users, paginated, filterable by eventType and date range
   - Files: `apps/api/src/routes/admin/activity.ts`
   - Test: Unit test — returns cross-user activity feed
-- [ ] 2.1.7: Mount admin user and activity routes in API index
+- [x] 2.1.7: Mount admin user and activity routes in API index
   - Files: `apps/api/src/index.ts`
   - Test: Routes respond to requests
 
 ### 2.2 Activity Log Instrumentation
 
-- [ ] 2.2.1: Add activity logging to auth flow — ACCOUNT_CREATED on signup, LOGIN on sign-in
+- [x] 2.2.1: Add activity logging to auth flow — ACCOUNT_CREATED on signup, LOGIN on sign-in
   - Files: `apps/api/src/auth.ts` or BetterAuth hooks
   - Test: Activity log entry created on signup and login
-- [ ] 2.2.2: Add activity logging to listing creation — LISTING_CREATED when POST /listings succeeds
+- [x] 2.2.2: Add activity logging to listing creation — LISTING_CREATED when POST /listings succeeds
   - Files: `apps/api/src/routes/listings.ts`
   - Test: Activity log entry created with listing ID
-- [ ] 2.2.3: Add activity logging to credit operations — CREDITS_PURCHASED, CREDITS_USED, CREDITS_REFUNDED, CREDITS_FREE_GRANT
+- [x] 2.2.3: Add activity logging to credit operations — CREDITS_PURCHASED, CREDITS_USED, CREDITS_REFUNDED, CREDITS_FREE_GRANT
   - Files: `apps/api/src/routes/credits.ts`, `apps/api/src/routes/apple-purchase.ts`, `apps/api/src/routes/listings.ts`
   - Test: Activity log entries created for each credit operation type
-- [ ] 2.2.4: Add activity logging to Inngest pipeline — LISTING_SUBMITTED, PIPELINE_ANALYZING, PIPELINE_RESEARCHING, PIPELINE_GENERATING, PIPELINE_COMPLETE, PIPELINE_ERROR
+- [x] 2.2.4: Add activity logging to Inngest pipeline — LISTING_SUBMITTED, PIPELINE_ANALYZING, PIPELINE_RESEARCHING, PIPELINE_GENERATING, PIPELINE_COMPLETE, PIPELINE_ERROR
   - Files: `apps/api/src/inngest/functions/generate-listing.ts`
   - Test: Activity log entries created at each pipeline step
-- [ ] 2.2.5: Add activity logging to image enhancement — IMAGE_ENHANCE_REQUESTED, IMAGE_ENHANCE_COMPLETED, IMAGE_ENHANCE_FAILED
+- [x] 2.2.5: Add activity logging to image enhancement — IMAGE_ENHANCE_REQUESTED, IMAGE_ENHANCE_COMPLETED, IMAGE_ENHANCE_FAILED
   - Files: `apps/api/src/inngest/functions/enhance-image.ts` or `apps/api/src/routes/listing-enhance.ts`
   - Test: Activity log entries created for enhancement lifecycle
 
 ### 2.3 Users List Page
 
-- [ ] 2.3.1: Install and configure shadcn/ui DataTable component (TanStack Table) in admin app if not already present
+- [x] 2.3.1: Install and configure shadcn/ui DataTable component (TanStack Table) in admin app if not already present
   - Files: `apps/admin/src/components/ui/data-table.tsx`, `apps/admin/package.json`
   - Test: DataTable component renders
-- [ ] 2.3.2: Build users list page with DataTable — columns: name, email, signup date, credit balance, total listings, status (suspended badge). Server-side pagination via `apiFetch()`.
+- [x] 2.3.2: Build users list page with DataTable — columns: name, email, signup date, credit balance, total listings, status (suspended badge). Server-side pagination via `apiFetch()`.
   - Files: `apps/admin/src/app/(admin)/users/page.tsx`, `apps/admin/src/app/(admin)/users/columns.tsx`
   - Design: `docs/design-system.md`
   - Test: Table renders with data, pagination works
-- [ ] 2.3.3: Add search input (name/email) and filter controls to users list
+- [x] 2.3.3: Add search input (name/email) and filter controls to users list
   - Files: `apps/admin/src/app/(admin)/users/page.tsx`
   - Test: Search filters the table, filters apply correctly
 
 ### 2.4 User Detail Page
 
-- [ ] 2.4.1: Build user detail page with overview tab — profile info, credit balance card, quick stats (total listings, errors, last active)
+- [x] 2.4.1: Build user detail page with overview tab — profile info, credit balance card, quick stats (total listings, errors, last active)
   - Files: `apps/admin/src/app/(admin)/users/[id]/page.tsx`
   - Design: `docs/design-system.md`
   - Test: Page renders user data correctly
-- [ ] 2.4.2: Build credit transaction history tab on user detail — table of all transactions with type, amount, balance after, date, associated listing link, Apple transaction ID
+- [x] 2.4.2: Build credit transaction history tab on user detail — table of all transactions with type, amount, balance after, date, associated listing link, Apple transaction ID
   - Files: `apps/admin/src/app/(admin)/users/[id]/page.tsx` or sub-component
   - Test: Transaction history renders correctly
-- [ ] 2.4.3: Build listings tab on user detail — table of user's listings with status, pipeline status, created date. Click through to admin listing detail.
+- [x] 2.4.3: Build listings tab on user detail — table of user's listings with status, pipeline status, created date. Click through to admin listing detail.
   - Files: `apps/admin/src/app/(admin)/users/[id]/page.tsx` or sub-component
   - Test: Listings table renders, links work
-- [ ] 2.4.4: Build activity timeline tab on user detail — reverse-chronological feed with event type icons, descriptions, resource links. Filter by event type.
+- [x] 2.4.4: Build activity timeline tab on user detail — reverse-chronological feed with event type icons, descriptions, resource links. Filter by event type.
   - Files: `apps/admin/src/app/(admin)/users/[id]/page.tsx`, `apps/admin/src/components/activity-timeline.tsx`
   - Design: `docs/design-system.md` — visual distinction between user events, system events, admin actions
   - Test: Timeline renders, filtering works, links navigate correctly
 
 ### 2.5 User Actions
 
-- [ ] 2.5.1: Build credit grant/deduct modal — form with action selector (grant/deduct), amount input, required reason textarea. Calls POST /admin/users/:id/credits.
+- [x] 2.5.1: Build credit grant/deduct modal — form with action selector (grant/deduct), amount input, required reason textarea. Calls POST /admin/users/:id/credits.
   - Files: `apps/admin/src/components/credit-action-modal.tsx`
   - Test: Modal opens, validates inputs, submits successfully, balance updates
-- [ ] 2.5.2: Build suspend/unsuspend controls on user detail — button with confirmation dialog and required reason. Calls POST /admin/users/:id/suspend.
+- [x] 2.5.2: Build suspend/unsuspend controls on user detail — button with confirmation dialog and required reason. Calls POST /admin/users/:id/suspend.
   - Files: `apps/admin/src/components/suspend-action.tsx`
   - Test: Suspend toggles correctly, reason required, status badge updates
 
 ### 2.6 Global Activity Page
 
-- [ ] 2.6.1: Build global activity page using the activity timeline component — shows cross-user activity feed with user name/link, filterable by event type and date range
+- [x] 2.6.1: Build global activity page using the activity timeline component — shows cross-user activity feed with user name/link, filterable by event type and date range
   - Files: `apps/admin/src/app/(admin)/activity/page.tsx`
   - Test: Global feed renders, filters work, user links navigate to user detail
 
 **Phase 2 Checkpoint:**
 
-- [ ] Users list shows all users with search, sort, filter, pagination
-- [ ] User detail shows overview, credit history, listings, and full activity timeline
-- [ ] Admin can grant/deduct credits with a reason
-- [ ] Admin can suspend/unsuspend users with a reason
-- [ ] Activity log captures all key user events (auth, listings, credits, images)
-- [ ] Global activity feed works
-- [ ] All tests pass with ≥80% coverage on new files
-- [ ] Commit: `feat(admin): users and account management (Phase 2)`
+- [x] Users list shows all users with search, sort, filter, pagination
+- [x] User detail shows overview, credit history, listings, and full activity timeline
+- [x] Admin can grant/deduct credits with a reason
+- [x] Admin can suspend/unsuspend users with a reason
+- [x] Activity log captures all key user events (auth, listings, credits, images)
+- [x] Global activity feed works
+- [x] All tests pass with ≥80% coverage on new files
+- [x] Commit: `feat(admin): users and account management (Phase 2)`
 
 ---
 

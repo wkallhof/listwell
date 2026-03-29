@@ -4,6 +4,7 @@ import { db } from "@listwell/db";
 import { listings, listingImages, user as userTable } from "@listwell/db/schema";
 import { inngest } from "../inngest/client";
 import { getOrCreateUserCredits, deductCredit } from "../lib/credits";
+import { logActivity, ACTIVITY_EVENTS } from "../lib/activity-log";
 
 export const listingsRoutes = new Hono();
 
@@ -108,6 +109,14 @@ listingsRoutes.post("/listings", async (c) => {
       imageUrls: imageRecords.map((img) => img.blobUrl),
       userDescription: description ?? null,
     },
+  });
+
+  await logActivity({
+    userId: user.id,
+    eventType: ACTIVITY_EVENTS.LISTING_CREATED,
+    description: `Created listing with ${imageRecords.length} images`,
+    resourceType: "listing",
+    resourceId: listing.id,
   });
 
   const result = {

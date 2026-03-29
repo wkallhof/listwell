@@ -1,6 +1,7 @@
 import { eq, sql } from "drizzle-orm";
 import { db } from "@listwell/db";
 import { userCredits, creditTransactions } from "@listwell/db/schema";
+import { logActivity, ACTIVITY_EVENTS } from "./activity-log";
 
 const FREE_CREDITS = 2;
 
@@ -57,6 +58,13 @@ export async function getOrCreateUserCredits(
     note: "Welcome bonus: 2 free listing credits",
   });
 
+  await logActivity({
+    userId,
+    eventType: ACTIVITY_EVENTS.CREDITS_FREE_GRANT,
+    description: `Received ${FREE_CREDITS} free welcome credits`,
+    metadata: { amount: FREE_CREDITS },
+  });
+
   return { balance: FREE_CREDITS, freeCreditsGranted: true };
 }
 
@@ -85,6 +93,14 @@ export async function deductCredit(
     balanceAfter: updated.balance,
     listingId,
     note: "Credit used for listing creation",
+  });
+
+  await logActivity({
+    userId,
+    eventType: ACTIVITY_EVENTS.CREDITS_USED,
+    description: "Credit used for listing creation",
+    resourceType: "listing",
+    resourceId: listingId,
   });
 
   return { success: true, balance: updated.balance };
@@ -127,6 +143,13 @@ export async function addPurchasedCredits(
     note: `Purchased ${amount} credits via Apple IAP`,
   });
 
+  await logActivity({
+    userId,
+    eventType: ACTIVITY_EVENTS.CREDITS_PURCHASED,
+    description: `Purchased ${amount} credits`,
+    metadata: { amount, appleTransactionId },
+  });
+
   return { alreadyProcessed: false, balance: updated.balance };
 }
 
@@ -164,6 +187,14 @@ export async function refundCredit(
     balanceAfter: updated.balance,
     listingId,
     note: "Auto-refund: AI pipeline failed",
+  });
+
+  await logActivity({
+    userId,
+    eventType: ACTIVITY_EVENTS.CREDITS_REFUNDED,
+    description: "Credit refunded: AI pipeline failed",
+    resourceType: "listing",
+    resourceId: listingId,
   });
 
   return { balance: updated.balance, alreadyRefunded: false };

@@ -6,6 +6,7 @@ import { inngest } from "../client";
 import { runListingAgent, type RunAgentResult } from "../../lib/ai/agent";
 import { sendListingReadyNotification } from "../../lib/notifications";
 import { refundCredit } from "../../lib/credits";
+import { logActivity, ACTIVITY_EVENTS } from "../../lib/activity-log";
 
 export const generateListing = inngest.createFunction(
   {
@@ -31,6 +32,21 @@ export const generateListing = inngest.createFunction(
         userDescription: string | null;
       };
 
+    // Log submission
+    const listing = await db.query.listings.findFirst({
+      where: eq(listings.id, listingId),
+    });
+    const userId = listing?.userId;
+    if (userId) {
+      await logActivity({
+        userId,
+        eventType: ACTIVITY_EVENTS.LISTING_SUBMITTED,
+        description: "Listing submitted for AI processing",
+        resourceType: "listing",
+        resourceId: listingId,
+      });
+    }
+
     const agentResult = await step.run("run-agent", async () => {
       await db
         .update(listings)
@@ -41,6 +57,16 @@ export const generateListing = inngest.createFunction(
           updatedAt: new Date(),
         })
         .where(eq(listings.id, listingId));
+
+      if (userId) {
+        await logActivity({
+          userId,
+          eventType: ACTIVITY_EVENTS.PIPELINE_ANALYZING,
+          description: "Pipeline started: analyzing images",
+          resourceType: "listing",
+          resourceId: listingId,
+        });
+      }
 
       try {
         return await runListingAgent({
@@ -61,6 +87,16 @@ export const generateListing = inngest.createFunction(
             updatedAt: new Date(),
           })
           .where(eq(listings.id, listingId));
+
+        if (userId) {
+          await logActivity({
+            userId,
+            eventType: ACTIVITY_EVENTS.PIPELINE_ERROR,
+            description: `Pipeline error: ${error instanceof Error ? error.message : "Agent execution failed"}`,
+            resourceType: "listing",
+            resourceId: listingId,
+          });
+        }
 
         throw error;
       }
@@ -95,8 +131,19 @@ export const generateListing = inngest.createFunction(
         where: eq(listings.id, listingId),
       });
 
-      if (listing) {
-        await sendListingReadyNotification(listing.userId, listingId, output.title);
+      const completedListing = await db.query.listings.findFirst({
+        where: eq(listings.id, listingId),
+      });
+
+      if (completedListing) {
+        await sendListingReadyNotification(completedListing.userId, listingId, output.title);
+        await logActivity({
+          userId: completedListing.userId,
+          eventType: ACTIVITY_EVENTS.PIPELINE_COMPLETE,
+          description: `Listing ready: ${output.title}`,
+          resourceType: "listing",
+          resourceId: listingId,
+        });
       }
     });
 
