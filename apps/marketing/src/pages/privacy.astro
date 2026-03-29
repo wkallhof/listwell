@@ -1,0 +1,108 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Privacy Policy — Listwell" description="Listwell's privacy policy. How we collect, use, and protect your data.">
+  <main class="bg-linen-bright py-12 sm:py-20">
+    <article class="mx-auto max-w-3xl px-4 sm:px-6">
+      <h1 class="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+        Privacy Policy
+      </h1>
+      <p class="mt-2 text-sm text-muted">Last updated: March 2026</p>
+
+      <div class="prose-legal mt-8 space-y-8 text-foreground/90">
+        <section>
+          <h2>What We Collect</h2>
+          <p>
+            When you use Listwell, we collect the following information to provide and improve our service:
+          </p>
+          <ul>
+            <li><strong>Account information:</strong> Your email address and name when you create an account.</li>
+            <li><strong>Photos:</strong> Images you upload for listing generation. These are stored securely and used only for creating your listings.</li>
+            <li><strong>Voice input:</strong> If you use voice descriptions, audio is processed for transcription and not stored after processing.</li>
+            <li><strong>Usage data:</strong> Basic analytics about how you use the app (pages visited, features used) to improve the experience.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>How We Use Your Data</h2>
+          <p>Your data is used to:</p>
+          <ul>
+            <li>Generate marketplace listings from your photos and descriptions.</li>
+            <li>Research market pricing for items you want to sell.</li>
+            <li>Enhance your photos for better listing quality.</li>
+            <li>Process in-app purchases and manage your credit balance.</li>
+            <li>Send you notifications about listing status (if enabled).</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Third-Party Services</h2>
+          <p>We use the following third-party services to power Listwell:</p>
+          <ul>
+            <li><strong>Anthropic (Claude):</strong> Powers the listing generation and item identification. Your photos and descriptions are sent to Anthropic's API for processing.</li>
+            <li><strong>Google (Gemini):</strong> Powers photo enhancement. Your images are sent to Google's API for processing.</li>
+            <li><strong>Apple:</strong> Processes in-app purchases via Apple's App Store. Apple's privacy policy governs transaction data.</li>
+            <li><strong>Neon:</strong> Hosts our database. Your account and listing data is stored securely on Neon's infrastructure.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>In-App Purchases</h2>
+          <p>
+            Listwell uses Apple's In-App Purchase system for credit purchases. Payment processing is handled entirely by Apple. We do not collect or store your payment card information. We receive a transaction confirmation from Apple to credit your account.
+          </p>
+        </section>
+
+        <section>
+          <h2>Data Storage and Security</h2>
+          <p>
+            Your data is stored on secure, encrypted servers. Photos are stored using industry-standard cloud storage with access controls. We use HTTPS for all data transmission and encrypt sensitive data at rest.
+          </p>
+        </section>
+
+        <section>
+          <h2>Data Retention</h2>
+          <p>
+            Your listings and account data are retained as long as your account is active. You can delete individual listings at any time. If you wish to delete your entire account, contact us at <a href="mailto:support@listwell.app" class="text-pine underline hover:text-pine-dark">support@listwell.app</a>.
+          </p>
+        </section>
+
+        <section>
+          <h2>Your Rights</h2>
+          <p>You have the right to:</p>
+          <ul>
+            <li>Access the personal data we hold about you.</li>
+            <li>Request correction of inaccurate data.</li>
+            <li>Request deletion of your data.</li>
+            <li>Export your listing data.</li>
+          </ul>
+          <p>
+            To exercise any of these rights, contact us at <a href="mailto:support@listwell.app" class="text-pine underline hover:text-pine-dark">support@listwell.app</a>.
+          </p>
+        </section>
+
+        <section>
+          <h2>Children's Privacy</h2>
+          <p>
+            Listwell is not intended for use by children under 13. We do not knowingly collect personal information from children under 13.
+          </p>
+        </section>
+
+        <section>
+          <h2>Changes to This Policy</h2>
+          <p>
+            We may update this privacy policy from time to time. We'll notify you of significant changes through the app or via email. Continued use of Listwell after changes constitutes acceptance of the updated policy.
+          </p>
+        </section>
+
+        <section>
+          <h2>Contact Us</h2>
+          <p>
+            Questions about this privacy policy? Reach out at <a href="mailto:support@listwell.app" class="text-pine underline hover:text-pine-dark">support@listwell.app</a>.
+          </p>
+        </section>
+      </div>
+    </article>
+  </main>
+</BaseLayout>

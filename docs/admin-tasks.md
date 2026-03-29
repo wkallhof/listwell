@@ -40,7 +40,7 @@
 - Phase 2: [ ] Not Started
 - Phase 3: [ ] Not Started
 - Phase 4: [ ] Not Started
-- Phase 5: [ ] Not Started
+- Phase 5: [x] Complete
 - **MVP Status:** Not Started
 
 ---
@@ -413,58 +413,58 @@
 
 ### 5.1 Site Structure
 
-- [ ] 5.1.1: Create base layout with shared head (meta tags, fonts, favicon), header (logo + nav), and footer (links to privacy, terms, support, copyright)
+- [x] 5.1.1: Create base layout with shared head (meta tags, fonts, favicon), header (logo + nav), and footer (links to privacy, terms, support, copyright)
   - Files: `apps/marketing/src/layouts/BaseLayout.astro`, `apps/marketing/src/components/Header.astro`, `apps/marketing/src/components/Footer.astro`
   - Test: Layout renders with header and footer
-- [ ] 5.1.2: Set up brand design tokens in Tailwind config — colors (teal pine, warm linen, shed), typography (Fraunces, Instrument Sans), spacing
+- [x] 5.1.2: Set up brand design tokens in Tailwind config — colors (teal pine, warm linen, shed), typography (Fraunces, Instrument Sans), spacing
   - Files: `apps/marketing/src/styles/global.css`, `apps/marketing/tailwind.config.mjs` (or Astro Tailwind config)
   - Test: Brand colors and fonts render correctly
 
 ### 5.2 Landing Page
 
-- [ ] 5.2.1: Build hero section — headline, subheadline ("Sell your stuff, not your Saturday"), App Store download badge, background with shed color
+- [x] 5.2.1: Build hero section — headline, subheadline ("Sell your stuff, not your Saturday"), App Store download badge, background with shed color
   - Files: `apps/marketing/src/pages/index.astro`, `apps/marketing/src/components/Hero.astro`
   - Design: `docs/design-system.md` — Marketing tokens (Fraunces display, pill buttons, shed hero bg)
   - Test: Hero renders, App Store badge links correctly
-- [ ] 5.2.2: Build "How it works" section — 3-4 step visual walkthrough (snap photos → AI generates → copy to marketplace). Icons or illustrations.
+- [x] 5.2.2: Build "How it works" section — 3-4 step visual walkthrough (snap photos → AI generates → copy to marketplace). Icons or illustrations.
   - Files: `apps/marketing/src/components/HowItWorks.astro`
   - Test: Section renders with steps
-- [ ] 5.2.3: Build key benefits section — time savings, AI pricing research, photo enhancement. Feature cards.
+- [x] 5.2.3: Build key benefits section — time savings, AI pricing research, photo enhancement. Feature cards.
   - Files: `apps/marketing/src/components/Benefits.astro`
   - Test: Benefits section renders
-- [ ] 5.2.4: Build social proof placeholder section — space for future testimonials/stats. Can show a simple stat like "Listings generated" or be a placeholder.
+- [x] 5.2.4: Build social proof placeholder section — space for future testimonials/stats. Can show a simple stat like "Listings generated" or be a placeholder.
   - Files: `apps/marketing/src/components/SocialProof.astro`
   - Test: Section renders
 
 ### 5.3 Legal & Support Pages
 
-- [ ] 5.3.1: Build privacy policy page with standard content covering data collection, Apple IAP, AI processing, third-party services
+- [x] 5.3.1: Build privacy policy page with standard content covering data collection, Apple IAP, AI processing, third-party services
   - Files: `apps/marketing/src/pages/privacy.astro`
   - Test: Page renders, content is complete
-- [ ] 5.3.2: Build terms of service page with standard consumer app terms
+- [x] 5.3.2: Build terms of service page with standard consumer app terms
   - Files: `apps/marketing/src/pages/terms.astro`
   - Test: Page renders, content is complete
-- [ ] 5.3.3: Build support page with support email and basic FAQ
+- [x] 5.3.3: Build support page with support email and basic FAQ
   - Files: `apps/marketing/src/pages/support.astro`
   - Test: Page renders, email link works
 
 ### 5.4 Polish & Deploy
 
-- [ ] 5.4.1: Verify mobile responsiveness on all pages (375px and up)
+- [x] 5.4.1: Verify mobile responsiveness on all pages (375px and up)
   - Test: All pages render correctly at mobile widths
-- [ ] 5.4.2: Add meta tags (Open Graph, Twitter cards) for social sharing
+- [x] 5.4.2: Add meta tags (Open Graph, Twitter cards) for social sharing
   - Files: `apps/marketing/src/layouts/BaseLayout.astro`
   - Test: Meta tags present in HTML output
-- [ ] 5.4.3: Verify static build output and configure for deployment
+- [x] 5.4.3: Verify static build output and configure for deployment
   - Test: `pnpm --filter @listwell/marketing build` produces static files in `dist/`
 
 **Phase 5 Checkpoint:**
 
-- [ ] Landing page renders with hero, how-it-works, benefits, footer
-- [ ] Privacy policy, terms, and support pages are complete
-- [ ] All pages are mobile-responsive
-- [ ] Static build produces deployable output
-- [ ] Commit: `feat(marketing): landing page and legal pages (Phase 5)`
+- [x] Landing page renders with hero, how-it-works, benefits, footer
+- [x] Privacy policy, terms, and support pages are complete
+- [x] All pages are mobile-responsive
+- [x] Static build produces deployable output
+- [x] Commit: `feat(marketing): landing page and legal pages (Phase 5)`
 
 ---
 
@@ -548,15 +548,15 @@
 | 4.3.2 | | | |
 | 4.3.3 | | | |
 | 4.3.4 | | | |
-| 5.1.1 | | | |
-| 5.1.2 | | | |
-| 5.2.1 | | | |
-| 5.2.2 | | | |
-| 5.2.3 | | | |
-| 5.2.4 | | | |
-| 5.3.1 | | | |
-| 5.3.2 | | | |
-| 5.3.3 | | | |
-| 5.4.1 | | | |
-| 5.4.2 | | | |
-| 5.4.3 | | | |
+| 5.1.1 | 2026-03-28 | | BaseLayout, Header, Footer with fonts + meta |
+| 5.1.2 | 2026-03-28 | | Tailwind v4 @theme tokens (pine, linen, shed) |
+| 5.2.1 | 2026-03-28 | | Hero section with App Store CTA |
+| 5.2.2 | 2026-03-28 | | 4-step how-it-works with icons |
+| 5.2.3 | 2026-03-28 | | 4 benefit cards |
+| 5.2.4 | 2026-03-28 | | Stats section with CTA |
+| 5.3.1 | 2026-03-28 | | Privacy policy (data, IAP, third-party) |
+| 5.3.2 | 2026-03-28 | | Terms of service |
+| 5.3.3 | 2026-03-28 | | Support page with FAQ |
+| 5.4.1 | 2026-03-28 | | Mobile-responsive via Tailwind breakpoints |
+| 5.4.2 | 2026-03-28 | | OG + Twitter Card meta tags |
+| 5.4.3 | 2026-03-28 | | Static build verified (4 pages in dist/) |

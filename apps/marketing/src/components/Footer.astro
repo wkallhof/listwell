@@ -1,0 +1,39 @@
+---
+const currentYear = new Date().getFullYear();
+
+const footerLinks = [
+  { label: "Privacy Policy", href: "/privacy" },
+  { label: "Terms of Service", href: "/terms" },
+  { label: "Support", href: "/support" },
+];
+---
+
+<footer class="bg-shed-deep text-shed-fg">
+  <div class="mx-auto max-w-5xl px-4 py-12 sm:px-6 sm:py-16">
+    <div class="flex flex-col items-center gap-8 sm:flex-row sm:justify-between">
+      <div>
+        <a href="/" class="font-display text-lg font-semibold tracking-tight">
+          Listwell
+        </a>
+        <p class="mt-1 text-sm text-shed-fg/60">
+          Sell your stuff, not your Saturday.
+        </p>
+      </div>
+      <nav aria-label="Footer navigation" class="flex flex-wrap items-center justify-center gap-6">
+        {footerLinks.map((link) => (
+          <a
+            href={link.href}
+            class="text-sm text-shed-fg/60 transition-colors duration-200 hover:text-shed-fg"
+          >
+            {link.label}
+          </a>
+        ))}
+      </nav>
+    </div>
+    <div class="mt-8 border-t border-white/10 pt-8 text-center">
+      <p class="text-xs text-shed-fg/40">
+        &copy; {currentYear} Listwell. All rights reserved.
+      </p>
+    </div>
+  </div>
+</footer>

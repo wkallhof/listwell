@@ -1,0 +1,60 @@
+---
+const steps = [
+  {
+    number: "1",
+    title: "Snap a photo",
+    description: "Take photos of whatever you want to sell. Kitchen table, garage floor, wherever it is.",
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>`,
+  },
+  {
+    number: "2",
+    title: "We do the research",
+    description: "Listwell identifies what you have, checks current market prices, and finds comparable listings.",
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>`,
+  },
+  {
+    number: "3",
+    title: "Get your listing",
+    description: "A complete, ready-to-post listing with title, description, price, and cleaned-up photos.",
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="m9 15 2 2 4-4"/></svg>`,
+  },
+  {
+    number: "4",
+    title: "Copy and sell",
+    description: "Paste into Facebook Marketplace, eBay, Craigslist — wherever you sell. Done.",
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>`,
+  },
+];
+---
+
+<section id="how-it-works" class="bg-linen-bright py-16 sm:py-24">
+  <div class="mx-auto max-w-5xl px-4 sm:px-6">
+    <div class="text-center">
+      <h2 class="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+        How it works
+      </h2>
+      <p class="mx-auto mt-4 max-w-lg text-lg text-muted">
+        Four steps from "I should sell this" to "it's listed."
+      </p>
+    </div>
+
+    <div class="mt-12 grid gap-8 sm:mt-16 sm:grid-cols-2 lg:grid-cols-4">
+      {steps.map((step) => (
+        <div class="relative rounded-xl bg-white p-6 shadow-sm">
+          <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-pine-light text-pine">
+            <Fragment set:html={step.icon} />
+          </div>
+          <span class="text-xs font-semibold uppercase tracking-widest text-pine">
+            Step {step.number}
+          </span>
+          <h3 class="mt-2 font-display text-lg font-semibold text-foreground">
+            {step.title}
+          </h3>
+          <p class="mt-2 text-sm leading-relaxed text-muted">
+            {step.description}
+          </p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

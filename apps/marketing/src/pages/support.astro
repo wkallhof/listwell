@@ -1,0 +1,106 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const faqs = [
+  {
+    question: "How does Listwell work?",
+    answer:
+      "Take photos of what you want to sell, and Listwell does the rest. It identifies the item, researches current market prices, writes a compelling listing description, and can even enhance your photos. You get a complete, ready-to-post listing in minutes.",
+  },
+  {
+    question: "What marketplaces does Listwell work with?",
+    answer:
+      "Listwell generates universal listings that work on any marketplace — Facebook Marketplace, eBay, Craigslist, OfferUp, Mercari, and more. Just copy and paste.",
+  },
+  {
+    question: "How much does it cost?",
+    answer:
+      "Listwell is free to download and includes free credits to get started. Additional credits can be purchased within the app. Each listing generation uses one credit.",
+  },
+  {
+    question: "Are the pricing suggestions accurate?",
+    answer:
+      "Listwell researches current market prices and comparable listings to give you informed pricing suggestions. We recommend reviewing the suggestions and adjusting based on your item's specific condition and your local market.",
+  },
+  {
+    question: "What happens to my photos?",
+    answer:
+      "Your photos are stored securely and used only for generating your listings. They are not shared with other users or used for any other purpose. You can delete your listings and photos at any time.",
+  },
+  {
+    question: "What if a listing generation fails?",
+    answer:
+      "If something goes wrong during listing generation, your credit is automatically refunded. You can try again at no cost.",
+  },
+  {
+    question: "How do I delete my account?",
+    answer:
+      "To delete your account and all associated data, contact us at support@listwell.app. We'll process your request promptly.",
+  },
+];
+---
+
+<BaseLayout title="Support — Listwell" description="Get help with Listwell. FAQs and contact information.">
+  <main class="bg-linen-bright py-12 sm:py-20">
+    <div class="mx-auto max-w-3xl px-4 sm:px-6">
+      <h1 class="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+        Support
+      </h1>
+      <p class="mt-4 text-lg text-muted">
+        Need help? We're here for you.
+      </p>
+
+      <!-- Contact -->
+      <div class="mt-8 rounded-xl bg-white p-6 shadow-sm sm:p-8">
+        <h2 class="font-display text-xl font-semibold text-foreground">
+          Get in touch
+        </h2>
+        <p class="mt-2 text-muted">
+          For questions, feedback, or account issues, email us at:
+        </p>
+        <a
+          href="mailto:support@listwell.app"
+          class="mt-4 inline-flex items-center gap-2 rounded-full bg-pine px-5 py-2.5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-pine-dark"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect width="20" height="16" x="2" y="4" rx="2" />
+            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+          </svg>
+          support@listwell.app
+        </a>
+      </div>
+
+      <!-- FAQ -->
+      <div class="mt-12">
+        <h2 class="font-display text-2xl font-bold tracking-tight text-foreground">
+          Frequently asked questions
+        </h2>
+        <div class="mt-6 space-y-4">
+          {faqs.map((faq) => (
+            <details class="group rounded-xl bg-white shadow-sm">
+              <summary class="flex cursor-pointer items-center justify-between p-5 font-medium text-foreground sm:p-6">
+                <span class="pr-4">{faq.question}</span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5 shrink-0 text-muted transition-transform duration-200 group-open:rotate-180"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
+              </summary>
+              <div class="px-5 pb-5 text-muted sm:px-6 sm:pb-6">
+                <p class="leading-relaxed">{faq.answer}</p>
+              </div>
+            </details>
+          ))}
+        </div>
+      </div>
+    </div>
+  </main>
+</BaseLayout>

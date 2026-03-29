@@ -1,0 +1,37 @@
+---
+const navLinks = [
+  { label: "How It Works", href: "/#how-it-works" },
+  { label: "Benefits", href: "/#benefits" },
+  { label: "Support", href: "/support" },
+];
+---
+
+<header class="sticky top-0 z-50 border-b border-white/10 bg-shed/95 backdrop-blur-sm">
+  <div class="mx-auto flex max-w-5xl items-center justify-between px-4 py-4 sm:px-6">
+    <a href="/" class="font-display text-xl font-semibold tracking-tight text-shed-fg">
+      Listwell
+    </a>
+    <nav aria-label="Main navigation" class="hidden items-center gap-6 sm:flex">
+      {navLinks.map((link) => (
+        <a
+          href={link.href}
+          class="text-sm font-medium text-shed-fg/70 transition-colors duration-200 hover:text-shed-fg"
+        >
+          {link.label}
+        </a>
+      ))}
+      <a
+        href="https://apps.apple.com"
+        class="rounded-full bg-pine px-4 py-2 text-sm font-semibold text-white transition-colors duration-200 hover:bg-pine-dark"
+      >
+        Download
+      </a>
+    </nav>
+    <a
+      href="https://apps.apple.com"
+      class="rounded-full bg-pine px-4 py-2 text-sm font-semibold text-white transition-colors duration-200 hover:bg-pine-dark sm:hidden"
+    >
+      Download
+    </a>
+  </div>
+</header>

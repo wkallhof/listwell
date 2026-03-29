@@ -1,0 +1,57 @@
+---
+const benefits = [
+  {
+    title: "Save hours, not minutes",
+    description:
+      "Writing listings, researching prices, editing photos — it adds up fast. Listwell handles the tedious work so you can focus on closing the deal.",
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
+  },
+  {
+    title: "Price it right",
+    description:
+      "Listwell researches current market prices and comparable listings so you know exactly what to ask — no guesswork, no leaving money on the table.",
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`,
+  },
+  {
+    title: "Photos that sell",
+    description:
+      "Automatic photo enhancement cleans up backgrounds, fixes lighting, and makes your items look their best — straight from your phone camera.",
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>`,
+  },
+  {
+    title: "Works everywhere",
+    description:
+      "Facebook Marketplace, eBay, Craigslist, OfferUp — your listing is formatted and ready to paste wherever you sell.",
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>`,
+  },
+];
+---
+
+<section id="benefits" class="bg-linen py-16 sm:py-24">
+  <div class="mx-auto max-w-5xl px-4 sm:px-6">
+    <div class="text-center">
+      <h2 class="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+        Stop dreading the listing process
+      </h2>
+      <p class="mx-auto mt-4 max-w-lg text-lg text-muted">
+        You already took the hardest step — deciding to sell. Let us handle the rest.
+      </p>
+    </div>
+
+    <div class="mt-12 grid gap-8 sm:mt-16 sm:grid-cols-2">
+      {benefits.map((benefit) => (
+        <div class="rounded-xl border border-foreground/5 bg-white p-6 transition-shadow duration-200 hover:shadow-md sm:p-8">
+          <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-pine-light text-pine">
+            <Fragment set:html={benefit.icon} />
+          </div>
+          <h3 class="font-display text-xl font-semibold text-foreground">
+            {benefit.title}
+          </h3>
+          <p class="mt-3 leading-relaxed text-muted">
+            {benefit.description}
+          </p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

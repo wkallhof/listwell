@@ -1,13 +1,16 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import Hero from "../components/Hero.astro";
+import HowItWorks from "../components/HowItWorks.astro";
+import Benefits from "../components/Benefits.astro";
+import SocialProof from "../components/SocialProof.astro";
 ---
 
-<BaseLayout title="Listwell — Sell your stuff, not your Saturday">
-  <main class="flex min-h-screen flex-col items-center justify-center px-6 text-center">
-    <h1 class="text-4xl font-bold tracking-tight sm:text-5xl">Listwell</h1>
-    <p class="mt-4 text-lg text-gray-600">
-      Turn photos into marketplace listings with AI.
-    </p>
-    <p class="mt-2 text-sm text-gray-400">Coming soon</p>
+<BaseLayout>
+  <main>
+    <Hero />
+    <HowItWorks />
+    <Benefits />
+    <SocialProof />
   </main>
 </BaseLayout>

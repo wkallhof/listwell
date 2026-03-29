@@ -1,10 +1,21 @@
 ---
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import "../styles/global.css";
+
 interface Props {
   title?: string;
   description?: string;
+  ogImage?: string;
 }
 
-const { title = "Listwell", description = "Turn photos into marketplace listings with AI" } = Astro.props;
+const {
+  title = "Listwell — Sell your stuff, not your Saturday",
+  description = "Turn photos of your stuff into ready-to-post marketplace listings. Snap a photo, get a complete listing with pricing research in minutes.",
+  ogImage = "/og-image.png",
+} = Astro.props;
+
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? "https://listwell.app");
 ---
 
 <!doctype html>
@@ -14,13 +25,35 @@ const { title = "Listwell", description = "Turn photos into marketplace listings
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={canonicalUrl.href} />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=Instrument+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:url" content={canonicalUrl.href} />
+    <meta property="og:site_name" content="Listwell" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
     <title>{title}</title>
   </head>
-  <body class="min-h-screen bg-white text-gray-900 antialiased">
+  <body class="min-h-screen">
+    <Header />
     <slot />
+    <Footer />
   </body>
 </html>
-
-<style is:global>
-  @import "../styles/global.css";
-</style>

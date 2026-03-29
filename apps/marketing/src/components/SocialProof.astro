@@ -1,0 +1,36 @@
+---
+import AppStoreButton from "./AppStoreButton.astro";
+
+const stats = [
+  { value: "2 min", label: "Average time to listing" },
+  { value: "4 steps", label: "Photo to posted" },
+  { value: "0", label: "Saturdays wasted" },
+];
+---
+
+<section class="bg-shed py-16 text-shed-fg sm:py-24">
+  <div class="mx-auto max-w-5xl px-4 sm:px-6">
+    <div class="text-center">
+      <h2 class="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+        Less time listing, more time living
+      </h2>
+    </div>
+
+    <div class="mt-12 grid gap-8 sm:grid-cols-3">
+      {stats.map((stat) => (
+        <div class="text-center">
+          <p class="font-display text-4xl font-bold text-pine sm:text-5xl">
+            {stat.value}
+          </p>
+          <p class="mt-2 text-sm text-shed-fg/60">
+            {stat.label}
+          </p>
+        </div>
+      ))}
+    </div>
+
+    <div class="mt-12 text-center">
+      <AppStoreButton label="Get Listwell Free" />
+    </div>
+  </div>
+</section>
