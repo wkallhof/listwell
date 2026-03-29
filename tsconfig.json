@@ -4,7 +4,8 @@
     "skipLibCheck": true
   },
   "references": [
-    { "path": "apps/web" },
+    { "path": "apps/admin" },
+    { "path": "apps/marketing" },
     { "path": "packages/shared" },
     { "path": "packages/db" }
   ]

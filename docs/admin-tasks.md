@@ -35,7 +35,7 @@
 
 ## Progress Summary
 
-- Phase 0: [ ] Not Started
+- Phase 0: [x] Complete
 - Phase 1: [ ] Not Started
 - Phase 2: [ ] Not Started
 - Phase 3: [ ] Not Started
@@ -49,53 +49,53 @@
 
 ### 0.0 Pre-flight
 
-- [ ] 0.0.1: Read CLAUDE.md, admin-prd.md, and admin-plan.md to confirm understanding
-- [ ] 0.0.2: Verify no uncommitted changes in working directory
+- [x] 0.0.1: Read CLAUDE.md, admin-prd.md, and admin-plan.md to confirm understanding
+- [x] 0.0.2: Verify no uncommitted changes in working directory
 
 ### 0.1 Rename apps/web → apps/admin
 
-- [ ] 0.1.1: Rename `apps/web` directory to `apps/admin`
+- [x] 0.1.1: Rename `apps/web` directory to `apps/admin`
   - Files: `apps/admin/` (renamed from `apps/web/`)
   - Test: Directory exists at new path
-- [ ] 0.1.2: Update package name in `apps/admin/package.json` from `@listwell/web` to `@listwell/admin`
+- [x] 0.1.2: Update package name in `apps/admin/package.json` from `@listwell/web` to `@listwell/admin`
   - Files: `apps/admin/package.json`
   - Test: `pnpm install` succeeds
-- [ ] 0.1.3: Update all references to `@listwell/web` in root `package.json`, `turbo.json`, and any scripts
+- [x] 0.1.3: Update all references to `@listwell/web` in root `package.json`, `turbo.json`, and any scripts
   - Files: `package.json`, `turbo.json`
   - Test: `pnpm build` succeeds
-- [ ] 0.1.4: Update `CLAUDE.md` project structure section to reflect `apps/admin` naming and commands
+- [x] 0.1.4: Update `CLAUDE.md` project structure section to reflect `apps/admin` naming and commands
   - Files: `CLAUDE.md`
   - Test: Documentation matches actual structure
-- [ ] 0.1.5: Verify all workspace commands work with the renamed package
+- [x] 0.1.5: Verify all workspace commands work with the renamed package
   - Test: `pnpm --filter @listwell/admin dev`, `pnpm --filter @listwell/admin build`, `pnpm --filter @listwell/admin typecheck` all succeed
 
 ### 0.2 Scaffold apps/marketing
 
-- [ ] 0.2.1: Initialize Astro project in `apps/marketing` with static output mode
+- [x] 0.2.1: Initialize Astro project in `apps/marketing` with static output mode
   - Files: `apps/marketing/package.json`, `apps/marketing/astro.config.mjs`, `apps/marketing/tsconfig.json`
   - Test: `pnpm --filter @listwell/marketing dev` starts the Astro dev server
-- [ ] 0.2.2: Add Tailwind CSS integration to the Astro project
+- [x] 0.2.2: Add Tailwind CSS integration to the Astro project
   - Files: `apps/marketing/src/styles/global.css`, Astro config
   - Test: Tailwind classes render correctly in dev mode
-- [ ] 0.2.3: Create minimal placeholder landing page
+- [x] 0.2.3: Create minimal placeholder landing page
   - Files: `apps/marketing/src/pages/index.astro`, `apps/marketing/src/layouts/BaseLayout.astro`
   - Test: Landing page renders at `localhost:4321`
-- [ ] 0.2.4: Update `CLAUDE.md` with marketing app commands and structure
+- [x] 0.2.4: Update `CLAUDE.md` with marketing app commands and structure
   - Files: `CLAUDE.md`
   - Test: Documentation is accurate
 
 ### 0.3 Verify Monorepo
 
-- [ ] 0.3.1: Run full workspace validation
+- [x] 0.3.1: Run full workspace validation
   - Test: `pnpm dev`, `pnpm build`, `pnpm typecheck`, `pnpm test` all succeed across all apps
 
 **Phase 0 Checkpoint:**
 
-- [ ] `apps/web` no longer exists, `apps/admin` is functional
-- [ ] `apps/marketing` builds and serves a placeholder page
-- [ ] All workspace scripts work correctly
-- [ ] `CLAUDE.md` updated with new structure
-- [ ] Commit: `chore: rename apps/web to apps/admin, scaffold apps/marketing (Phase 0)`
+- [x] `apps/web` no longer exists, `apps/admin` is functional
+- [x] `apps/marketing` builds and serves a placeholder page
+- [x] All workspace scripts work correctly
+- [x] `CLAUDE.md` updated with new structure
+- [x] Commit: `chore: rename apps/web to apps/admin, scaffold apps/marketing (Phase 0)`
 
 ---
 
@@ -472,18 +472,18 @@
 
 | Task | Completed | Commit | Notes |
 | ---- | --------- | ------ | ----- |
-| 0.0.1 | | | |
-| 0.0.2 | | | |
-| 0.1.1 | | | |
-| 0.1.2 | | | |
-| 0.1.3 | | | |
-| 0.1.4 | | | |
-| 0.1.5 | | | |
-| 0.2.1 | | | |
-| 0.2.2 | | | |
-| 0.2.3 | | | |
-| 0.2.4 | | | |
-| 0.3.1 | | | |
+| 0.0.1 | 2026-03-28 | 5c1fe8e | Read all docs |
+| 0.0.2 | 2026-03-28 | 5c1fe8e | Clean working directory |
+| 0.1.1 | 2026-03-28 | 5c1fe8e | Renamed apps/web → apps/admin |
+| 0.1.2 | 2026-03-28 | 5c1fe8e | Updated package name |
+| 0.1.3 | 2026-03-28 | 5c1fe8e | Updated tsconfig, drizzle.config, .env.example, README |
+| 0.1.4 | 2026-03-28 | 5c1fe8e | Updated CLAUDE.md |
+| 0.1.5 | 2026-03-28 | 5c1fe8e | All workspace commands verified |
+| 0.2.1 | 2026-03-28 | | Astro project scaffolded |
+| 0.2.2 | 2026-03-28 | | Tailwind v4 via @tailwindcss/vite |
+| 0.2.3 | 2026-03-28 | | Placeholder landing page |
+| 0.2.4 | 2026-03-28 | | CLAUDE.md updated with marketing |
+| 0.3.1 | 2026-03-28 | | build, typecheck, test all pass |
 | 1.1.1 | | | |
 | 1.1.2 | | | |
 | 1.1.3 | | | |

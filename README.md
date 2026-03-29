@@ -35,7 +35,7 @@ A mobile-first progressive web app that turns photos of items into ready-to-post
 ```
 listwell/
 ├── apps/
-│   ├── web/          ← Next.js frontend (proxies /api/* to Hono)
+│   ├── admin/        ← Next.js admin dashboard (proxies /api/* to Hono)
 │   └── api/          ← Hono REST API (auth, CRUD, AI, jobs)
 ├── packages/
 │   ├── shared/       ← Types, Zod schemas, utilities
@@ -45,7 +45,7 @@ listwell/
 └── docker-compose.yml
 ```
 
-- **`apps/web`** — Frontend only. Server components fetch data via `apiFetch()` which forwards cookies through a Next.js rewrites proxy. Client components use `fetch("/api/...")` directly.
+- **`apps/admin`** — Admin dashboard. Server components fetch data via `apiFetch()` which forwards cookies through a Next.js rewrites proxy. Client components use `fetch("/api/...")` directly.
 - **`apps/api`** — All business logic: authentication, CRUD, AI agent orchestration, image enhancement, Inngest background jobs, push notifications. Runs on port 4000.
 - **`packages/shared`** — Shared TypeScript types, Zod validation schemas, and utility functions consumed as TS source by both apps.
 - **`packages/db`** — Drizzle ORM schema, database client factory, and migrations. Used by the API app.
@@ -69,8 +69,8 @@ cd listwell
 pnpm install
 
 # Copy environment variables
-cp .env.example apps/web/.env.local
-# Edit apps/web/.env.local with your web values
+cp .env.example apps/admin/.env.local
+# Edit apps/admin/.env.local with your admin app values
 # Set up apps/api/.env with API values (see Environment Variables below)
 
 # Start local PostgreSQL
@@ -87,7 +87,7 @@ The web app will be at [http://localhost:3000](http://localhost:3000) and the AP
 
 ### Environment Variables
 
-#### Web App (`apps/web/.env.local`)
+#### Admin App (`apps/admin/.env.local`)
 
 | Variable | Description |
 |----------|-------------|
@@ -129,9 +129,9 @@ pnpm inngest:dev      # Start Inngest dev server
 
 ```bash
 pnpm test                                      # Run all tests
-pnpm --filter @listwell/web test               # Web tests only
+pnpm --filter @listwell/admin test              # Admin tests only
 pnpm --filter @listwell/api test               # API tests only
-pnpm --filter @listwell/web test -- --coverage  # Web tests with coverage
+pnpm --filter @listwell/admin test -- --coverage # Admin tests with coverage
 ```
 
 ### Database
@@ -148,9 +148,9 @@ pnpm --filter @listwell/db exec drizzle-kit studio            # Database GUI
 ### Per-app Commands
 
 ```bash
-pnpm --filter @listwell/web dev       # Web dev server only
+pnpm --filter @listwell/admin dev      # Admin dev server only
 pnpm --filter @listwell/api dev       # API dev server only
-pnpm --filter @listwell/web build     # Build web only
+pnpm --filter @listwell/admin build   # Build admin only
 pnpm --filter @listwell/api build     # Build API only
 ```
 

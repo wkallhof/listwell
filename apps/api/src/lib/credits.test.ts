@@ -221,6 +221,6 @@ describe("refundCredit", () => {
 
     const result = await refundCredit("user-1", "listing-1");
 
-    expect(result).toEqual({ balance: 1 });
+    expect(result).toEqual({ balance: 1, alreadyRefunded: false });
   });
 });

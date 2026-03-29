@@ -6,10 +6,11 @@ Listwell is a mobile-first progressive web app that turns photos of items into r
 
 ## Architecture
 
-Turborepo + pnpm monorepo with two apps and two shared packages:
+Turborepo + pnpm monorepo with three apps and two shared packages:
 
-- **`apps/web`** — Next.js frontend (App Router). No server-side business logic. Calls the Hono API via Next.js rewrites proxy (`/api/*` → API server). Server components use `apiFetch()` to forward cookies.
+- **`apps/admin`** — Next.js admin dashboard (App Router). Calls the Hono API via Next.js rewrites proxy (`/api/*` → API server). Server components use `apiFetch()` to forward cookies.
 - **`apps/api`** — Hono REST API (`@hono/node-server`). All business logic: auth, CRUD, AI agent, image enhancement, Inngest jobs, push notifications. Runs on port 4000.
+- **`apps/marketing`** — Astro static marketing site. Landing page, legal pages, App Store link. No API calls, no auth. Outputs static HTML/CSS.
 - **`packages/shared`** — Types (`AgentLogEntry`), Zod schemas (`listingAgentOutputSchema`), and utilities (`formatListingForClipboard`). Consumed as TS source (no build step).
 - **`packages/db`** — Drizzle schema, client factory, and migrations. Uses `DB_DRIVER=neon` for production Neon driver, `postgres` for local dev.
 
@@ -54,27 +55,25 @@ Turborepo + pnpm monorepo with two apps and two shared packages:
 ```
 listwell/
 ├── apps/
-│   ├── web/                         ← Next.js frontend
+│   ├── admin/                       ← Next.js admin dashboard
 │   │   ├── src/
 │   │   │   ├── app/
 │   │   │   │   ├── globals.css
 │   │   │   │   ├── layout.tsx
-│   │   │   │   ├── manifest.ts
 │   │   │   │   ├── login/page.tsx
-│   │   │   │   └── (authenticated)/
-│   │   │   │       ├── page.tsx             ← Feed (uses apiFetch)
-│   │   │   │       ├── new/page.tsx         ← Capture
-│   │   │   │       ├── new/describe/page.tsx← Describe + submit
-│   │   │   │       └── listings/[id]/page.tsx ← Detail (client fetch)
+│   │   │   │   └── (admin)/         ← Admin pages (sidebar layout)
+│   │   │   │       ├── page.tsx             ← Dashboard
+│   │   │   │       ├── users/page.tsx       ← Users list
+│   │   │   │       ├── listings/page.tsx    ← Listings list
+│   │   │   │       ├── revenue/page.tsx     ← Revenue & Costs
+│   │   │   │       └── activity/page.tsx    ← Activity feed
 │   │   │   ├── components/
 │   │   │   │   ├── ui/              ← shadcn/ui primitives
-│   │   │   │   └── *.tsx            ← App components
+│   │   │   │   └── *.tsx            ← Admin components
 │   │   │   └── lib/
 │   │   │       ├── api.ts           ← apiFetch() for server components
 │   │   │       ├── auth-client.ts   ← BetterAuth client
 │   │   │       ├── auth-middleware.ts← Route protection middleware
-│   │   │       ├── upload-client.ts ← Presigned URL upload
-│   │   │       ├── new-listing-context.tsx
 │   │   │       └── utils.ts
 │   │   ├── public/
 │   │   ├── next.config.ts           ← API rewrites proxy
@@ -105,6 +104,17 @@ listwell/
 │               ├── notifications.ts
 │               └── ai/
 │
+│   └── marketing/                   ← Astro static marketing site
+│       ├── src/
+│       │   ├── pages/
+│       │   │   └── index.astro      ← Landing page
+│       │   ├── layouts/
+│       │   │   └── BaseLayout.astro
+│       │   └── styles/
+│       │       └── global.css       ← Tailwind CSS
+│       ├── astro.config.mjs
+│       └── package.json
+│
 ├── packages/
 │   ├── shared/                      ← Types, schemas, utilities
 │   │   └── src/
@@ -134,7 +144,7 @@ listwell/
 ### Development
 
 ```bash
-pnpm dev              # Start both web (3000) and API (4000) via Turborepo
+pnpm dev              # Start both admin (3000) and API (4000) via Turborepo
 pnpm inngest:dev      # Start Inngest dev server pointing at API
 pnpm build            # Production build (all apps)
 pnpm lint             # Run ESLint (all apps)
@@ -146,9 +156,9 @@ pnpm format           # Run Prettier
 
 ```bash
 pnpm test                                    # Run all tests (all apps)
-pnpm --filter @listwell/web test             # Run web tests only
+pnpm --filter @listwell/admin test            # Run admin tests only
 pnpm --filter @listwell/api test             # Run API tests only
-pnpm --filter @listwell/web test -- --coverage # Web tests with coverage
+pnpm --filter @listwell/admin test -- --coverage # Admin tests with coverage
 ```
 
 ### Database
@@ -164,10 +174,12 @@ pnpm --filter @listwell/db exec drizzle-kit studio           # Open Drizzle Stud
 ### Per-app Commands
 
 ```bash
-pnpm --filter @listwell/web dev       # Start Next.js dev server only
+pnpm --filter @listwell/admin dev      # Start Next.js admin dev server only
 pnpm --filter @listwell/api dev       # Start Hono API dev server only
-pnpm --filter @listwell/web build     # Build web app only
+pnpm --filter @listwell/marketing dev  # Start Astro marketing dev server only
+pnpm --filter @listwell/admin build   # Build admin app only
 pnpm --filter @listwell/api build     # Build API app only
+pnpm --filter @listwell/marketing build # Build marketing site (static output)
 ```
 
 ### Claude Code Skills
@@ -204,7 +216,7 @@ pnpm --filter @listwell/api build     # Build API app only
 - Use `type` for unions/intersections, `interface` for object shapes
 - Prefer `unknown` over `any` when type is truly unknown
 
-### React / Next.js (apps/web)
+### React / Next.js (apps/admin)
 
 - Functional components only
 - Props interface named `{Component}Props`
@@ -212,6 +224,7 @@ pnpm --filter @listwell/api build     # Build API app only
 - Client components use `fetch("/api/...")` (proxied to Hono API)
 - Only use `"use client"` when interactivity is required
 - No server actions — all mutations go through the API
+- Desktop-first layout for admin (sidebar nav), not mobile-first
 
 ### Hono API (apps/api)
 
@@ -242,7 +255,7 @@ pnpm --filter @listwell/api build     # Build API app only
 - Each function/component should have at least one test
 - Use descriptive test names: "should {behavior} when {condition}"
 - Prefer integration tests over unit tests for UI
-- Run `pnpm --filter @listwell/web test -- --coverage` to verify coverage thresholds
+- Run `pnpm --filter @listwell/admin test -- --coverage` to verify coverage thresholds
 
 ### Git
 
@@ -302,7 +315,7 @@ See [docs/tasks.md](docs/tasks.md) for current implementation status.
 
 ## Environment Variables
 
-### Web App (`apps/web/.env.local`)
+### Admin App (`apps/admin/.env.local`)
 
 ```
 NEXT_PUBLIC_APP_URL=http://localhost:3000
@@ -353,12 +366,12 @@ NEXT_PUBLIC_VAPID_PUBLIC_KEY=           # Web push VAPID public key
 ### TypeScript errors
 
 - Run `pnpm typecheck` for details
-- Clean `.next` cache if stale references: `rm -rf apps/web/.next`
+- Clean `.next` cache if stale references: `rm -rf apps/admin/.next`
 - Ensure strict mode is respected
 - Check that all imports resolve correctly
 
 ### API not responding
 
 - Ensure API is running: `pnpm --filter @listwell/api dev`
-- Check `API_URL` in `apps/web/.env.local` points to `http://localhost:4000`
+- Check `API_URL` in `apps/admin/.env.local` points to `http://localhost:4000`
 - Verify CORS config in API allows web origin
