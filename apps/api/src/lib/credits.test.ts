@@ -157,6 +157,8 @@ describe("addPurchasedCredits", () => {
       balanceAfter: 7,
       appleTransactionId: "apple-123",
       listingId: null,
+      adminUserId: null,
+      reason: null,
       note: null,
       createdAt: new Date(),
     });

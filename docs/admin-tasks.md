@@ -36,7 +36,7 @@
 ## Progress Summary
 
 - Phase 0: [x] Complete
-- Phase 1: [ ] Not Started
+- Phase 1: [x] Complete
 - Phase 2: [ ] Not Started
 - Phase 3: [ ] Not Started
 - Phase 4: [ ] Not Started
@@ -103,89 +103,89 @@
 
 ### 1.1 Schema Changes
 
-- [ ] 1.1.1: Add `role` column to `user` table with default `"user"`
+- [x] 1.1.1: Add `role` column to `user` table with default `"user"`
   - Files: `packages/db/src/schema.ts`
   - Test: `pnpm --filter @listwell/db exec drizzle-kit push` succeeds, column exists
-- [ ] 1.1.2: Add `suspended` (boolean, default false) and `suspendedReason` (text, nullable) columns to `user` table
+- [x] 1.1.2: Add `suspended` (boolean, default false) and `suspendedReason` (text, nullable) columns to `user` table
   - Files: `packages/db/src/schema.ts`
   - Test: Schema push succeeds
-- [ ] 1.1.3: Add `agentCostUsd` (real), `agentInputTokens` (integer), `agentOutputTokens` (integer), `agentProvider` (text) columns to `listings` table — all nullable
+- [x] 1.1.3: Add `agentCostUsd` (real), `agentInputTokens` (integer), `agentOutputTokens` (integer), `agentProvider` (text) columns to `listings` table — all nullable
   - Files: `packages/db/src/schema.ts`
   - Test: Schema push succeeds
-- [ ] 1.1.4: Extend `creditTransactionTypeEnum` with `MANUAL_GRANT` and `MANUAL_DEDUCT` values
+- [x] 1.1.4: Extend `creditTransactionTypeEnum` with `MANUAL_GRANT` and `MANUAL_DEDUCT` values
   - Files: `packages/db/src/schema.ts`
   - Test: Schema push succeeds, enum has new values
-- [ ] 1.1.5: Add `adminUserId` (text, nullable) and `reason` (text, nullable) columns to `creditTransactions` table
+- [x] 1.1.5: Add `adminUserId` (text, nullable) and `reason` (text, nullable) columns to `creditTransactions` table
   - Files: `packages/db/src/schema.ts`
   - Test: Schema push succeeds
-- [ ] 1.1.6: Create `userActivityLog` table with id, userId, eventType, description, resourceType, resourceId, metadata (json), createdAt. Add indexes on (userId, createdAt) and (eventType, createdAt)
+- [x] 1.1.6: Create `userActivityLog` table with id, userId, eventType, description, resourceType, resourceId, metadata (json), createdAt. Add indexes on (userId, createdAt) and (eventType, createdAt)
   - Files: `packages/db/src/schema.ts`
   - Test: Schema push succeeds, table and indexes exist
-- [ ] 1.1.7: Add relations for `userActivityLog` (user relation) and update `userRelations` to include activity logs
+- [x] 1.1.7: Add relations for `userActivityLog` (user relation) and update `userRelations` to include activity logs
   - Files: `packages/db/src/schema.ts`
   - Test: TypeScript compiles, `pnpm typecheck` passes
 
 ### 1.2 Admin API Middleware
 
-- [ ] 1.2.1: Update `SessionUser` interface in auth middleware to include `role` field
+- [x] 1.2.1: Update `SessionUser` interface in auth middleware to include `role` field
   - Files: `apps/api/src/middleware/auth.ts`
   - Test: TypeScript compiles
-- [ ] 1.2.2: Create `requireAdmin` middleware that wraps `requireAuth` and checks `user.role === "admin"`; returns 403 if not admin
+- [x] 1.2.2: Create `requireAdmin` middleware that wraps `requireAuth` and checks `user.role === "admin"`; returns 403 if not admin
   - Files: `apps/api/src/middleware/admin.ts`
   - Test: Unit test — returns 403 for non-admin, passes through for admin
-- [ ] 1.2.3: Add suspension check to `POST /listings` route — return 403 with message if user is suspended
+- [x] 1.2.3: Add suspension check to `POST /listings` route — return 403 with message if user is suspended
   - Files: `apps/api/src/routes/listings.ts`
   - Test: Unit test — suspended user gets 403, non-suspended user proceeds normally
-- [ ] 1.2.4: Mount `requireAdmin` middleware on `/admin/*` paths in API index
+- [x] 1.2.4: Mount `requireAdmin` middleware on `/admin/*` paths in API index
   - Files: `apps/api/src/index.ts`
   - Test: Unauthenticated/non-admin requests to `/admin/*` return 401/403
 
 ### 1.3 Activity Log Helper
 
-- [ ] 1.3.1: Create `logActivity()` helper function that inserts into `userActivityLog` with try/catch (fire-and-forget, never throws)
+- [x] 1.3.1: Create `logActivity()` helper function that inserts into `userActivityLog` with try/catch (fire-and-forget, never throws)
   - Files: `apps/api/src/lib/activity-log.ts`
   - Test: Unit test — writes to DB, swallows errors gracefully
-- [ ] 1.3.2: Define activity event type constants (ACCOUNT_CREATED, LOGIN, LISTING_CREATED, LISTING_SUBMITTED, PIPELINE_ANALYZING, PIPELINE_RESEARCHING, PIPELINE_GENERATING, PIPELINE_COMPLETE, PIPELINE_ERROR, CREDITS_PURCHASED, CREDITS_USED, CREDITS_REFUNDED, CREDITS_FREE_GRANT, IMAGE_ENHANCE_REQUESTED, IMAGE_ENHANCE_COMPLETED, IMAGE_ENHANCE_FAILED, ACCOUNT_SUSPENDED, ACCOUNT_UNSUSPENDED, MANUAL_CREDIT_GRANT, MANUAL_CREDIT_DEDUCT)
+- [x] 1.3.2: Define activity event type constants (ACCOUNT_CREATED, LOGIN, LISTING_CREATED, LISTING_SUBMITTED, PIPELINE_ANALYZING, PIPELINE_RESEARCHING, PIPELINE_GENERATING, PIPELINE_COMPLETE, PIPELINE_ERROR, CREDITS_PURCHASED, CREDITS_USED, CREDITS_REFUNDED, CREDITS_FREE_GRANT, IMAGE_ENHANCE_REQUESTED, IMAGE_ENHANCE_COMPLETED, IMAGE_ENHANCE_FAILED, ACCOUNT_SUSPENDED, ACCOUNT_UNSUSPENDED, MANUAL_CREDIT_GRANT, MANUAL_CREDIT_DEDUCT)
   - Files: `apps/api/src/lib/activity-log.ts`
   - Test: TypeScript compiles, constants exported
 
 ### 1.4 Strip Consumer Pages
 
-- [ ] 1.4.1: Remove all consumer-facing page directories and components from admin app: `(authenticated)/`, `login/`, consumer components (ListingCard, ImageCarousel, AgentActivityLog, PipelineSteps, VoiceInput, PushPrompt, etc.)
+- [x] 1.4.1: Remove all consumer-facing page directories and components from admin app: `(authenticated)/`, `login/`, consumer components (ListingCard, ImageCarousel, AgentActivityLog, PipelineSteps, VoiceInput, PushPrompt, etc.)
   - Files: `apps/admin/src/app/`, `apps/admin/src/components/`
   - Test: No build errors after removal
-- [ ] 1.4.2: Remove service worker, PWA manifest, and offline-related code
+- [x] 1.4.2: Remove service worker, PWA manifest, and offline-related code
   - Files: `apps/admin/src/app/manifest.ts`, any SW files, related imports
   - Test: `pnpm --filter @listwell/admin build` succeeds
-- [ ] 1.4.3: Remove consumer-specific lib files (new-listing-context, upload-client, voice-related) but keep api.ts, auth-client.ts, auth-middleware.ts, utils.ts
+- [x] 1.4.3: Remove consumer-specific lib files (new-listing-context, upload-client, voice-related) but keep api.ts, auth-client.ts, auth-middleware.ts, utils.ts
   - Files: `apps/admin/src/lib/`
   - Test: No import errors, build succeeds
 
 ### 1.5 Admin App Shell
 
-- [ ] 1.5.1: Create admin layout with sidebar navigation component (Dashboard, Users, Listings, Revenue & Costs, Activity). Use Lucide icons. Desktop-first with collapsible sidebar.
+- [x] 1.5.1: Create admin layout with sidebar navigation component (Dashboard, Users, Listings, Revenue & Costs, Activity). Use Lucide icons. Desktop-first with collapsible sidebar.
   - Files: `apps/admin/src/components/admin-sidebar.tsx`, `apps/admin/src/app/(admin)/layout.tsx`
   - Design: `docs/design-system.md` — use existing color tokens, desktop layout
   - Test: Component renders, navigation links work
-- [ ] 1.5.2: Create admin login page that checks user role after auth — redirect non-admins to an "unauthorized" message
+- [x] 1.5.2: Create admin login page that checks user role after auth — redirect non-admins to an "unauthorized" message
   - Files: `apps/admin/src/app/login/page.tsx`, `apps/admin/src/lib/auth-middleware.ts`
   - Test: Admin user proceeds to dashboard, non-admin sees unauthorized message
-- [ ] 1.5.3: Create placeholder pages for each sidebar section (Dashboard, Users, Listings, Revenue & Costs, Activity) with section titles
+- [x] 1.5.3: Create placeholder pages for each sidebar section (Dashboard, Users, Listings, Revenue & Costs, Activity) with section titles
   - Files: `apps/admin/src/app/(admin)/page.tsx`, `apps/admin/src/app/(admin)/users/page.tsx`, `apps/admin/src/app/(admin)/listings/page.tsx`, `apps/admin/src/app/(admin)/revenue/page.tsx`, `apps/admin/src/app/(admin)/activity/page.tsx`
   - Test: Each page renders, sidebar highlights active section
-- [ ] 1.5.4: Update Next.js middleware to protect admin routes — redirect unauthenticated users to login
+- [x] 1.5.4: Update Next.js middleware to protect admin routes — redirect unauthenticated users to login
   - Files: `apps/admin/src/middleware.ts` or `apps/admin/src/lib/auth-middleware.ts`
   - Test: Unauthenticated access redirects to login
 
 **Phase 1 Checkpoint:**
 
-- [ ] Database schema has all new columns and tables
-- [ ] Admin middleware returns 403 for non-admin users
-- [ ] Suspended users cannot create listings (API returns 403)
-- [ ] Admin app shows login → sidebar layout → placeholder pages
-- [ ] `logActivity()` helper is functional
-- [ ] All tests pass, `pnpm typecheck` clean
-- [ ] Commit: `feat(admin): schema changes, admin auth, and app shell (Phase 1)`
+- [x] Database schema has all new columns and tables
+- [x] Admin middleware returns 403 for non-admin users
+- [x] Suspended users cannot create listings (API returns 403)
+- [x] Admin app shows login → sidebar layout → placeholder pages
+- [x] `logActivity()` helper is functional
+- [x] All tests pass, `pnpm typecheck` clean
+- [x] Commit: `feat(admin): schema changes, admin auth, and app shell (Phase 1)`
 
 ---
 
@@ -484,26 +484,26 @@
 | 0.2.3 | 2026-03-28 | | Placeholder landing page |
 | 0.2.4 | 2026-03-28 | | CLAUDE.md updated with marketing |
 | 0.3.1 | 2026-03-28 | | build, typecheck, test all pass |
-| 1.1.1 | | | |
-| 1.1.2 | | | |
-| 1.1.3 | | | |
-| 1.1.4 | | | |
-| 1.1.5 | | | |
-| 1.1.6 | | | |
-| 1.1.7 | | | |
-| 1.2.1 | | | |
-| 1.2.2 | | | |
-| 1.2.3 | | | |
-| 1.2.4 | | | |
-| 1.3.1 | | | |
-| 1.3.2 | | | |
-| 1.4.1 | | | |
-| 1.4.2 | | | |
-| 1.4.3 | | | |
-| 1.5.1 | | | |
-| 1.5.2 | | | |
-| 1.5.3 | | | |
-| 1.5.4 | | | |
+| 1.1.1 | 2026-03-28 | | role column on user table |
+| 1.1.2 | 2026-03-28 | | suspended + suspendedReason on user |
+| 1.1.3 | 2026-03-28 | | cost columns on listings |
+| 1.1.4 | 2026-03-28 | | MANUAL_GRANT, MANUAL_DEDUCT enum values |
+| 1.1.5 | 2026-03-28 | | adminUserId + reason on creditTransactions |
+| 1.1.6 | 2026-03-28 | | userActivityLog table with indexes |
+| 1.1.7 | 2026-03-28 | | activityLogs relation on user |
+| 1.2.1 | 2026-03-28 | | role field on SessionUser |
+| 1.2.2 | 2026-03-28 | | requireAdmin middleware |
+| 1.2.3 | 2026-03-28 | | suspension check on POST /listings |
+| 1.2.4 | 2026-03-28 | | /admin/* middleware mount |
+| 1.3.1 | 2026-03-28 | | logActivity() helper |
+| 1.3.2 | 2026-03-28 | | 20 event type constants |
+| 1.4.1 | 2026-03-28 | | Removed (authenticated)/, consumer components |
+| 1.4.2 | 2026-03-28 | | Removed SW, manifest, PWA icons |
+| 1.4.3 | 2026-03-28 | | Removed new-listing-context, upload-client |
+| 1.5.1 | 2026-03-28 | | Sidebar + admin layout |
+| 1.5.2 | 2026-03-28 | | Admin login with role check |
+| 1.5.3 | 2026-03-28 | | Placeholder pages for all sections |
+| 1.5.4 | 2026-03-28 | | Next.js middleware route protection |
 | 2.1.1 | | | |
 | 2.1.2 | | | |
 | 2.1.3 | | | |

@@ -5,6 +5,7 @@ interface SessionUser {
   id: string;
   email: string;
   name: string;
+  role: string;
 }
 
 declare module "hono" {

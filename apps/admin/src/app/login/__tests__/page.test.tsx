@@ -2,7 +2,6 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-// Mock next/navigation
 const mockPush = vi.fn();
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
@@ -15,19 +14,19 @@ vi.mock("next/navigation", () => ({
   }),
 }));
 
-// Mock auth client
 const mockSignInEmail = vi.fn();
-const mockSignUpEmail = vi.fn();
+const mockSignOut = vi.fn();
 vi.mock("@/lib/auth-client", () => ({
   authClient: {
     signIn: {
       email: (...args: unknown[]) => mockSignInEmail(...args),
     },
-    signUp: {
-      email: (...args: unknown[]) => mockSignUpEmail(...args),
-    },
+    signOut: (...args: unknown[]) => mockSignOut(...args),
   },
 }));
+
+const mockFetch = vi.fn();
+vi.stubGlobal("fetch", mockFetch);
 
 import LoginPage from "@/app/login/page";
 
@@ -35,27 +34,17 @@ describe("LoginPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockSignInEmail.mockResolvedValue({ data: {} });
-    mockSignUpEmail.mockResolvedValue({ data: {} });
+    mockSignOut.mockResolvedValue(undefined);
   });
 
   describe("rendering", () => {
-    it("renders the app name and tagline", () => {
+    it("renders admin title and description", () => {
       render(<LoginPage />);
-      expect(screen.getByText("Listwell")).toBeInTheDocument();
-      expect(
-        screen.getByText("Turn photos into listings"),
-      ).toBeInTheDocument();
+      expect(screen.getByText("Listwell Admin")).toBeInTheDocument();
+      expect(screen.getByText("Operations dashboard")).toBeInTheDocument();
     });
 
-    it("renders login and register tabs", () => {
-      render(<LoginPage />);
-      expect(screen.getByRole("tab", { name: /log in/i })).toBeInTheDocument();
-      expect(
-        screen.getByRole("tab", { name: /sign up/i }),
-      ).toBeInTheDocument();
-    });
-
-    it("shows login form by default", () => {
+    it("renders login form with email and password", () => {
       render(<LoginPage />);
       expect(screen.getByLabelText("Email")).toBeInTheDocument();
       expect(screen.getByLabelText("Password")).toBeInTheDocument();
@@ -64,46 +53,61 @@ describe("LoginPage", () => {
       ).toBeInTheDocument();
     });
 
-    it("switches to register form when clicking Sign up tab", async () => {
-      const user = userEvent.setup();
+    it("does not render a signup tab", () => {
       render(<LoginPage />);
-
-      await user.click(screen.getByRole("tab", { name: /sign up/i }));
-
-      expect(screen.getByLabelText("Confirm password")).toBeInTheDocument();
-      expect(
-        screen.getByRole("button", { name: /create account/i }),
-      ).toBeInTheDocument();
+      expect(screen.queryByRole("tab", { name: /sign up/i })).not.toBeInTheDocument();
     });
   });
 
-  describe("login form", () => {
+  describe("login flow", () => {
     it("calls signIn.email with correct credentials", async () => {
+      mockFetch.mockResolvedValue(
+        new Response(JSON.stringify({ role: "admin" }), { status: 200 }),
+      );
       const user = userEvent.setup();
       render(<LoginPage />);
 
-      await user.type(screen.getByLabelText("Email"), "test@example.com");
+      await user.type(screen.getByLabelText("Email"), "admin@example.com");
       await user.type(screen.getByLabelText("Password"), "password123");
       await user.click(screen.getByRole("button", { name: /log in/i }));
 
       expect(mockSignInEmail).toHaveBeenCalledWith({
-        email: "test@example.com",
+        email: "admin@example.com",
         password: "password123",
       });
     });
 
-    it("redirects to / on successful login", async () => {
+    it("redirects to / on successful admin login", async () => {
+      mockFetch.mockResolvedValue(
+        new Response(JSON.stringify({ role: "admin" }), { status: 200 }),
+      );
       const user = userEvent.setup();
       render(<LoginPage />);
 
-      await user.type(screen.getByLabelText("Email"), "test@example.com");
+      await user.type(screen.getByLabelText("Email"), "admin@example.com");
       await user.type(screen.getByLabelText("Password"), "password123");
       await user.click(screen.getByRole("button", { name: /log in/i }));
 
       expect(mockPush).toHaveBeenCalledWith("/");
     });
 
-    it("shows error message on login failure", async () => {
+    it("shows error and signs out when user is not admin", async () => {
+      mockFetch.mockResolvedValue(
+        new Response(JSON.stringify({ role: "user" }), { status: 200 }),
+      );
+      const user = userEvent.setup();
+      render(<LoginPage />);
+
+      await user.type(screen.getByLabelText("Email"), "user@example.com");
+      await user.type(screen.getByLabelText("Password"), "password123");
+      await user.click(screen.getByRole("button", { name: /log in/i }));
+
+      expect(await screen.findByText(/admin privileges required/i)).toBeInTheDocument();
+      expect(mockSignOut).toHaveBeenCalled();
+      expect(mockPush).not.toHaveBeenCalled();
+    });
+
+    it("shows error on signIn failure", async () => {
       mockSignInEmail.mockResolvedValue({
         error: { message: "Invalid credentials" },
       });
@@ -114,9 +118,19 @@ describe("LoginPage", () => {
       await user.type(screen.getByLabelText("Password"), "wrong");
       await user.click(screen.getByRole("button", { name: /log in/i }));
 
-      expect(
-        await screen.findByText("Invalid credentials"),
-      ).toBeInTheDocument();
+      expect(await screen.findByText("Invalid credentials")).toBeInTheDocument();
+    });
+
+    it("shows error when /me fetch fails", async () => {
+      mockFetch.mockResolvedValue(new Response(null, { status: 500 }));
+      const user = userEvent.setup();
+      render(<LoginPage />);
+
+      await user.type(screen.getByLabelText("Email"), "admin@example.com");
+      await user.type(screen.getByLabelText("Password"), "password123");
+      await user.click(screen.getByRole("button", { name: /log in/i }));
+
+      expect(await screen.findByText("Failed to verify account")).toBeInTheDocument();
     });
 
     it("shows generic error on unexpected failure", async () => {
@@ -131,134 +145,6 @@ describe("LoginPage", () => {
       expect(
         await screen.findByText("An unexpected error occurred"),
       ).toBeInTheDocument();
-    });
-  });
-
-  describe("register form", () => {
-    it("calls signUp.email with correct data", async () => {
-      const user = userEvent.setup();
-      render(<LoginPage />);
-
-      await user.click(screen.getByRole("tab", { name: /sign up/i }));
-      await user.type(screen.getByLabelText("Email"), "new@example.com");
-      await user.type(screen.getByLabelText("Password"), "password123");
-      await user.type(
-        screen.getByLabelText("Confirm password"),
-        "password123",
-      );
-      await user.click(
-        screen.getByRole("button", { name: /create account/i }),
-      );
-
-      expect(mockSignUpEmail).toHaveBeenCalledWith({
-        email: "new@example.com",
-        password: "password123",
-        name: "new",
-      });
-    });
-
-    it("redirects to / on successful registration", async () => {
-      const user = userEvent.setup();
-      render(<LoginPage />);
-
-      await user.click(screen.getByRole("tab", { name: /sign up/i }));
-      await user.type(screen.getByLabelText("Email"), "new@example.com");
-      await user.type(screen.getByLabelText("Password"), "password123");
-      await user.type(
-        screen.getByLabelText("Confirm password"),
-        "password123",
-      );
-      await user.click(
-        screen.getByRole("button", { name: /create account/i }),
-      );
-
-      expect(mockPush).toHaveBeenCalledWith("/");
-    });
-
-    it("shows error when passwords do not match", async () => {
-      const user = userEvent.setup();
-      render(<LoginPage />);
-
-      await user.click(screen.getByRole("tab", { name: /sign up/i }));
-      await user.type(screen.getByLabelText("Email"), "new@example.com");
-      await user.type(screen.getByLabelText("Password"), "password123");
-      await user.type(
-        screen.getByLabelText("Confirm password"),
-        "different123",
-      );
-      await user.click(
-        screen.getByRole("button", { name: /create account/i }),
-      );
-
-      expect(
-        await screen.findByText("Passwords do not match"),
-      ).toBeInTheDocument();
-      expect(mockSignUpEmail).not.toHaveBeenCalled();
-    });
-
-    it("shows error when password is too short", async () => {
-      const user = userEvent.setup();
-      render(<LoginPage />);
-
-      await user.click(screen.getByRole("tab", { name: /sign up/i }));
-      await user.type(screen.getByLabelText("Email"), "new@example.com");
-      await user.type(screen.getByLabelText("Password"), "short");
-      await user.type(screen.getByLabelText("Confirm password"), "short");
-      await user.click(
-        screen.getByRole("button", { name: /create account/i }),
-      );
-
-      expect(
-        await screen.findByText("Password must be at least 8 characters"),
-      ).toBeInTheDocument();
-      expect(mockSignUpEmail).not.toHaveBeenCalled();
-    });
-
-    it("shows error message on registration failure", async () => {
-      mockSignUpEmail.mockResolvedValue({
-        error: { message: "Email already registered" },
-      });
-      const user = userEvent.setup();
-      render(<LoginPage />);
-
-      await user.click(screen.getByRole("tab", { name: /sign up/i }));
-      await user.type(screen.getByLabelText("Email"), "existing@example.com");
-      await user.type(screen.getByLabelText("Password"), "password123");
-      await user.type(
-        screen.getByLabelText("Confirm password"),
-        "password123",
-      );
-      await user.click(
-        screen.getByRole("button", { name: /create account/i }),
-      );
-
-      expect(
-        await screen.findByText("Email already registered"),
-      ).toBeInTheDocument();
-    });
-  });
-
-  describe("tab behavior", () => {
-    it("clears error when switching tabs", async () => {
-      mockSignInEmail.mockResolvedValue({
-        error: { message: "Invalid credentials" },
-      });
-      const user = userEvent.setup();
-      render(<LoginPage />);
-
-      await user.type(screen.getByLabelText("Email"), "test@example.com");
-      await user.type(screen.getByLabelText("Password"), "wrong");
-      await user.click(screen.getByRole("button", { name: /log in/i }));
-
-      expect(
-        await screen.findByText("Invalid credentials"),
-      ).toBeInTheDocument();
-
-      await user.click(screen.getByRole("tab", { name: /sign up/i }));
-
-      expect(
-        screen.queryByText("Invalid credentials"),
-      ).not.toBeInTheDocument();
     });
   });
 });

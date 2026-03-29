@@ -18,6 +18,7 @@ import { creditsRoutes } from "./routes/credits";
 import { applePurchaseRoutes } from "./routes/apple-purchase";
 import { inngestHandler } from "./inngest/handler";
 import { requireAuth } from "./middleware/auth";
+import { requireAdmin } from "./middleware/admin";
 
 const app = new Hono<{ Bindings: Record<string, string | undefined> }>().basePath("/api");
 
@@ -47,6 +48,8 @@ app.use("/me", requireAuth);
 app.use("/credits", requireAuth);
 app.use("/credits/*", requireAuth);
 app.use("/purchases/*", requireAuth);
+app.use("/admin/*", requireAuth);
+app.use("/admin/*", requireAdmin);
 
 // Routes
 app.route("/", authRoutes);

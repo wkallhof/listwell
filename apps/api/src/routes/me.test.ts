@@ -5,7 +5,7 @@ import { meRoutes } from "./me";
 function createTestApp() {
   const app = new Hono();
   app.use("*", async (c, next) => {
-    c.set("user", { id: "test-user-1", email: "test@example.com", name: "Test User" });
+    c.set("user", { id: "test-user-1", email: "test@example.com", name: "Test User", role: "user" });
     await next();
   });
   app.route("/", meRoutes);
@@ -24,6 +24,7 @@ describe("GET /me", () => {
       id: "test-user-1",
       name: "Test User",
       email: "test@example.com",
+      role: "user",
     });
   });
 });

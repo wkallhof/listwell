@@ -21,6 +21,9 @@ export const user = pgTable("user", {
   email: text("email").notNull().unique(),
   emailVerified: boolean("email_verified").default(false).notNull(),
   image: text("image"),
+  role: text("role").notNull().default("user"),
+  suspended: boolean("suspended").notNull().default(false),
+  suspendedReason: text("suspended_reason"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
@@ -127,6 +130,7 @@ export const userRelations = relations(user, ({ many, one }) => ({
   preferences: one(userPreferences),
   credits: one(userCredits),
   creditTransactions: many(creditTransactions),
+  activityLogs: many(userActivityLog),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({
@@ -206,6 +210,8 @@ export const creditTransactionTypeEnum = pgEnum("credit_transaction_type", [
   "PURCHASE",
   "USAGE",
   "REFUND",
+  "MANUAL_GRANT",
+  "MANUAL_DEDUCT",
 ]);
 
 // Comparable listing shape stored as JSON
@@ -246,6 +252,10 @@ export const listings = pgTable("listings", {
   pipelineError: text("pipeline_error"),
   agentLog: json("agent_log").$type<AgentLogEntry[]>(),
   agentTranscriptUrl: text("agent_transcript_url"),
+  agentCostUsd: real("agent_cost_usd"),
+  agentInputTokens: integer("agent_input_tokens"),
+  agentOutputTokens: integer("agent_output_tokens"),
+  agentProvider: text("agent_provider"),
   inngestRunId: text("inngest_run_id"),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
@@ -312,6 +322,8 @@ export const creditTransactions = pgTable(
     balanceAfter: integer("balance_after").notNull(),
     appleTransactionId: text("apple_transaction_id"),
     listingId: text("listing_id").references(() => listings.id),
+    adminUserId: text("admin_user_id"),
+    reason: text("reason"),
     note: text("note"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
@@ -340,6 +352,48 @@ export const creditTransactionsRelations = relations(
     listing: one(listings, {
       fields: [creditTransactions.listingId],
       references: [listings.id],
+    }),
+  }),
+);
+
+// ─── User Activity Log Table ────────────────────────────────────────────────
+
+export const userActivityLog = pgTable(
+  "user_activity_log",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    eventType: text("event_type").notNull(),
+    description: text("description"),
+    resourceType: text("resource_type"),
+    resourceId: text("resource_id"),
+    metadata: json("metadata").$type<Record<string, unknown>>(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("activity_log_userId_createdAt_idx").on(
+      table.userId,
+      table.createdAt,
+    ),
+    index("activity_log_eventType_createdAt_idx").on(
+      table.eventType,
+      table.createdAt,
+    ),
+  ],
+);
+
+export const userActivityLogRelations = relations(
+  userActivityLog,
+  ({ one }) => ({
+    user: one(user, {
+      fields: [userActivityLog.userId],
+      references: [user.id],
     }),
   }),
 );

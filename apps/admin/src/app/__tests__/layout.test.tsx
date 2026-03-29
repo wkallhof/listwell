@@ -2,27 +2,21 @@
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("next/font/google", () => ({
-  Fraunces: () => ({ variable: "--font-fraunces" }),
   Instrument_Sans: () => ({ variable: "--font-instrument-sans" }),
   JetBrains_Mono: () => ({ variable: "--font-jetbrains-mono" }),
 }));
 
 describe("RootLayout", () => {
-  it("exports viewport with cover viewport-fit", async () => {
+  it("exports viewport config", async () => {
     const mod = await import("@/app/layout");
     expect(mod.viewport).toBeDefined();
-    expect(mod.viewport.viewportFit).toBe("cover");
-    expect(mod.viewport.themeColor).toBe("#259E89");
+    expect(mod.viewport.width).toBe("device-width");
   });
 
-  it("exports metadata with apple web app config", async () => {
+  it("exports metadata for admin dashboard", async () => {
     const mod = await import("@/app/layout");
     expect(mod.metadata).toBeDefined();
-    expect(mod.metadata.title).toBe("Listwell");
-    expect(mod.metadata.appleWebApp).toMatchObject({
-      capable: true,
-      statusBarStyle: "black-translucent",
-    });
+    expect(mod.metadata.title).toBe("Listwell Admin");
   });
 
   it("exports a default layout function", async () => {

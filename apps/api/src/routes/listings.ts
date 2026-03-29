@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { eq, desc } from "drizzle-orm";
 import { db } from "@listwell/db";
-import { listings, listingImages } from "@listwell/db/schema";
+import { listings, listingImages, user as userTable } from "@listwell/db/schema";
 import { inngest } from "../inngest/client";
 import { getOrCreateUserCredits, deductCredit } from "../lib/credits";
 
@@ -29,6 +29,19 @@ interface ImageInput {
 
 listingsRoutes.post("/listings", async (c) => {
   const user = c.get("user");
+
+  // Check if user is suspended
+  const userRecord = await db.query.user.findFirst({
+    where: eq(userTable.id, user.id),
+    columns: { suspended: true },
+  });
+  if (userRecord?.suspended) {
+    return c.json(
+      { error: "Your account is suspended. You cannot create new listings." },
+      403,
+    );
+  }
+
   const body = await c.req.json();
   const description = body.description as string | null | undefined;
   const images = body.images as ImageInput[] | undefined;
