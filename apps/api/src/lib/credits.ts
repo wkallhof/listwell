@@ -133,7 +133,19 @@ export async function addPurchasedCredits(
 export async function refundCredit(
   userId: string,
   listingId: string,
-): Promise<{ balance: number }> {
+): Promise<{ balance: number; alreadyRefunded: boolean }> {
+  // Idempotency: only refund once per listing
+  const existingRefund = await db.query.creditTransactions.findFirst({
+    where: sql`${creditTransactions.listingId} = ${listingId} AND ${creditTransactions.type} = 'REFUND'`,
+  });
+
+  if (existingRefund) {
+    const credits = await db.query.userCredits.findFirst({
+      where: eq(userCredits.userId, userId),
+    });
+    return { balance: credits?.balance ?? 0, alreadyRefunded: true };
+  }
+
   // Ensure credit record exists
   await getOrCreateUserCredits(userId);
 
@@ -154,5 +166,5 @@ export async function refundCredit(
     note: "Auto-refund: AI pipeline failed",
   });
 
-  return { balance: updated.balance };
+  return { balance: updated.balance, alreadyRefunded: false };
 }

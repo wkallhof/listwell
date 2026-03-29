@@ -11,6 +11,16 @@ export const generateListing = inngest.createFunction(
   {
     id: "generate-listing",
     retries: 1,
+    onFailure: async ({ event }) => {
+      // Refund credit after all retries are exhausted (idempotent)
+      const { listingId } = event.data.event.data as { listingId: string };
+      const listing = await db.query.listings.findFirst({
+        where: eq(listings.id, listingId),
+      });
+      if (listing) {
+        await refundCredit(listing.userId, listingId);
+      }
+    },
   },
   { event: "listing.submitted" },
   async ({ event, step }) => {
@@ -51,14 +61,6 @@ export const generateListing = inngest.createFunction(
             updatedAt: new Date(),
           })
           .where(eq(listings.id, listingId));
-
-        // Auto-refund the credit on pipeline failure
-        const listing = await db.query.listings.findFirst({
-          where: eq(listings.id, listingId),
-        });
-        if (listing) {
-          await refundCredit(listing.userId, listingId);
-        }
 
         throw error;
       }
