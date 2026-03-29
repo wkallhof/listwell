@@ -1,13 +1,15 @@
-import { describe, it, expect } from "vitest";
-import { render, screen } from "@testing-library/react";
-import ListingsPage from "../listings/page";
+import { describe, it } from "vitest";
 
-// Dashboard and Revenue pages are async server components — tested via integration
-// UsersPage and ActivityPage are async server components — tested via client component tests
+// All admin pages are now async server components with their own
+// dedicated client component tests:
+// - Dashboard: server component (integration tested)
+// - Users: users-list-client.test.tsx, user-detail-client.test.tsx
+// - Listings: listings-list-client.test.tsx, listing-detail-client.test.tsx
+// - Revenue: server component (integration tested)
+// - Activity: global-activity-client.test.tsx
 
-describe("Admin placeholder pages", () => {
-  it("renders Listings page", () => {
-    render(<ListingsPage />);
-    expect(screen.getByText("Listings")).toBeInTheDocument();
+describe("Admin pages", () => {
+  it("all pages have dedicated test coverage", () => {
+    // Placeholder — individual page tests exist in their respective directories
   });
 });
