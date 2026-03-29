@@ -9,6 +9,7 @@ struct FeedView: View {
     @State private var newListingStep = NewListingStep.capture
     @State private var creditsViewModel = CreditsViewModel()
     @State private var showPurchaseCredits = false
+    @State private var listingToDelete: Listing?
 
     private enum NewListingStep {
         case capture, describe
@@ -186,23 +187,121 @@ struct FeedView: View {
     // MARK: - Listings
 
     private var listingsContent: some View {
-        ScrollView {
-            LazyVStack(spacing: Spacing.md) {
-                ForEach(viewModel.listings) { listing in
-                    Button {
-                        navigationPath.append(listing.id)
-                    } label: {
-                        ListingCardView(listing: listing)
-                    }
-                    .buttonStyle(.plain)
+        List {
+            ForEach(viewModel.listings) { listing in
+                Button {
+                    navigationPath.append(listing.id)
+                } label: {
+                    ListingCardView(listing: listing)
                 }
+                .buttonStyle(.plain)
+                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                    Button(role: .destructive) {
+                        listingToDelete = listing
+                    } label: {
+                        Label("Delete", systemImage: "trash")
+                    }
+                }
+                .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                    leadingSwipeActions(for: listing)
+                }
+                .listRowSeparator(.hidden)
+                .listRowInsets(EdgeInsets(
+                    top: Spacing.md / 2,
+                    leading: Sizing.pagePadding,
+                    bottom: Spacing.md / 2,
+                    trailing: Sizing.pagePadding
+                ))
+                .listRowBackground(Color.clear)
             }
-            .padding(.horizontal, Sizing.pagePadding)
-            .padding(.vertical, Spacing.lg)
-            .animation(.easeOut(duration: 0.2), value: viewModel.listings.map(\.id))
         }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .background(Color.appBackground)
+        .animation(.easeOut(duration: 0.2), value: viewModel.listings.map(\.id))
         .refreshable {
             await viewModel.refresh(token: authState.token)
+        }
+        .confirmationDialog(
+            "Delete Listing",
+            isPresented: Binding(
+                get: { listingToDelete != nil },
+                set: { if !$0 { listingToDelete = nil } }
+            ),
+            titleVisibility: .visible
+        ) {
+            Button("Delete", role: .destructive) {
+                guard let listing = listingToDelete else { return }
+                Task {
+                    await viewModel.deleteListing(id: listing.id, token: authState.token)
+                }
+            }
+        } message: {
+            Text("This listing will be permanently deleted.")
+        }
+    }
+
+    // MARK: - Swipe Actions
+
+    @ViewBuilder
+    private func leadingSwipeActions(for listing: Listing) -> some View {
+        switch listing.status {
+        case .ready:
+            Button {
+                Task {
+                    await viewModel.updateStatus(
+                        ListingStatus.listed.rawValue,
+                        listingId: listing.id,
+                        token: authState.token
+                    )
+                }
+            } label: {
+                Label("Mark Listed", systemImage: "tag.fill")
+            }
+            .tint(.blue)
+
+            Button {
+                Task {
+                    await viewModel.updateStatus(
+                        ListingStatus.archived.rawValue,
+                        listingId: listing.id,
+                        token: authState.token
+                    )
+                }
+            } label: {
+                Label("Archive", systemImage: "archivebox.fill")
+            }
+            .tint(.orange)
+
+        case .listed:
+            Button {
+                Task {
+                    await viewModel.updateStatus(
+                        ListingStatus.sold.rawValue,
+                        listingId: listing.id,
+                        token: authState.token
+                    )
+                }
+            } label: {
+                Label("Mark Sold", systemImage: "checkmark.circle.fill")
+            }
+            .tint(.green)
+
+            Button {
+                Task {
+                    await viewModel.updateStatus(
+                        ListingStatus.archived.rawValue,
+                        listingId: listing.id,
+                        token: authState.token
+                    )
+                }
+            } label: {
+                Label("Archive", systemImage: "archivebox.fill")
+            }
+            .tint(.orange)
+
+        default:
+            EmptyView()
         }
     }
 }
