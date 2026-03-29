@@ -70,7 +70,7 @@ enum APIConfig {
            !url.isEmpty {
             return url
         }
-        return "https://listwellapi-production.up.railway.app/api"
+        return "https://api.getlistwell.app/api"
     }()
 
     static let pollingInterval: TimeInterval = 4

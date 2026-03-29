@@ -748,7 +748,7 @@
 		093A89B27F8543350E3A8FA0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				API_BASE_URL = "https://listwellapi-production.up.railway.app/api";
+				API_BASE_URL = "https://api.getlistwell.app/api";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Listwell/Listwell.entitlements;
@@ -874,7 +874,7 @@
 		59D9FE938E690A2ACEE0DDA3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				API_BASE_URL = "https://listwellapi-production.up.railway.app/api";
+				API_BASE_URL = "https://api.getlistwell.app/api";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Listwell/Listwell.entitlements;
