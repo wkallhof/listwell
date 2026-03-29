@@ -122,6 +122,9 @@ export function createE2BProvider(): AgentProvider {
         let hasError = false;
         let errorMessage = "";
         let stdoutBuffer = "";
+        let resultCostUsd = 0;
+        let resultInputTokens = 0;
+        let resultOutputTokens = 0;
         const stderrChunks: string[] = [];
 
         function processLine(line: string): void {
@@ -137,6 +140,11 @@ export function createE2BProvider(): AgentProvider {
               message?: { content?: ContentBlock[] };
               is_error?: boolean;
               errors?: string[];
+              total_cost_usd?: number;
+              usage?: {
+                input_tokens?: number;
+                output_tokens?: number;
+              };
             };
 
             if (
@@ -153,6 +161,13 @@ export function createE2BProvider(): AgentProvider {
                 errorMessage = Array.isArray(parsed.errors)
                   ? parsed.errors.join("; ")
                   : "Agent execution failed";
+              }
+              if (typeof parsed.total_cost_usd === "number") {
+                resultCostUsd = parsed.total_cost_usd;
+              }
+              if (parsed.usage) {
+                resultInputTokens = parsed.usage.input_tokens ?? 0;
+                resultOutputTokens = parsed.usage.output_tokens ?? 0;
               }
             }
           } catch {
@@ -209,7 +224,13 @@ export function createE2BProvider(): AgentProvider {
         const raw = JSON.parse(outputText) as unknown;
         const output = parseAgentOutput(raw);
 
-        return { output, costUsd: 0, transcriptLines: rawTranscript };
+        return {
+          output,
+          costUsd: resultCostUsd,
+          inputTokens: resultInputTokens,
+          outputTokens: resultOutputTokens,
+          transcriptLines: rawTranscript,
+        };
       } finally {
         await sandbox.kill().catch(() => {});
       }

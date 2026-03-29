@@ -18,6 +18,7 @@ import { creditsRoutes } from "./routes/credits";
 import { applePurchaseRoutes } from "./routes/apple-purchase";
 import { adminUsersRoutes } from "./routes/admin/users";
 import { adminActivityRoutes } from "./routes/admin/activity";
+import { adminDashboardRoutes } from "./routes/admin/dashboard";
 import { inngestHandler } from "./inngest/handler";
 import { requireAuth } from "./middleware/auth";
 import { requireAdmin } from "./middleware/admin";
@@ -69,6 +70,7 @@ app.route("/", creditsRoutes);
 app.route("/", applePurchaseRoutes);
 app.route("/", adminUsersRoutes);
 app.route("/", adminActivityRoutes);
+app.route("/", adminDashboardRoutes);
 
 // Inngest webhook handler
 app.on(["GET", "POST", "PUT"], "/inngest", (c) => inngestHandler(c));

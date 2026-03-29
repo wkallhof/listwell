@@ -212,6 +212,8 @@ export function createAnthropicApiProvider(): AgentProvider {
           return {
             output,
             costUsd: estimateCost(totalInputTokens, totalOutputTokens),
+            inputTokens: totalInputTokens,
+            outputTokens: totalOutputTokens,
             transcriptLines,
           };
         }
@@ -235,6 +237,8 @@ export function createAnthropicApiProvider(): AgentProvider {
               return {
                 output,
                 costUsd: estimateCost(totalInputTokens, totalOutputTokens),
+                inputTokens: totalInputTokens,
+                outputTokens: totalOutputTokens,
                 transcriptLines,
               };
             } catch {

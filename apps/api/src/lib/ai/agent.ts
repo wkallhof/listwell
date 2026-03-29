@@ -4,8 +4,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@listwell/db";
 import { listings } from "@listwell/db/schema";
 import { uploadBuffer } from "../blob";
-import type { AgentLogEntry } from "@listwell/shared";
-import type { ListingAgentOutput } from "@listwell/shared";
+import type { AgentLogEntry, ListingAgentOutput } from "@listwell/shared";
 import { getAgentProvider } from "./agent-provider";
 import type { AgentImage } from "./agent-provider";
 
@@ -18,6 +17,9 @@ export interface RunAgentInput {
 export interface RunAgentResult {
   output: ListingAgentOutput;
   costUsd: number;
+  inputTokens: number;
+  outputTokens: number;
+  provider: string;
   transcriptUrl: string | null;
 }
 
@@ -161,6 +163,9 @@ export async function runListingAgent(
     return {
       output: result.output,
       costUsd: result.costUsd,
+      inputTokens: result.inputTokens,
+      outputTokens: result.outputTokens,
+      provider: provider.name,
       transcriptUrl,
     };
   } catch (error) {

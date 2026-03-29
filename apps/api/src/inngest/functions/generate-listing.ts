@@ -103,7 +103,8 @@ export const generateListing = inngest.createFunction(
     });
 
     await step.run("complete", async () => {
-      const { output, transcriptUrl } = agentResult as RunAgentResult;
+      const { output, costUsd, inputTokens, outputTokens, provider, transcriptUrl } =
+        agentResult as RunAgentResult;
 
       await db
         .update(listings)
@@ -120,6 +121,10 @@ export const generateListing = inngest.createFunction(
           researchNotes: output.researchNotes,
           comparables: output.comparables as Comparable[],
           agentTranscriptUrl: transcriptUrl ?? null,
+          agentCostUsd: costUsd,
+          agentInputTokens: inputTokens,
+          agentOutputTokens: outputTokens,
+          agentProvider: provider,
           status: "READY",
           pipelineStep: "COMPLETE",
           pipelineError: null,

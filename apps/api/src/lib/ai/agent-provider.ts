@@ -1,5 +1,4 @@
-import type { AgentLogEntry } from "@listwell/shared";
-import type { ListingAgentOutput } from "@listwell/shared";
+import type { AgentLogEntry, ListingAgentOutput } from "@listwell/shared";
 
 // --- Provider Interface ---
 
@@ -20,6 +19,8 @@ export interface AgentProviderInput {
 export interface AgentProviderResult {
   output: ListingAgentOutput;
   costUsd: number;
+  inputTokens: number;
+  outputTokens: number;
   transcriptLines: string[];
 }
 
