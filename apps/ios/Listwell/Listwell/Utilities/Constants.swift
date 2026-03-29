@@ -66,14 +66,11 @@ enum Sizing {
 
 enum APIConfig {
     static let baseURL: String = {
-        if let url = ProcessInfo.processInfo.environment["API_BASE_URL"] {
+        if let url = Bundle.main.object(forInfoDictionaryKey: "APIBaseURL") as? String,
+           !url.isEmpty {
             return url
         }
-        #if DEBUG
-        return "http://localhost:4000/api"
-        #else
-        return "https://api.listwell.app/api"
-        #endif
+        return "https://listwellapi-production.up.railway.app/api"
     }()
 
     static let pollingInterval: TimeInterval = 4

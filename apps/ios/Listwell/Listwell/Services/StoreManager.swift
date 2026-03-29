@@ -8,12 +8,14 @@ final class StoreManager {
     private(set) var isLoading = false
     private(set) var purchaseError: String?
 
+    @ObservationIgnored
     private var transactionListener: Task<Void, Never>?
 
     static let creditProductId = "com.listwell.credits5"
 
     init() {
-        transactionListener = listenForTransactions()
+        let task = listenForTransactions()
+        transactionListener = task
     }
 
     deinit {
@@ -52,7 +54,7 @@ final class StoreManager {
             case .success(let verification):
                 let transaction = try checkVerified(verification)
                 let success = await verifyWithBackend(
-                    transaction: transaction,
+                    verification: verification,
                     token: token
                 )
                 if success {
@@ -88,11 +90,9 @@ final class StoreManager {
                 guard let self else { return }
                 do {
                     let transaction = try self.checkVerified(result)
-                    // Interrupted purchase — retry backend verification
-                    // Token will be fetched from keychain for retry
                     if let savedToken = KeychainManager.retrieve(forKey: KeychainKeys.authToken) {
                         let success = await self.verifyWithBackend(
-                            transaction: transaction,
+                            verification: result,
                             token: savedToken
                         )
                         if success {
@@ -118,16 +118,14 @@ final class StoreManager {
     }
 
     private func verifyWithBackend(
-        transaction: Transaction,
+        verification: VerificationResult<Transaction>,
         token: String
     ) async -> Bool {
-        guard let jwsRepresentation = transaction.jsonRepresentation.isEmpty ? nil : transaction.jwsRepresentation else {
-            return false
-        }
+        let jwsString = verification.jwsRepresentation
 
         do {
             let response = try await CreditsService.verifyPurchase(
-                signedTransaction: jwsRepresentation,
+                signedTransaction: jwsString,
                 token: token
             )
             return response.success

@@ -40,6 +40,16 @@ function getVerifier(): SignedDataVerifier {
   return verifierInstance;
 }
 
+/** Decode a JWS payload without signature verification (development only). */
+function decodeJWSPayload(jws: string): Record<string, unknown> {
+  const parts = jws.split(".");
+  if (parts.length !== 3) {
+    throw new Error("Invalid JWS format");
+  }
+  const payload = Buffer.from(parts[1], "base64url").toString("utf-8");
+  return JSON.parse(payload) as Record<string, unknown>;
+}
+
 export const applePurchaseRoutes = new Hono();
 
 applePurchaseRoutes.post("/purchases/apple/verify", async (c) => {
@@ -51,12 +61,26 @@ applePurchaseRoutes.post("/purchases/apple/verify", async (c) => {
     return c.json({ error: "signedTransaction is required" }, 400);
   }
 
-  try {
-    const verifier = getVerifier();
-    const transaction =
-      await verifier.verifyAndDecodeTransaction(signedTransaction);
+  const skipVerification = process.env.APPLE_SKIP_VERIFICATION === "true";
 
-    const originalTransactionId = transaction.originalTransactionId;
+  try {
+    let originalTransactionId: string | undefined;
+
+    if (skipVerification) {
+      console.warn(
+        "[Apple IAP] APPLE_SKIP_VERIFICATION is enabled — skipping signature validation",
+      );
+      const decoded = decodeJWSPayload(signedTransaction);
+      originalTransactionId = decoded.originalTransactionId as
+        | string
+        | undefined;
+    } else {
+      const verifier = getVerifier();
+      const transaction =
+        await verifier.verifyAndDecodeTransaction(signedTransaction);
+      originalTransactionId = transaction.originalTransactionId;
+    }
+
     if (!originalTransactionId) {
       return c.json({ error: "Invalid transaction: missing ID" }, 400);
     }

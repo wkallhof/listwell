@@ -36,12 +36,12 @@ final class NewListingViewModel {
         errorMessage = nil
         needsCredits = false
         uploadProgress = 0
-        defer { isSubmitting = false }
 
         // Pre-check credit balance
         do {
             let credits = try await CreditsService.fetchBalance(token: token)
             if credits.balance < 1 {
+                isSubmitting = false
                 needsCredits = true
                 return
             }
@@ -61,15 +61,17 @@ final class NewListingViewModel {
                 token: token
             )
             uploadProgress = 1.0
+            isSubmitting = false
             submittedListingId = listing.id
         } catch let error as APIError {
-            // Handle 402 from API as a credit gate
+            isSubmitting = false
             if case .httpError(let code, _) = error, code == 402 {
                 needsCredits = true
             } else {
                 errorMessage = error.errorDescription
             }
         } catch {
+            isSubmitting = false
             errorMessage = "Failed to create listing."
         }
     }

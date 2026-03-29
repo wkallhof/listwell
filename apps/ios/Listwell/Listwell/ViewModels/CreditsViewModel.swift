@@ -12,8 +12,8 @@ final class CreditsViewModel {
 
     private let storeManager: StoreManager
 
-    init(storeManager: StoreManager = StoreManager()) {
-        self.storeManager = storeManager
+    init(storeManager: StoreManager? = nil) {
+        self.storeManager = storeManager ?? StoreManager()
     }
 
     var productDisplayPrice: String? {

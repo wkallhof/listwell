@@ -30,7 +30,7 @@
 	<key>UILaunchScreen</key>
 	<dict>
 		<key>UIColorName</key>
-		<string>AccentColor</string>
+		<string>AppBackground</string>
 	</dict>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
@@ -40,6 +40,8 @@
 	<array>
 		<string>arm64</string>
 	</array>
+	<key>APIBaseURL</key>
+	<string>$(API_BASE_URL)</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>

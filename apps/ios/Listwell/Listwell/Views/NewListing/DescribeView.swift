@@ -7,7 +7,9 @@ struct DescribeView: View {
     @State private var speechRecognizer = SpeechRecognizer()
     @State private var showPushPrompt = false
     @State private var pendingListingId: String?
+    #if !PUSH_DISABLED
     @Environment(PushNotificationManager.self) private var pushManager
+    #endif
 
     var onSubmitted: (String) -> Void
 
@@ -52,9 +54,12 @@ struct DescribeView: View {
                 }
             }
         }
-        .sheet(isPresented: Bindable(viewModel).needsCredits) {
+        .sheet(isPresented: Bindable(viewModel).needsCredits, onDismiss: {
+            viewModel.needsCredits = false
+        }) {
             PurchaseCreditsView()
         }
+        #if !PUSH_DISABLED
         .alert("Enable Notifications?", isPresented: $showPushPrompt) {
             Button("Enable") {
                 Task {
@@ -68,6 +73,13 @@ struct DescribeView: View {
         } message: {
             Text("Get notified when your listing is ready. We'll send a push notification when the AI finishes generating your listing.")
         }
+        #else
+        .onChange(of: showPushPrompt) { _, show in
+            if show, let id = pendingListingId {
+                onSubmitted(id)
+            }
+        }
+        #endif
     }
 
     // MARK: - Thumbnail Strip
@@ -244,7 +256,9 @@ struct DescribeView: View {
     private func shouldPromptForPush() -> Bool {
         let key = "hasPromptedForPush"
         guard !UserDefaults.standard.bool(forKey: key) else { return false }
+        #if !PUSH_DISABLED
         guard !pushManager.isRegistered else { return false }
+        #endif
         UserDefaults.standard.set(true, forKey: key)
         return true
     }

@@ -5,7 +5,9 @@ import Kingfisher
 struct ListwellApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @State private var authState = AuthState()
+    #if !PUSH_DISABLED
     @State private var pushManager = PushNotificationManager()
+    #endif
     @State private var settingsStore = SettingsStore()
 
     init() {
@@ -16,7 +18,9 @@ struct ListwellApp: App {
         WindowGroup {
             ContentView()
                 .environment(authState)
+                #if !PUSH_DISABLED
                 .environment(pushManager)
+                #endif
                 .environment(settingsStore)
                 .preferredColorScheme(settingsStore.colorScheme)
         }
@@ -41,10 +45,13 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
+        #if !PUSH_DISABLED
         UNUserNotificationCenter.current().delegate = self
+        #endif
         return true
     }
 
+    #if !PUSH_DISABLED
     func application(
         _ application: UIApplication,
         didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
@@ -87,11 +94,14 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
             }
         }
     }
+    #endif
 }
 
 // MARK: - Notification Names
 
 extension Notification.Name {
     static let navigateToListing = Notification.Name("navigateToListing")
+    #if !PUSH_DISABLED
     static let didRegisterForRemoteNotifications = Notification.Name("didRegisterForRemoteNotifications")
+    #endif
 }

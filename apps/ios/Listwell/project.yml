@@ -11,6 +11,9 @@ packages:
   Kingfisher:
     url: https://github.com/onevcat/Kingfisher.git
     from: "7.0.0"
+  MarkdownUI:
+    url: https://github.com/gonzalezreal/swift-markdown-ui.git
+    from: "2.0.0"
 
 targets:
   Listwell:
@@ -21,7 +24,9 @@ targets:
     settings:
       base:
         SWIFT_VERSION: "5.9"
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) PUSH_DISABLED"
         INFOPLIST_FILE: Listwell/Info.plist
+        API_BASE_URL: https://listwellapi-production.up.railway.app/api
         PRODUCT_BUNDLE_IDENTIFIER: com.listwell.app
         MARKETING_VERSION: "1.0.0"
         CURRENT_PROJECT_VERSION: "1"
@@ -35,10 +40,10 @@ targets:
         CODE_SIGN_ENTITLEMENTS: Listwell/Listwell.entitlements
     entitlements:
       path: Listwell/Listwell.entitlements
-      properties:
-        aps-environment: development
+      properties: {}
     dependencies:
       - package: Kingfisher
+      - package: MarkdownUI
     scheme:
       testTargets:
         - ListwellTests
