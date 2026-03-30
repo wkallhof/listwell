@@ -2,7 +2,8 @@ import { config } from "dotenv";
 import { defineConfig } from "drizzle-kit";
 import path from "path";
 
-// Load .env.local from the monorepo root or apps/admin
+// Load .env.local from API, admin, or monorepo root (first match wins)
+config({ path: path.resolve(__dirname, "../../apps/api/.env.local") });
 config({ path: path.resolve(__dirname, "../../apps/admin/.env.local") });
 config({ path: path.resolve(__dirname, "../../.env.local") });
 

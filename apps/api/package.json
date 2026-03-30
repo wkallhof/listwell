@@ -6,8 +6,11 @@
   "scripts": {
     "dev": "tsx watch --env-file=.env.local src/index.ts",
     "build": "tsup",
-    "start": "node dist/migrate.js && node dist/index.js",
+    "start": "node --env-file=.env.local dist/migrate.js && node --env-file=.env.local dist/index.js",
     "db:migrate": "node dist/migrate.js",
+    "db:push": "pnpm --filter @listwell/db db:push",
+    "db:generate": "pnpm --filter @listwell/db db:generate",
+    "db:studio": "pnpm --filter @listwell/db db:studio",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests"
   },
